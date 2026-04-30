@@ -11,18 +11,21 @@ const MARKETING_PATHS = ["/", "/pricing", "/templates"];
 
 export default function RootLayoutShell({
   children,
+  isSite
 }: {
   children: React.ReactNode;
+  isSite: boolean;
 }) {
   const pathname = usePathname();
   const isMarketing = MARKETING_PATHS.includes(pathname);
+  const showShell = isMarketing && !isSite
   const { resolvedTheme } = useTheme();
 
   return (
     <>
-      {isMarketing && <Navbar />}
+      {showShell && <Navbar />}
       <main className="flex-1">{children}</main>
-      {isMarketing && <Footer />}
+      {showShell && <Footer />}
 
       {/* Toaster is always mounted, works on every page */}
       <Toaster

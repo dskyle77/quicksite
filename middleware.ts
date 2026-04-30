@@ -6,40 +6,41 @@ export function middleware(req: NextRequest) {
   const hostname = req.headers.get("host") || "";
 
   // 1. Define your internal domains
-  // For production, use your primary Vercel URL
   const rootDomain = "quicksiteio.vercel.app";
-  
-  // 2. Standard exclusions (Next.js internals, static files, and API)
+
+  // 2. Standard exclusions
   if (
-    url.pathname.startsWith("/_next") || 
+    url.pathname.startsWith("/_next") ||
     url.pathname.startsWith("/api") ||
     url.pathname.startsWith("/static") ||
-    url.pathname.includes(".") // Handles files like favicon.ico, robots.txt
+    url.pathname.includes(".")
   ) {
     return NextResponse.next();
   }
 
-  // 3. Determine if we are on the Root Domain
-  // We check for localhost (without a subdomain) or the exact production root
-  const isRootDomain = 
-    hostname === rootDomain || 
+  // 3. Root Domain Logic
+  const isRootDomain =
+    hostname === rootDomain ||
     hostname === "localhost:3000" ||
-    hostname.split(':')[0] === "127.0.0.1";
+    hostname.split(":")[0] === "127.0.0.1";
 
   if (isRootDomain) {
     return NextResponse.next();
   }
 
   // 4. CUSTOM DOMAIN / SUBDOMAIN LOGIC
-  // If we reach here, it's a custom domain (user-domain.com) 
-  // or a test subdomain (newsitenewsite.vercel.app)
-  
-  // Clean the hostname (remove port for local testing if necessary)
   const cleanHostname = hostname.split(":")[0];
 
-  // Rewrite to the dynamic directory
-  // Result: /s/domain/newsitenewsite.vercel.app/[original-path]
-  return NextResponse.rewrite(
-    new URL(`/s/domain/${cleanHostname}${url.pathname}`, req.url)
+  // Create the rewrite URL
+  const rewriteUrl = new URL(
+    `/s/domain/${cleanHostname}${url.pathname}`,
+    req.url,
   );
+
+  // 5. Inject the 'x-is-site' header
+  // This is the key to hiding the Navbar/Footer in your layout
+  const response = NextResponse.rewrite(rewriteUrl);
+  response.headers.set("x-is-site", "true");
+
+  return response;
 }

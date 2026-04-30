@@ -1,5 +1,6 @@
 // src/app/layout.tsx
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -26,11 +27,13 @@ export const metadata: Metadata = {
   keywords: ["website builder", "Nigeria", "small business", "online store"],
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = await headers();
+  const isSite = headersList.get("x-is-site") === "true";
   return (
     <html
       lang="en"
@@ -40,7 +43,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <AuthProvider>
-            <RootLayoutShell>{children}</RootLayoutShell>
+            <RootLayoutShell isSite={isSite}>{children}</RootLayoutShell>
           </AuthProvider>
         </ThemeProvider>
       </body>

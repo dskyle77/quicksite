@@ -11,6 +11,8 @@ import {
   Copy,
   Loader2,
   AlertCircle,
+  RefreshCw,
+  XCircle,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -24,6 +26,10 @@ export default function DomainsPage() {
   const [domain, setDomain] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // New States for Verification
+  const [status, setStatus] = useState<"idle" | "verifying" | "valid" | "invalid">("idle");
+  const [foundRecords, setFoundRecords] = useState<string[]>([]);
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard");
@@ -35,15 +41,32 @@ export default function DomainsPage() {
       return toast.error("Please fill in all fields");
     }
 
-    // Basic domain validation
-    const domainRegex =
-      /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/;
+    const domainRegex = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+$/;
     if (!domainRegex.test(domain)) {
-      return toast.error("Please enter a valid domain (e.g., example.com)");
+      return toast.error("Please enter a valid domain");
     }
 
     setIsSubmitting(true);
+    setStatus("verifying");
+
     try {
+      // 1. Verify DNS First (Internal API)
+      const verifyRes = await fetch("/api/domains/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ domain: domain.toLowerCase().trim() }),
+      });
+      
+      const verification = await verifyRes.json();
+      setFoundRecords(verification.found || []);
+
+      if (!verification.isValid) {
+        setStatus("invalid");
+        throw new Error("DNS records do not match. See the instructions on the right.");
+      }
+
+      // 2. If DNS is valid, register with Vercel/Firestore
+      setStatus("valid");
       const token = await user.getIdToken();
       const res = await fetch("/api/domains/register", {
         method: "POST",
@@ -63,6 +86,7 @@ export default function DomainsPage() {
 
       toast.success("Domain linked successfully!");
       setDomain("");
+      setStatus("idle");
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -83,16 +107,10 @@ export default function DomainsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left: Form Section */}
         <div className="lg:col-span-1 space-y-6">
-          <form
-            onSubmit={handleConnect}
-            className="bg-white border rounded-3xl p-6 shadow-sm space-y-4"
-          >
+          <form onSubmit={handleConnect} className="bg-white border rounded-3xl p-6 shadow-sm space-y-4">
             <div>
-              <label className="text-sm font-bold block mb-2 ml-1">
-                Select Site
-              </label>
+              <label className="text-sm font-bold block mb-2 ml-1">Select Site</label>
               <select
                 required
                 value={selectedSiteId}
@@ -109,41 +127,52 @@ export default function DomainsPage() {
             </div>
 
             <div>
-              <label className="text-sm font-bold block mb-2 ml-1">
-                Domain Name
-              </label>
+              <label className="text-sm font-bold block mb-2 ml-1">Domain Name</label>
               <input
                 required
                 type="text"
                 placeholder="www.yourdomain.com"
                 value={domain}
-                onChange={(e) => setDomain(e.target.value)}
+                onChange={(e) => {
+                  setDomain(e.target.value);
+                  if(status !== 'idle') setStatus('idle'); // Reset status on change
+                }}
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none"
               />
             </div>
 
             <button
               disabled={isSubmitting}
-              className="w-full py-4 bg-primary text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-50 transition-all"
+              className={`w-full py-4 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${
+                status === 'invalid' ? 'bg-red-500' : 'bg-primary hover:opacity-90'
+              } disabled:opacity-50`}
             >
-              {isSubmitting ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                "Connect Domain"
-              )}
+              {isSubmitting ? <Loader2 className="animate-spin" /> : status === 'invalid' ? "Retry Connection" : "Connect Domain"}
             </button>
           </form>
 
+          {status === "invalid" && (
+            <div className="bg-red-50 border border-red-100 rounded-2xl p-4 flex gap-3">
+              <XCircle className="text-red-500 shrink-0" size={20} />
+              <div>
+                <p className="text-xs text-red-700 font-bold">Verification Failed</p>
+                <p className="text-[10px] text-red-600 leading-tight">
+                  We found: {foundRecords.length > 0 ? foundRecords.join(", ") : "no records"}. 
+                  Ensure your DNS is updated and try again.
+                </p>
+              </div>
+            </div>
+          )}
+
           <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3">
             <AlertCircle className="text-blue-500 shrink-0" size={20} />
-            <p className="text-xs text-blue-700 leading-relaxed">
-              Domain propagation can take up to 24 hours depending on your
-              registrar.
+            <p className="text-xs text-blue-700">
+              Domain propagation can take up to 24 hours.
             </p>
           </div>
         </div>
 
-        {/* Right: DNS Instructions Section */}
+        {/* Right Section */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-xl">
             <h2 className="text-xl font-bold flex items-center gap-2 mb-6">
@@ -151,78 +180,57 @@ export default function DomainsPage() {
               Required DNS Settings
             </h2>
 
-            <p className="text-slate-400 text-sm mb-8">
-              Log in to your domain provider (e.g. GoDaddy) and add these
-              records to point your domain to our servers.
-            </p>
-
             <div className="space-y-4">
               {/* A Record */}
-              <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-5 group">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-black uppercase tracking-widest text-primary">
-                    A Record
-                  </span>
-                  <CheckCircle2 size={16} className="text-slate-600" />
-                </div>
-                <div className="flex items-center justify-between bg-slate-900 rounded-lg p-3 border border-slate-700">
-                  <div className="grid grid-cols-2 gap-8">
-                    <div>
-                      <p className="text-[10px] text-slate-500 uppercase">
-                        Host
-                      </p>
-                      <p className="font-mono">@</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-slate-500 uppercase">
-                        Value
-                      </p>
-                      <p className="font-mono">76.76.21.21</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard("76.76.21.21")}
-                    className="p-2 hover:bg-slate-800 rounded-md transition-colors"
-                  >
-                    <Copy size={16} className="text-slate-400" />
-                  </button>
-                </div>
-              </div>
-
+              <DNSRecordCard 
+                type="A Record" 
+                host="@" 
+                value="76.76.21.21" 
+                status={status} 
+                isA 
+                onCopy={copyToClipboard} 
+              />
               {/* CNAME Record */}
-              <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-5 group">
-                <div className="flex justify-between items-start mb-2">
-                  <span className="text-xs font-black uppercase tracking-widest text-primary">
-                    CNAME Record
-                  </span>
-                  <CheckCircle2 size={16} className="text-slate-600" />
-                </div>
-                <div className="flex items-center justify-between bg-slate-900 rounded-lg p-3 border border-slate-700">
-                  <div className="grid grid-cols-2 gap-8">
-                    <div>
-                      <p className="text-[10px] text-slate-500 uppercase">
-                        Host
-                      </p>
-                      <p className="font-mono">www</p>
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-slate-500 uppercase">
-                        Value
-                      </p>
-                      <p className="font-mono text-xs">cname.vercel-dns.com</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => copyToClipboard("cname.vercel-dns.com")}
-                    className="p-2 hover:bg-slate-800 rounded-md transition-colors"
-                  >
-                    <Copy size={16} className="text-slate-400" />
-                  </button>
-                </div>
-              </div>
+              <DNSRecordCard 
+                type="CNAME Record" 
+                host="www" 
+                value="cname.vercel-dns.com" 
+                status={status} 
+                onCopy={copyToClipboard} 
+              />
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Sub-component for Cleaner Code
+function DNSRecordCard({ type, host, value, status, isA, onCopy }: any) {
+  return (
+    <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-5">
+      <div className="flex justify-between items-start mb-2">
+        <span className="text-xs font-black uppercase tracking-widest text-primary">{type}</span>
+        {status === "verifying" ? <RefreshCw size={16} className="text-slate-400 animate-spin" /> : 
+         status === "valid" ? <CheckCircle2 size={16} className="text-green-500" /> : 
+         status === "invalid" && isA ? <XCircle size={16} className="text-red-500" /> :
+         <CheckCircle2 size={16} className="text-slate-600" />}
+      </div>
+      <div className="flex items-center justify-between bg-slate-900 rounded-lg p-3 border border-slate-700">
+        <div className="grid grid-cols-2 gap-8">
+          <div>
+            <p className="text-[10px] text-slate-500 uppercase">Host</p>
+            <p className="font-mono">{host}</p>
+          </div>
+          <div>
+            <p className="text-[10px] text-slate-500 uppercase">Value</p>
+            <p className="font-mono text-xs">{value}</p>
+          </div>
+        </div>
+        <button onClick={() => onCopy(value)} className="p-2 hover:bg-slate-800 rounded-md">
+          <Copy size={16} className="text-slate-400" />
+        </button>
       </div>
     </div>
   );
