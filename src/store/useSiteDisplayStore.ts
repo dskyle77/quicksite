@@ -1,6 +1,6 @@
 // src/store/useSiteDisplayStore.ts
 import { create } from "zustand";
-import { getSiteBySlug as fetchPublicSiteBySlug } from "@/lib/firestore";
+import { getSiteBySlug as fetchPublicSiteBySlug, getSiteByDomain } from "@/lib/firestore";
 import type { Site } from "@/lib/types";
 
 interface SiteDisplayState {
@@ -8,6 +8,7 @@ interface SiteDisplayState {
   loading: boolean;
 
   fetchPublicSite: (slug: string) => Promise<void>;
+  fetchSiteByDomain: (slug: string) => Promise<void>;
   reset: () => void;
 }
 
@@ -28,6 +29,17 @@ export const useSiteDisplayStore = create<SiteDisplayState>((set) => ({
       set({ site: null });
     } finally {
       set({ loading: false });
+    }
+  },
+  // Inside useSiteDisplayStore
+  fetchSiteByDomain: async (domain: string) => {
+    set({ loading: true });
+    try {
+      const site = await getSiteByDomain(domain);
+      set({ site, loading: false });
+    } catch (error) {
+      set({ loading: false });
+      console.error(error);
     }
   },
 

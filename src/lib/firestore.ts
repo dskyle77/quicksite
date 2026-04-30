@@ -149,7 +149,27 @@ export async function getSiteBySlug(slug: string): Promise<Site | null> {
   const d = snap.docs[0];
   return serializeData<Site>({ id: d.id, ...d.data() });
 }
+/**
+ * PUBLIC: Fetches a published site by its custom domain.
+ * Used by middleware to route custom domain traffic.
+ */
+export async function getSiteByDomain(domain: string): Promise<Site | null> {
+  if (!domain) return null;
 
+  // We query the 'sites' collection for a matching 'customDomain' field
+  const q = query(
+    collection(db, "sites"),
+    where("customDomain", "==", domain),
+    where("status", "==", "published"),
+  );
+
+  const snap = await getDocs(q);
+
+  if (snap.empty) return null;
+
+  const d = snap.docs[0];
+  return serializeData<Site>({ id: d.id, ...d.data() });
+}
 /**
  * PRIVATE: Fetches a site by slug for the owner (uid required).
  * Used in the editor. Returns draft or published.

@@ -155,12 +155,10 @@ function SiteCard({ site }: { site: Site }) {
           </div>
           <div className="flex items-center gap-2">
             <Link href={`/editor/${site.slug}`}>
-              <button
-                className="p-2 rounded-lg bg-secondary/10 text-secondary hover:bg-secondary hover:text-white transition cursor-pointer"
-                title="Edit Site"
-              >
-                <Edit3 className="h-4 w-4" />
-              </button>
+              <span className="p-2 rounded-lg bg-secondary/10 text-secondary hover:bg-secondary hover:text-white transition cursor-pointer" title="Edit Site">
+                Edit
+              </span>
+         
             </Link>
           </div>
         </div>
