@@ -1,7 +1,6 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { trackSiteEvent } from "@/lib/firestore";
 import { useSiteDisplayStore } from "@/store/useSiteDisplayStore";
 
 import SiteRenderer from "@/screen/s/SiteRenderer";
@@ -34,7 +33,7 @@ export default function PublicSitePage() {
       <div className="h-screen flex flex-col items-center justify-center text-center px-6">
         <h1 className="text-2xl font-bold">Site not available</h1>
         <p className="text-slate-500 mt-2">
-          This site may be unpublished or doesn’t exist.
+          This site may be unpublished or doesn&apos;t exist.
         </p>
       </div>
     );

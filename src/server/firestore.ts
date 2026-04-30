@@ -1,23 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/server/firestore.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// All write operations live here. Never import this file from client components.
-// Auth and plan enforcement happen at this layer.
-// ─────────────────────────────────────────────────────────────────────────────
 
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  collection,
-  query,
-  where,
-  getDocs,
-  serverTimestamp,
-  increment,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase";
+import { adminDb } from "./firebase-admin";
+import { FieldValue } from "firebase-admin/firestore";
 import { getSiteLimit } from "@/lib/plans";
 import type { Site, AnalyticsEventType } from "@/lib/types";
 import type { Plan } from "@/lib/plans";
@@ -25,23 +10,23 @@ import type { Plan } from "@/lib/plans";
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 async function getSiteCount(uid: string): Promise<number> {
-  const q = query(collection(db, "sites"), where("uid", "==", uid));
-  const snap = await getDocs(q);
-  return snap.size;
+  const userDoc = await adminDb.collection("users").doc(uid).get();
+
+  if (!userDoc.exists) {
+    return 0;
+  }
+  return userDoc.data()?.siteCount || 0;
 }
 
-async function assertSiteOwner(siteId: string, uid: string): Promise<void> {
-  const snap = await getDoc(doc(db, "sites", siteId));
-  if (!snap.exists()) throw new Error("Site not found.");
-  if (snap.data().uid !== uid) throw new Error("Permission denied.");
+async function assertSiteOwner(siteId: string, uid: string): Promise<any> {
+  const doc = await adminDb.collection("sites").doc(siteId).get();
+  if (!doc.exists) throw new Error("Site not found.");
+  if (doc.data()?.uid !== uid) throw new Error("Permission denied.");
+  return doc.data();
 }
 
 // ── Sites ─────────────────────────────────────────────────────────────────────
 
-/**
- * Create a site after verifying plan limits.
- * Returns the new site doc ID.
- */
 export async function serverCreateSite(
   uid: string,
   plan: Plan,
@@ -67,23 +52,34 @@ export async function serverCreateSite(
     throw new Error("That URL slug is already taken. Please choose another.");
   }
 
-  const newRef = doc(collection(db, "sites"));
-  await setDoc(newRef, {
+  const newRef = adminDb.collection("sites").doc();
+  const userRef = adminDb.collection("users").doc(uid);
+
+  // We use a writeBatch to ensure both the site creation AND
+  // the user's siteCount update happen together (or not at all).
+  const batch = adminDb.batch();
+
+  batch.set(newRef, {
     uid,
     visits: 0,
     whatsappClicks: 0,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
     ...data,
   });
+
+  // This ensures your Security Rules function (getUserSiteCount)
+  // actually has a value to look at!
+  batch.update(userRef, {
+    siteCount: FieldValue.increment(1),
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+
+  await batch.commit();
 
   return newRef.id;
 }
 
-/**
- * Update a site's content/theme/name.
- * Validates that the requesting uid owns the site.
- */
 export async function serverUpdateSite(
   siteId: string,
   uid: string,
@@ -91,75 +87,77 @@ export async function serverUpdateSite(
 ): Promise<void> {
   await assertSiteOwner(siteId, uid);
 
-  await updateDoc(doc(db, "sites", siteId), {
-    ...data,
-    updatedAt: serverTimestamp(),
-  });
+  await adminDb
+    .collection("sites")
+    .doc(siteId)
+    .update({
+      ...data,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
 }
 
-/**
- * Update a site by slug.
- * Validates that the requesting uid owns the site.
- */
 export async function serverUpdateSiteBySlug(
   uid: string,
   slug: string,
   data: Partial<Omit<Site, "id" | "uid" | "createdAt">>,
 ): Promise<void> {
-  const q = query(
-    collection(db, "sites"),
-    where("slug", "==", slug),
-    where("uid", "==", uid),
-  );
-  const snap = await getDocs(q);
+  const snap = await adminDb
+    .collection("sites")
+    .where("slug", "==", slug)
+    .where("uid", "==", uid)
+    .limit(1)
+    .get();
+
   if (snap.empty) throw new Error("Site not found.");
 
-  await updateDoc(doc(db, "sites", snap.docs[0].id), {
+  await snap.docs[0].ref.update({
     ...data,
-    updatedAt: serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
   });
 }
 
-/**
- * Toggle a site's status between "published" and "draft".
- * Validates ownership.
- */
 export async function serverToggleSiteStatus(
   siteId: string,
   uid: string,
 ): Promise<"published" | "draft"> {
-  const snap = await getDoc(doc(db, "sites", siteId));
-  if (!snap.exists()) throw new Error("Site not found.");
-  if (snap.data().uid !== uid) throw new Error("Permission denied.");
+  const siteData = await assertSiteOwner(siteId, uid);
+  const nextStatus = siteData.status === "published" ? "draft" : "published";
 
-  const next = snap.data().status === "published" ? "draft" : "published";
-
-  await updateDoc(doc(db, "sites", siteId), {
-    status: next,
-    updatedAt: serverTimestamp(),
+  await adminDb.collection("sites").doc(siteId).update({
+    status: nextStatus,
+    updatedAt: FieldValue.serverTimestamp(),
   });
 
-  return next;
+  return nextStatus;
 }
-
-/**
- * Delete a site.
- * Validates ownership.
- */
 export async function serverDeleteSite(
   siteId: string,
   uid: string,
 ): Promise<void> {
+  // 1. Verify ownership first
   await assertSiteOwner(siteId, uid);
-  await deleteDoc(doc(db, "sites", siteId));
+
+  const siteRef = adminDb.collection("sites").doc(siteId);
+  const userRef = adminDb.collection("users").doc(uid);
+
+  // 2. Initialize a batch
+  const batch = adminDb.batch();
+
+  // 3. Queue the delete operation
+  batch.delete(siteRef);
+
+  // 4. Queue the decrement operation
+  batch.update(userRef, {
+    siteCount: FieldValue.increment(-1),
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+
+  // 5. Commit both at once
+  await batch.commit();
 }
 
 // ── Analytics ─────────────────────────────────────────────────────────────────
 
-/**
- * Track a site visit or whatsapp click.
- * Validates ownership before incrementing.
- */
 export async function serverTrackSiteEvent(
   siteId: string,
   uid: string,
@@ -170,18 +168,20 @@ export async function serverTrackSiteEvent(
 
   const metricField = type === "visit" ? "visits" : "whatsappClicks";
 
-  await updateDoc(doc(db, "sites", siteId), {
-    [metricField]: increment(1),
-    updatedAt: serverTimestamp(),
-  });
+  await adminDb
+    .collection("sites")
+    .doc(siteId)
+    .update({
+      [metricField]: FieldValue.increment(1),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
 
-  const { addDoc } = await import("firebase/firestore");
-  await addDoc(collection(db, "analytics_events"), {
+  await adminDb.collection("analytics_events").add({
     uid,
     siteId,
     siteSlug: slug,
     type,
-    createdAt: serverTimestamp(),
+    createdAt: FieldValue.serverTimestamp(),
   });
 }
 
@@ -191,7 +191,10 @@ export async function checkSlugTaken(
   slug: string,
   excludeSiteId?: string,
 ): Promise<boolean> {
-  const q = query(collection(db, "sites"), where("slug", "==", slug));
-  const snap = await getDocs(q);
+  const snap = await adminDb
+    .collection("sites")
+    .where("slug", "==", slug)
+    .get();
+
   return snap.docs.some((d) => d.id !== excludeSiteId);
 }

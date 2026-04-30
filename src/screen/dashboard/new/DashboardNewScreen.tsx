@@ -102,7 +102,8 @@ function TemplatePicker({
       </div>
       <div className="grid gap-3">
         {templatesRegistry.slice(0, 3).map((t) => {
-          const selected = selectedType === t.type;
+          const type = t.config.type;
+          const selected = selectedType === type;
           return (
             <div
               className={[
@@ -111,8 +112,8 @@ function TemplatePicker({
                   ? "border-primary bg-primary/5"
                   : "border-transparent bg-muted/40",
               ].join(" ")}
-              key={t.type}
-              onClick={() => onTemplateChange(t.type)}
+              key={type}
+              onClick={() => onTemplateChange(type)}
             >
               <div className="flex items-center gap-3">
                 <div

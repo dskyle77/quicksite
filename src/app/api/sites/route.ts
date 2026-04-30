@@ -5,7 +5,7 @@
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/server/auth";
 import { serverCreateSite } from "@/server/firestore";
-import { getTemplateByType } from "@/lib/templates";
+import { getTemplateContentByType } from "@/lib/templatesContent";
 import type { Plan } from "@/lib/plans";
 
 export async function POST(req: Request) {
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     const normalizedName = (name as string).trim();
     const normalizedSlug = (slug as string).trim();
 
-    const templateEntry = getTemplateByType(type);
+    const templateEntry = getTemplateContentByType(type);
     if (!templateEntry) {
       return NextResponse.json(
         { error: "Invalid template type." },
@@ -55,7 +55,11 @@ export async function POST(req: Request) {
       },
     );
 
-    return NextResponse.json({ success: true, id: siteId, slug: normalizedSlug });
+    return NextResponse.json({
+      success: true,
+      id: siteId,
+      slug: normalizedSlug,
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Server error.";
     const isPlanError = message.includes("Plan limit");

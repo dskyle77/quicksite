@@ -122,14 +122,14 @@ export default function TemplateGallery() {
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
                   {templates.map((template, i) => (
                     <TemplateCard
-                      key={template.type}
-                      type={template.type}
+                      key={template.config.type}
+                      type={template.config.type}
                       title={template.meta.title}
                       description={template.meta.description}
                       category={template.meta.category}
-                      previewHref={buildQuery(`/templates/${template.type}`)}
+                      previewHref={buildQuery(`/templates/${template.config.type}`)}
                       useHref={buildQuery(
-                        `/dashboard/new?template=${encodeURIComponent(template.type)}`,
+                        `/dashboard/new?template=${encodeURIComponent(template.config.type)}`,
                       )}
                       delay={i * 40}
                     />

@@ -4,7 +4,9 @@ import { headers } from "next/headers";
 import { adminAuth, adminDb } from "./firebase-admin";
 
 export async function getUserFromSession() {
-  const authHeader = (await headers()).get("authorization");
+  const authHeader =
+    (await headers()).get("authorization") ||
+    (await headers()).get("Authorization");
 
   if (!authHeader?.startsWith("Bearer ")) {
     return null;

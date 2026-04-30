@@ -1,6 +1,5 @@
 "use client";
 
-import { trackSiteEvent } from "@/lib/firestore";
 import { useParams } from "next/navigation";
 import { useSiteDisplayStore } from "@/store/useSiteDisplayStore";
 
@@ -12,9 +11,9 @@ export default function PublicSitePage() {
   const slug = params.slug as string;
   const subslug = params.subslug as string;
   const slugs = {
-    slug, subslug
-  }
-  
+    slug,
+    subslug,
+  };
 
   const siteData = useSiteDisplayStore((s) => s.site);
   const loading = useSiteDisplayStore((s) => s.loading);
@@ -34,7 +33,7 @@ export default function PublicSitePage() {
       <div className="h-screen flex flex-col items-center justify-center text-center px-6">
         <h1 className="text-2xl font-bold">Site not available</h1>
         <p className="text-slate-500 mt-2">
-          This site may be unpublished or doesn’t exist.
+          This site may be unpublished or doesn&apos;t exist.
         </p>
       </div>
     );

@@ -31,11 +31,11 @@ export const templatesCategories = Array.from(
   new Set(
     templatesRegistry
       .map((t: any) => t.category)
-      .filter((category) => !!category)
-  )
+      .filter((category) => !!category),
+  ),
 );
 
 export const getTemplateByType = (type: string) =>
-  templatesRegistry.find((t) => t.type === type);
+  templatesRegistry.find((t) => t.config.type === type);
 
 export const isValidTemplate = (type: string) => !!getTemplateByType(type);

@@ -65,27 +65,35 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   return serializeData<UserProfile>(snap.data());
 }
 
-export async function createOrUpdateUserProfile(
-  uid: string,
-  data: Partial<Omit<UserProfile, "uid" | "createdAt">>,
-): Promise<void> {
-  const docRef = doc(db, "users", uid);
-  const snap = await getDoc(docRef);
+export async function createOrUpdateUserProfile(uid: string, data: any) {
+  const userRef = doc(db, "users", uid);
+  const snap = await getDoc(userRef);
 
   if (!snap.exists()) {
-    await setDoc(docRef, {
+    // INITIAL SIGN UP: Set everything
+    await setDoc(userRef, {
       uid,
-      plan: "free",
-      // maxSites is not stored — getSiteLimit(plan) is the source of truth
-      whatsappNumber: "",
-      defaultAuthor: "",
-      defaultMessage: "",
+      email: data.email,
+      displayName: data.displayName || "",
+      photoURL: data.photoURL || "",
+      phoneNumber: data.phoneNumber || "",
+      defaultMessage:
+        data.defaultMessage || "Hi! I'm interested in your services.",
+      plan: "free", // Hardcoded safe default
+      siteCount: 0, // Hardcoded safe default
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp(),
-      ...data,
     });
   } else {
-    await updateDoc(docRef, { ...data, updatedAt: serverTimestamp() });
+    // PROFILE UPDATE: Only allow specific fields
+    // We ignore 'plan' and 'siteCount' entirely here
+    await updateDoc(userRef, {
+      displayName: data.displayName ?? snap.data().displayName,
+      photoURL: data.photoURL ?? snap.data().photoURL,
+      phoneNumber: data.phoneNumber ?? snap.data().phoneNumber,
+      defaultMessage: data.defaultMessage ?? snap.data().defaultMessage,
+      updatedAt: serverTimestamp(),
+    });
   }
 }
 
