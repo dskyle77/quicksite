@@ -10,10 +10,17 @@ export async function POST(req: Request) {
   try {
     const { siteId, domain, uid } = await req.json();
 
+    if (!siteId || !domain || !uid) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 },
+      );
+    }
+
     // 1. Verify user owns the site in Firestore
     const siteRef = adminDb.collection("sites").doc(siteId);
     const siteSnap = await siteRef.get();
-    
+
     if (!siteSnap.exists || siteSnap.data()?.uid !== uid) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
@@ -28,22 +35,47 @@ export async function POST(req: Request) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ name: domain }),
-      }
+      },
     );
 
     const vercelData = await vercelRes.json();
-    if (vercelData.error) {
-      return NextResponse.json({ error: vercelData.error.message }, { status: 400 });
+
+    // Check for Vercel-specific errors
+    if (!vercelRes.ok) {
+      const errorCode = vercelData.error?.code;
+
+      // Handle the "Already Used" case
+      if (errorCode === "domain_taken" || errorCode === "conflict") {
+        return NextResponse.json(
+          {
+            error:
+              "This domain is already in use by another project. Please remove it from its current host first.",
+          },
+          { status: 400 },
+        );
+      }
+
+      return NextResponse.json(
+        {
+          error:
+            vercelData.error?.message || "Failed to link domain with Vercel",
+        },
+        { status: 400 },
+      );
     }
 
-    // 3. Update Firestore with the custom domain
-    await siteRef.update({ 
-      customDomain: domain,
-      updatedAt: new Date().toISOString() 
+    // 3. Update Firestore with the custom domain ONLY if Vercel succeeded
+    await siteRef.update({
+      customDomain: domain.toLowerCase().trim(),
+      updatedAt: new Date().toISOString(),
     });
 
     return NextResponse.json({ success: true, vercelData });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Domain Registration Error:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
   }
 }
