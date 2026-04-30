@@ -44,11 +44,11 @@ export default function SiteEditorSubPage() {
       toast.error("Could not save changes.");
     }
   };
-  //   useEffect(() => {
-  //     if (!subslug && slug) {
-  //       router.replace("/editor/" + slug);
-  //     }
-  //   }, [subslug, slug, router]);
+  useEffect(() => {
+    if (!subslug && slug) {
+      router.replace("/editor/" + slug);
+    }
+  }, [subslug, slug, router]);
   // ── Loading State ──────────────────────────────────────────────────
   if (loading) {
     return (

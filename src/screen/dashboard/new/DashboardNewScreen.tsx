@@ -3,15 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { createSite, isSlugTaken } from "@/lib/firestore";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserStore } from "@/store/useUserStore";
-import { useDashboardStore } from "@/store/useDashboardStore";
-import {
-  getTemplateByType,
-  isValidTemplate,
-  templatesRegistry,
-} from "@/lib/templates";
+
+import { isValidTemplate, templatesRegistry } from "@/lib/templates";
 import { Layout, ArrowRight, CheckCircle2, Loader2, Eye } from "lucide-react";
 import { toast } from "sonner";
 
@@ -194,8 +189,6 @@ export default function CreateSitePage() {
   const defaultMessage = userProfile?.defaultMessage;
   const whatsappNumber = userProfile?.whatsappNumber;
 
-  const templateEntry = getTemplateByType(selectedTemplateType);
-
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: paramsName || "",
@@ -225,43 +218,42 @@ export default function CreateSitePage() {
     const normalizedName = formData.name.trim();
     const normalizedSlug = formData.slug.trim();
 
-    // Validate inputs before any Firestore calls
+    // Basic validation (UI only)
     if (!normalizedName || !normalizedSlug) {
       return toast.error("Please add both site name and URL slug.");
     }
-    if (!templateEntry) {
-      return toast.error("Please select a valid template");
-    }
 
     setLoading(true);
-    try {
-      const taken = await isSlugTaken(normalizedSlug);
-      if (taken) {
-        return toast.error("This URL is already taken.");
-      }
 
-      const content = templateEntry.starterContent({
-        selectedTitle: normalizedName,
-        defaultMessage,
-        whatsappNumber,
+    try {
+      const token = await user.getIdToken();
+
+      const res = await fetch("/api/create-site", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // 🔥 important
+        },
+        body: JSON.stringify({
+          name: normalizedName,
+          slug: normalizedSlug,
+          type: formData.type,
+          defaultMessage,
+          whatsappNumber,
+        }),
       });
 
-      const sitePayload = {
-        slug: normalizedSlug,
-        type: formData.type,
-        name: normalizedName,
-        theme: templateEntry.config.theme,
-        status: "draft" as const,
-        content,
-      };
+      const data = await res.json();
 
-      await createSite(user.uid, sitePayload);
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to create site");
+      }
+
       toast.success("Site initialized!");
-      router.push(`/editor/${normalizedSlug}`);
+      router.push(`/editor/${data.slug}`);
     } catch (error: any) {
       console.error(error);
-      // Show the actual Firebase error message to help debug
-      toast.error(error?.message ?? "Failed to create site.");
+      toast.error(error.message || "Something went wrong");
     } finally {
       setLoading(false);
     }

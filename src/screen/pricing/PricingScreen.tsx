@@ -1,7 +1,6 @@
+// src/features/pricing/PricingScreen.tsx
 "use client";
 
-// src/features/pricing/PricingScreen.tsx
-import React from "react";
 import { Check, Sparkles, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
@@ -36,7 +35,7 @@ const PLANS = [
   },
   {
     name: "Growth",
-    price: 3000,
+    price: 4000,
     description: "Grow your business",
     features: [
       "Everything in Basic",
@@ -50,7 +49,7 @@ const PLANS = [
   },
   {
     name: "Pro",
-    price: 6000,
+    price: 10000,
     description: "Run your business online",
     features: [
       "Everything in Growth",
