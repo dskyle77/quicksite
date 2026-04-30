@@ -17,11 +17,7 @@ export default function SiteEditorPage() {
   const params = useParams();
   const slug = params.slug as string;
   const subslug = params.subslug as string;
-
-  const slugs = {
-    slug,
-    subslug,
-  };
+  const slugs = { slug, subslug };
 
   const siteData = useSiteEditorStore((s) => s.site);
   const loading = useSiteEditorStore((s) => s.loading);
@@ -31,10 +27,10 @@ export default function SiteEditorPage() {
   const saveSite = useSiteEditorStore((s) => s.saveSite);
 
   const handleSave = async () => {
-    if (!user?.uid) return;
-
+    if (!user) return;
     try {
-      await saveSite(user.uid);
+      const token = await user.getIdToken();
+      await saveSite(token);
       toast.success("All changes saved!");
     } catch (error) {
       console.error("Save Error:", error);
@@ -42,7 +38,6 @@ export default function SiteEditorPage() {
     }
   };
 
-  // ── Loading State ──────────────────────────────────────────────────
   if (loading) {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-50 gap-4">
@@ -52,7 +47,6 @@ export default function SiteEditorPage() {
     );
   }
 
-  // ── Error State ────────────────────────────────────────────────────
   if (!siteData) {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center gap-4">
@@ -64,10 +58,8 @@ export default function SiteEditorPage() {
     );
   }
 
-  // ── Success State ──────────────────────────────────────────────────
   return (
     <div className="flex flex-col h-screen overflow-hidden">
-      {/* Editor Toolbar */}
       <header className="h-16 border-b bg-background flex items-center justify-between px-6 shrink-0 z-50 shadow-sm">
         <div className="flex items-center gap-4">
           <Link
@@ -76,7 +68,6 @@ export default function SiteEditorPage() {
           >
             <ArrowLeft size={20} />
           </Link>
-
           <div>
             <h1 className="font-bold text-foreground leading-none">
               {siteData.name || "Untitled Site"}
@@ -91,13 +82,10 @@ export default function SiteEditorPage() {
           <span className="text-xs text-slate-400 italic hidden sm:block">
             Theme
           </span>
-
           <select
             className="border border-black rounded-full px-3 py-1 text-xs text-black bg-white/80 focus:ring-2 focus:ring-primary outline-none transition-all"
             value={siteData.theme}
-            onChange={
-              (e) => updateSite({ theme: e.target.value }) // 🔥 replaced setState
-            }
+            onChange={(e) => updateSite({ theme: e.target.value })}
             disabled={isSaving}
           >
             {getAllThemes().map(({ id }) => (
@@ -122,12 +110,11 @@ export default function SiteEditorPage() {
         </div>
       </header>
 
-      {/* Editor Workspace */}
       <main className="flex-1 overflow-y-auto bg-slate-100 p-4 md:p-8">
         <div className="max-w-300 mx-auto min-h-full">
           <EditorScreen
             data={siteData}
-            onChange={(updated) => updateSite(updated)} 
+            onChange={(updated) => updateSite(updated)}
             slugs={slugs}
           />
         </div>

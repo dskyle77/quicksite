@@ -1,4 +1,4 @@
-// /src/lib/plans.ts
+// src/lib/plans.ts
 
 export type Plan = "free" | "basic" | "growth" | "pro";
 
@@ -27,4 +27,19 @@ export const PLAN_LIMITS = {
     analytics: true,
     payments: true,
   },
-};
+} as const;
+
+export function getSiteLimit(plan: Plan): number {
+  return PLAN_LIMITS[plan].sites;
+}
+
+export function canUseFeature(
+  plan: Plan,
+  feature: keyof (typeof PLAN_LIMITS)["free"],
+): boolean {
+  return PLAN_LIMITS[plan][feature] === true;
+}
+
+export function canCreateSite(plan: Plan, currentSites: number): boolean {
+  return currentSites < PLAN_LIMITS[plan].sites;
+}

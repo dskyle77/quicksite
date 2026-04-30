@@ -1,23 +1,14 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/store/useDashboardStore.ts
-// ─────────────────────────────────────────────────────────────
-// Zustand dashboard store (Profile-free version)
-// ─────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+// All write operations go through API routes so plan enforcement
+// and auth validation happen server-side.
+// ─────────────────────────────────────────────────────────────────────────────
 
 import { create } from "zustand";
-import {
-  getUserSites,
-  createSite,
-  updateSite,
-  deleteSite,
-  getUserSiteLimit,
-} from "@/lib/firestore";
-
+import { getUserSites, getUserSiteLimit } from "@/lib/firestore";
 import type { Site, DashboardStats } from "@/lib/types";
 
-// ─────────────────────────────────────────────────────────────
-// UI STATE
-// ─────────────────────────────────────────────────────────────
+// ── UI State ──────────────────────────────────────────────────────────────────
 
 interface UIState {
   createModalOpen: boolean;
@@ -25,48 +16,22 @@ interface UIState {
   sidebarOpen: boolean;
 }
 
-// ─────────────────────────────────────────────────────────────
-// STORE STATE
-// ─────────────────────────────────────────────────────────────
+// ── Store State ───────────────────────────────────────────────────────────────
 
 interface DashboardState {
   sites: Site[];
   siteLimit: number;
-
   stats: DashboardStats;
-
   sitesLoading: boolean;
   sitesError: string | null;
-
   ui: UIState;
 
-  // ── data actions
   initialize: (uid: string) => Promise<void>;
   fetchSites: (uid: string) => Promise<void>;
 
-  addSite: (
-    uid: string,
-    data: Omit<
-      Site,
-      "id" | "uid" | "visits" | "whatsappClicks" | "createdAt" | "updatedAt"
-    >,
-  ) => Promise<string>;
+  removeSite: (siteId: string, token: string) => Promise<void>;
+  toggleSiteStatus: (siteId: string, token: string) => Promise<void>;
 
-  editSite: (
-    siteId: string,
-    data: Partial<Omit<Site, "id" | "uid" | "createdAt">>,
-    uid: string,
-  ) => Promise<void>;
-
-  removeSite: (siteId: string, uid: string) => Promise<void>;
-
-  toggleSiteStatus: (
-    siteId: string,
-    current: Site["status"],
-    uid: string,
-  ) => Promise<void>;
-
-  // ── UI actions
   setCreateModal: (open: boolean) => void;
   setDeleteConfirm: (siteId: string | null) => void;
   setSidebarOpen: (open: boolean) => void;
@@ -74,28 +39,7 @@ interface DashboardState {
   reset: () => void;
 }
 
-// ─────────────────────────────────────────────────────────────
-// HELPERS
-// ─────────────────────────────────────────────────────────────
-
-function getContentPublicIds(content: Record<string, any>): string[] {
-  const ids: string[] = [];
-
-  function walk(obj: any) {
-    if (!obj || typeof obj !== "object") return;
-
-    for (const [key, value] of Object.entries(obj)) {
-      if (key.endsWith("PId") && typeof value === "string" && value) {
-        ids.push(value);
-      } else {
-        walk(value);
-      }
-    }
-  }
-
-  walk(content);
-  return ids;
-}
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function calcStats(sites: Site[], siteLimit: number): DashboardStats {
   return {
@@ -106,9 +50,59 @@ function calcStats(sites: Site[], siteLimit: number): DashboardStats {
   };
 }
 
-// ─────────────────────────────────────────────────────────────
-// INITIAL STATE
-// ─────────────────────────────────────────────────────────────
+async function deleteCloudinaryImages(content: Record<string, unknown>) {
+  const ids: string[] = [];
+
+  function walk(obj: unknown) {
+    if (!obj || typeof obj !== "object") return;
+    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
+      if (key.endsWith("PId") && typeof value === "string" && value) {
+        ids.push(value);
+      } else {
+        walk(value);
+      }
+    }
+  }
+
+  walk(content);
+
+  if (ids.length === 0) return;
+
+  await Promise.allSettled(
+    ids.map((publicId) =>
+      fetch("/api/imageDelete", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ publicId }),
+      }),
+    ),
+  );
+}
+
+async function apiFetch(
+  url: string,
+  method: string,
+  token: string,
+  body?: unknown,
+): Promise<Response> {
+  const res = await fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+  });
+
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.error ?? `Request failed (${res.status})`);
+  }
+
+  return res;
+}
+
+// ── Initial State ─────────────────────────────────────────────────────────────
 
 const initialStats: DashboardStats = {
   totalVisits: 0,
@@ -123,9 +117,7 @@ const initialUI: UIState = {
   sidebarOpen: false,
 };
 
-// ─────────────────────────────────────────────────────────────
-// STORE
-// ─────────────────────────────────────────────────────────────
+// ── Store ─────────────────────────────────────────────────────────────────────
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
   sites: [],
@@ -135,36 +127,23 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   sitesError: null,
   ui: initialUI,
 
-  // ─────────────────────────────────────────────────────────
-  // INITIALIZE
-  // ─────────────────────────────────────────────────────────
+  // ── Initialize ──────────────────────────────────────────────────────────────
 
-  initialize: async (uid: string) => {
-    set({
-      sitesLoading: true,
-      sitesError: null,
-    });
-
+  initialize: async (uid) => {
+    set({ sitesLoading: true, sitesError: null });
     await get().fetchSites(uid);
-
-    set({
-      sitesLoading: false,
-    });
+    set({ sitesLoading: false });
   },
 
-  // ─────────────────────────────────────────────────────────
-  // FETCH SITES
-  // ─────────────────────────────────────────────────────────
+  // ── Fetch sites (read — still direct Firestore, read-only is fine) ──────────
 
   fetchSites: async (uid) => {
     set({ sitesLoading: true, sitesError: null });
-
     try {
       const [sites, siteLimit] = await Promise.all([
         getUserSites(uid),
         getUserSiteLimit(uid),
       ]);
-
       set({
         sites,
         siteLimit,
@@ -172,79 +151,24 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
         sitesLoading: false,
       });
     } catch (e) {
-      set({
-        sitesError: (e as Error).message,
-        sitesLoading: false,
-      });
+      set({ sitesError: (e as Error).message, sitesLoading: false });
     }
   },
 
-  // ─────────────────────────────────────────────────────────
-  // ADD SITE
-  // ─────────────────────────────────────────────────────────
+  // ── Remove site ─────────────────────────────────────────────────────────────
 
-  addSite: async (uid, data) => {
-    const id = await createSite(uid, data);
-
-    const newSite: Site = {
-      id,
-      uid,
-      visits: 0,
-      whatsappClicks: 0,
-      createdAt: null,
-      updatedAt: null,
-      ...data,
-    };
-
-    set((state) => {
-      const sites = [newSite, ...state.sites];
-
-      return {
-        sites,
-        stats: calcStats(sites, state.siteLimit),
-      };
-    });
-
-    return id;
-  },
-
-  // ─────────────────────────────────────────────────────────
-  // EDIT SITE
-  // ─────────────────────────────────────────────────────────
-
-  editSite: async (siteId, data, uid) => {
-    await updateSite(siteId, data, uid);
-
-    set((state) => ({
-      sites: state.sites.map((s) => (s.id === siteId ? { ...s, ...data } : s)),
-    }));
-  },
-
-  // ─────────────────────────────────────────────────────────
-  // REMOVE SITE
-  // ─────────────────────────────────────────────────────────
-
-  removeSite: async (siteId, uid) => {
+  removeSite: async (siteId, token) => {
     const site = get().sites.find((s) => s.id === siteId);
-    const publicIds = getContentPublicIds((site as any)?.content ?? {});
 
-    if (publicIds.length > 0) {
-      await Promise.allSettled(
-        publicIds.map((publicId) =>
-          fetch("/api/imageDelete", {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ publicId }),
-          }),
-        ),
-      );
+    // Delete Cloudinary images first (best-effort)
+    if (site?.content) {
+      await deleteCloudinaryImages(site.content as Record<string, unknown>);
     }
 
-    await deleteSite(siteId, uid);
+    await apiFetch(`/api/sites/${siteId}`, "DELETE", token);
 
     set((state) => {
       const sites = state.sites.filter((s) => s.id !== siteId);
-
       return {
         sites,
         stats: calcStats(sites, state.siteLimit),
@@ -253,44 +177,31 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     });
   },
 
-  // ─────────────────────────────────────────────────────────
-  // TOGGLE STATUS
-  // ─────────────────────────────────────────────────────────
+  // ── Toggle status ───────────────────────────────────────────────────────────
 
-  toggleSiteStatus: async (siteId, current, uid) => {
-    const next = current === "published" ? "draft" : "published";
-
-    await updateSite(siteId, { status: next }, uid);
+  toggleSiteStatus: async (siteId, token) => {
+    const res = await apiFetch(`/api/sites/${siteId}/status`, "PATCH", token);
+    const { status: nextStatus } = await res.json();
 
     set((state) => ({
       sites: state.sites.map((s) =>
-        s.id === siteId ? { ...s, status: next } : s,
+        s.id === siteId ? { ...s, status: nextStatus } : s,
       ),
     }));
   },
 
-  // ─────────────────────────────────────────────────────────
-  // UI ACTIONS
-  // ─────────────────────────────────────────────────────────
+  // ── UI ──────────────────────────────────────────────────────────────────────
 
   setCreateModal: (open) =>
-    set((state) => ({
-      ui: { ...state.ui, createModalOpen: open },
-    })),
+    set((state) => ({ ui: { ...state.ui, createModalOpen: open } })),
 
   setDeleteConfirm: (siteId) =>
-    set((state) => ({
-      ui: { ...state.ui, deleteConfirmId: siteId },
-    })),
+    set((state) => ({ ui: { ...state.ui, deleteConfirmId: siteId } })),
 
   setSidebarOpen: (open) =>
-    set((state) => ({
-      ui: { ...state.ui, sidebarOpen: open },
-    })),
+    set((state) => ({ ui: { ...state.ui, sidebarOpen: open } })),
 
-  // ─────────────────────────────────────────────────────────
-  // RESET
-  // ─────────────────────────────────────────────────────────
+  // ── Reset ───────────────────────────────────────────────────────────────────
 
   reset: () =>
     set({

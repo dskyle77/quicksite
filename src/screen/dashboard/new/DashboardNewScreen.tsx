@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
+
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -13,7 +14,6 @@ import { toast } from "sonner";
 const SITE_DOMAIN_NAME = process.env.NEXT_PUBLIC_SITE_DOMAIN_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
 
-// ---- Site Name and Slug Form ----
 function SiteFormInputs({
   formData,
   setFormData,
@@ -79,7 +79,6 @@ function SiteFormInputs({
   );
 }
 
-// ---- Template Picker ----
 function TemplatePicker({
   selectedType,
   onTemplateChange,
@@ -170,7 +169,6 @@ function TemplatePicker({
   );
 }
 
-// ---- Main Page ----
 export default function CreateSitePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -184,7 +182,6 @@ export default function CreateSitePage() {
   const paramsName = searchParams.get("name");
   const paramsSlug = searchParams.get("slug");
 
-  // get profile data
   const userProfile = useUserStore().profile;
   const defaultMessage = userProfile?.defaultMessage;
   const whatsappNumber = userProfile?.whatsappNumber;
@@ -213,12 +210,11 @@ export default function CreateSitePage() {
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return toast.error("Please login first");
+    if (!user) return toast.error("Please login first.");
 
     const normalizedName = formData.name.trim();
     const normalizedSlug = formData.slug.trim();
 
-    // Basic validation (UI only)
     if (!normalizedName || !normalizedSlug) {
       return toast.error("Please add both site name and URL slug.");
     }
@@ -228,11 +224,11 @@ export default function CreateSitePage() {
     try {
       const token = await user.getIdToken();
 
-      const res = await fetch("/api/create-site", {
+      const res = await fetch("/api/sites", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // 🔥 important
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: normalizedName,
@@ -246,14 +242,14 @@ export default function CreateSitePage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to create site");
+        throw new Error(data.error || "Failed to create site.");
       }
 
-      toast.success("Site initialized!");
+      toast.success("Site created!");
       router.push(`/editor/${data.slug}`);
     } catch (error: any) {
       console.error(error);
-      toast.error(error.message || "Something went wrong");
+      toast.error(error.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
@@ -266,14 +262,13 @@ export default function CreateSitePage() {
           Launch Your Site
         </h1>
         <p className="text-slate-500 mt-2 text-base sm:text-lg">
-          Start with a production-ready online catalogue template.
+          Start with a production-ready template.
         </p>
       </div>
       <form
         onSubmit={handleCreate}
         className="flex flex-col gap-6 md:grid md:grid-cols-3 md:gap-8"
       >
-        {/* Template Picker — top on mobile, right on desktop */}
         <div className="order-1 md:order-2">
           <TemplatePicker
             selectedType={formData.type}
@@ -283,7 +278,6 @@ export default function CreateSitePage() {
           />
         </div>
 
-        {/* Inputs — bottom on mobile, left on desktop */}
         <div className="order-2 md:order-1 md:col-span-2 space-y-6 bg-card p-4 sm:p-8 rounded-3xl border shadow-sm">
           <SiteFormInputs
             formData={formData}

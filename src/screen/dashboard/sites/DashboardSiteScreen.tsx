@@ -1,7 +1,6 @@
 "use client";
 
-// src/features/dashboard/sites/DashboardSiteScreen.tsx
-// Real sites from Zustand — create, toggle status, delete with confirm.
+// src/screen/dashboard/sites/DashboardSiteScreen.tsx
 
 import { useState } from "react";
 import Link from "next/link";
@@ -19,30 +18,36 @@ import {
 } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useUserStore } from "@/store/useUserStore";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
 import type { Site } from "@/lib/types";
 
 const SITE_DOMAIN_NAME = process.env.NEXT_PUBLIC_SITE_DOMAIN_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
+
 // ── Delete Confirm Modal ──────────────────────────────────────────────────────
 
 function DeleteModal({ site, onClose }: { site: Site; onClose: () => void }) {
-  const { profile } = useUserStore();
+  const { user } = useAuth();
   const { removeSite } = useDashboardStore();
   const [loading, setLoading] = useState(false);
-  const uid = profile?.uid;
 
   const handleDelete = async () => {
-    if (!profile || !uid) {
+    if (!user) {
       toast.error("You must be logged in to delete a site.");
-      setLoading(false);
       onClose();
       return;
     }
     setLoading(true);
     try {
-      await removeSite(site.id, uid);
+      const token = await user.getIdToken();
+      await removeSite(site.id, token);
+      toast.success("Site deleted.");
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete site.",
+      );
     } finally {
       setLoading(false);
       onClose();
@@ -77,11 +82,8 @@ function DeleteModal({ site, onClose }: { site: Site; onClose: () => void }) {
           </button>
           <button
             onClick={handleDelete}
-            disabled={loading || !profile}
+            disabled={loading}
             className="flex-1 h-10 rounded-full bg-destructive text-white text-sm font-semibold hover:opacity-90 transition disabled:opacity-60 flex items-center justify-center gap-2 cursor-pointer"
-            title={
-              !profile ? "You must be logged in to delete a site" : undefined
-            }
           >
             {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Delete"}
           </button>
@@ -95,27 +97,22 @@ function DeleteModal({ site, onClose }: { site: Site; onClose: () => void }) {
 
 function SiteCard({ site }: { site: Site }) {
   const { toggleSiteStatus, setDeleteConfirm } = useDashboardStore();
-  const { profile: user } = useUserStore();
+  const { user } = useAuth();
   const [toggling, setToggling] = useState(false);
 
-  // Handler for publish/unpublish button
   const handleToggle = async () => {
-    if (!user || !user.uid) {
-      // Do nothing or optionally show a warning
-      setToggling(false);
-      return;
-    }
+    if (!user) return;
     setToggling(true);
     try {
-      await toggleSiteStatus(site.id, site.status, user.uid);
+      const token = await user.getIdToken();
+      await toggleSiteStatus(site.id, token);
+    } catch (err) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update status.",
+      );
     } finally {
       setToggling(false);
     }
-  };
-
-  // Handlers for Delete action, opens confirm modal
-  const handleDelete = () => {
-    setDeleteConfirm(site.id);
   };
 
   return (
@@ -167,7 +164,7 @@ function SiteCard({ site }: { site: Site }) {
             </Link>
           </div>
         </div>
-        {/* Action buttons for Publish/Unpublish and Delete */}
+
         <div className="flex items-center justify-between gap-3 mt-4">
           <button
             onClick={handleToggle}
@@ -177,13 +174,6 @@ function SiteCard({ site }: { site: Site }) {
                 ? "bg-orange-500 text-white hover:bg-orange-600"
                 : "bg-emerald-500 text-white hover:bg-emerald-600"
             }`}
-            title={
-              !user
-                ? "You must be logged in to publish/unpublish"
-                : site.status === "published"
-                  ? "Unpublish Site"
-                  : "Publish Site"
-            }
           >
             {toggling ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -195,9 +185,8 @@ function SiteCard({ site }: { site: Site }) {
             {site.status === "published" ? "Unpublish" : "Publish"}
           </button>
           <button
-            onClick={handleDelete}
-            className="flex items-center gap-2 px-4 py-2 rounded-md bg-destructive text-white text-sm font-medium hover:bg-destructive/80 transition disabled:opacity-70"
-            title="Delete Site"
+            onClick={() => setDeleteConfirm(site.id)}
+            className="flex items-center gap-2 px-4 py-2 rounded-md bg-destructive text-white text-sm font-medium hover:bg-destructive/80 transition"
           >
             <Trash2 className="h-4 w-4" />
             Delete
@@ -215,7 +204,6 @@ export default function DashboardSiteScreen() {
   const { profile: user } = useUserStore();
   const [searchQuery, setSearchQuery] = useState("");
 
-  // If not logged in, show a message and skip site management UI
   if (!user) {
     return (
       <div className="flex flex-col items-center justify-center py-32">
@@ -223,11 +211,10 @@ export default function DashboardSiteScreen() {
         <h2 className="font-bold text-xl mb-2">
           Please log in to manage sites
         </h2>
-        <p className="text-muted-foreground max-w-sm text-center mb-4">
+        <p className="text-muted-foreground max-w-sm text-center">
           You need to be signed in to create, manage, publish, or delete your
           sites.
         </p>
-        {/* Optionally, add a login button here */}
       </div>
     );
   }
@@ -244,7 +231,6 @@ export default function DashboardSiteScreen() {
 
   return (
     <div className="space-y-6">
-      {/* Delete confirm */}
       {siteToDelete && (
         <DeleteModal
           site={siteToDelete}
@@ -252,7 +238,6 @@ export default function DashboardSiteScreen() {
         />
       )}
 
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -272,7 +257,6 @@ export default function DashboardSiteScreen() {
         </Link>
       </div>
 
-      {/* Content */}
       {sitesLoading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />

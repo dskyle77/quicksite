@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-
 import { useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { Loader2, Save, ArrowLeft } from "lucide-react";
@@ -19,11 +18,8 @@ export default function SiteEditorSubPage() {
   const params = useParams();
   const slug = params.slug as string;
   const subslug = params.subslug as string;
+  const slugs = { slug, subslug };
 
-  const slugs = {
-    slug,
-    subslug,
-  };
   const router = useRouter();
 
   const siteData = useSiteEditorStore((s) => s.site);
@@ -34,22 +30,23 @@ export default function SiteEditorSubPage() {
   const saveSite = useSiteEditorStore((s) => s.saveSite);
 
   const handleSave = async () => {
-    if (!user?.uid) return;
-
+    if (!user) return;
     try {
-      await saveSite(user.uid);
+      const token = await user.getIdToken();
+      await saveSite(token);
       toast.success("All changes saved!");
     } catch (error) {
       console.error("Save Error:", error);
       toast.error("Could not save changes.");
     }
   };
+
   useEffect(() => {
     if (!subslug && slug) {
       router.replace("/editor/" + slug);
     }
   }, [subslug, slug, router]);
-  // ── Loading State ──────────────────────────────────────────────────
+
   if (loading) {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-50 gap-4">
@@ -59,7 +56,6 @@ export default function SiteEditorSubPage() {
     );
   }
 
-  // ── Error State ────────────────────────────────────────────────────
   if (!siteData) {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center gap-4">
@@ -71,10 +67,8 @@ export default function SiteEditorSubPage() {
     );
   }
 
-  // ── Success State ──────────────────────────────────────────────────
   return (
     <div className="flex flex-col h-screen overflow-hidden">
-      {/* Editor Toolbar */}
       <header className="h-16 border-b bg-background flex items-center justify-between px-6 shrink-0 z-50 shadow-sm">
         <div className="flex items-center gap-4">
           <Link
@@ -83,7 +77,6 @@ export default function SiteEditorSubPage() {
           >
             <ArrowLeft size={20} />
           </Link>
-
           <div>
             <h1 className="font-bold text-foreground leading-none">
               {siteData.name || "Untitled Site"}
@@ -98,13 +91,10 @@ export default function SiteEditorSubPage() {
           <span className="text-xs text-slate-400 italic hidden sm:block">
             Theme
           </span>
-
           <select
             className="border border-black rounded-full px-3 py-1 text-xs text-black bg-white/80 focus:ring-2 focus:ring-primary outline-none transition-all"
             value={siteData.theme}
-            onChange={
-              (e) => updateSite({ theme: e.target.value }) // 🔥 replaced setState
-            }
+            onChange={(e) => updateSite({ theme: e.target.value })}
             disabled={isSaving}
           >
             {getAllThemes().map(({ id }) => (
@@ -129,12 +119,11 @@ export default function SiteEditorSubPage() {
         </div>
       </header>
 
-      {/* Editor Workspace */}
       <main className="flex-1 overflow-y-auto bg-slate-100 p-4 md:p-8">
         <div className="max-w-300 mx-auto min-h-full">
           <EditorScreen
             data={siteData}
-            onChange={(updated) => updateSite(updated)} // 🔥 key change
+            onChange={(updated) => updateSite(updated)}
             slugs={slugs}
           />
         </div>
