@@ -29,6 +29,7 @@ export interface Site {
   createdAt?: Timestamp | null;
   updatedAt?: Timestamp | null;
   content: Record<string, any>;
+  customDomain?: string;
 }
 
 export interface DashboardStats {

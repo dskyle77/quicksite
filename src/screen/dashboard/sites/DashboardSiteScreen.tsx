@@ -142,11 +142,24 @@ function SiteCard({ site }: { site: Site }) {
           href={`https://${SITE_DOMAIN_NAME}${DOMAIN_NAME}/s/${site.slug}`}
           target="_blank"
           rel="noreferrer"
-          className="text-xs text-primary hover:underline flex items-center gap-1 mb-4"
+          className="text-xs text-primary hover:underline flex items-center gap-1 mb-2"
         >
           {SITE_DOMAIN_NAME}
           {DOMAIN_NAME}/s/{site.slug} <ExternalLink className="h-3 w-3" />
         </a>
+
+        {/* Show custom domain if exists */}
+        {site.customDomain && (
+          <a
+            href={`https://${site.customDomain}`}
+            target="_blank"
+            rel="noreferrer"
+            className="text-xs text-emerald-700 hover:underline flex items-center gap-1 mb-4"
+            title={site.customDomain}
+          >
+            {site.customDomain} <ExternalLink className="h-3 w-3" />
+          </a>
+        )}
 
         <div className="flex items-center justify-between pt-4 border-t border-border">
           <div className="text-[11px] text-muted-foreground">
@@ -155,10 +168,12 @@ function SiteCard({ site }: { site: Site }) {
           </div>
           <div className="flex items-center gap-2">
             <Link href={`/editor/${site.slug}`}>
-              <span className="p-2 rounded-lg bg-secondary/10 text-secondary hover:bg-secondary hover:text-white transition cursor-pointer" title="Edit Site">
+              <span
+                className="p-2 rounded-lg bg-secondary/10 text-secondary hover:bg-secondary hover:text-white transition cursor-pointer"
+                title="Edit Site"
+              >
                 Edit
               </span>
-         
             </Link>
           </div>
         </div>
