@@ -142,7 +142,7 @@ export default function SiteManageScreen() {
 
         {/* Custom Domain */}
         <Link
-          href={`/dashboard/domains?site=${site.id}`}
+          href={`/dashboard/domains?site=${site.slug || site.id}`}
           className="flex items-center justify-between px-5 py-4 hover:bg-muted transition"
         >
           <div className="flex items-center gap-3">

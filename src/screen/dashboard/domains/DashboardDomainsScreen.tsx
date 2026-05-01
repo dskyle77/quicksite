@@ -4,6 +4,7 @@
 
 import { useState, useEffect } from "react";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { useUserStore } from "@/store/useUserStore";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import {
@@ -17,21 +18,27 @@ import {
   XCircle,
   ExternalLink,
   Link as LinkIcon,
+  Unlink,
+  Lock,
+  Sparkles,
 } from "lucide-react";
 import { toast } from "sonner";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { canUseFeature } from "@/lib/plans";
 
 export default function DashboardDomainsScreen() {
   const { user } = useAuth();
   const { sites } = useDashboardStore();
+  const { profile } = useUserStore();
+  const userPlan = profile?.plan || "free";
+  const canUseDomains = canUseFeature(userPlan, "customDomain");
 
   const SITE_STANDARD_NAME = process.env.NEXT_PUBLIC_SITE_STANDARD_NAME;
 
   // Form States
   const searchParams = useSearchParams();
   const [selectedSiteId, setSelectedSiteId] = useState("");
-
   const [domainInput, setDomainInput] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -43,13 +50,13 @@ export default function DashboardDomainsScreen() {
 
   // Management States
   const [managedDomains, setManagedDomains] = useState<any[]>([]);
+  const [unlinkingDomain, setUnlinkingDomain] = useState<string | null>(null);
 
   // Auto-select site from ?site= query param
   useEffect(() => {
     const siteParam = searchParams.get("site");
     if (!siteParam || sites.length === 0) return;
 
-    // Match by site name (slug-style, case-insensitive)
     const match = sites.find(
       (s) =>
         s.name.toLowerCase().replace(/\s+/g, "-") === siteParam.toLowerCase() ||
@@ -59,7 +66,7 @@ export default function DashboardDomainsScreen() {
     if (match) setSelectedSiteId(match.id);
   }, [searchParams, sites]);
 
-  // 1. Listen to User's Managed Domains in Firestore
+  // Listen to User's Managed Domains in Firestore
   useEffect(() => {
     if (!user) return;
 
@@ -84,9 +91,11 @@ export default function DashboardDomainsScreen() {
     toast.success("Copied to clipboard");
   };
 
-  // 2. Action: Connect a BRAND NEW Domain
+  // Action: Connect a BRAND NEW Domain
   const handleConnectNew = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canUseDomains)
+      return toast.error("Upgrade your plan to connect custom domains.");
     if (!user || !selectedSiteId || !domainInput) {
       return toast.error("Please select a site and enter a domain.");
     }
@@ -139,8 +148,10 @@ export default function DashboardDomainsScreen() {
     }
   };
 
-  // 3. Action: Relink an EXISTING Domain
+  // Action: Relink an EXISTING Domain to a different site
   const handleRelink = async (domainToMove: string) => {
+    if (!canUseDomains)
+      return toast.error("Upgrade your plan to manage custom domains.");
     if (!selectedSiteId)
       return toast.error("Select a 'Target Site' from the dropdown first.");
 
@@ -171,6 +182,39 @@ export default function DashboardDomainsScreen() {
     }
   };
 
+  // Action: Unlink (delete) a domain entirely
+  const handleUnlink = async (domain: string, siteId: string) => {
+    if (!canUseDomains) return;
+    if (
+      !confirm(
+        `Are you sure you want to unlink "${domain}"? This cannot be undone.`,
+      )
+    )
+      return;
+
+    setUnlinkingDomain(domain);
+    try {
+      const token = await user?.getIdToken();
+      const res = await fetch("/api/domains/delete", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ domain, siteId }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Unlink failed");
+
+      toast.success(`${domain} has been unlinked.`);
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setUnlinkingDomain(null);
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto py-10 px-4">
       {/* Header */}
@@ -184,7 +228,36 @@ export default function DashboardDomainsScreen() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Plan Gate Banner */}
+      {!canUseDomains && (
+        <div className="mb-8 bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-6 flex items-center gap-5">
+          <div className="bg-amber-100 p-3 rounded-2xl shrink-0">
+            <Lock className="text-amber-600" size={24} />
+          </div>
+          <div className="flex-1">
+            <p className="font-bold text-amber-900">
+              Custom domains are a paid feature
+            </p>
+            <p className="text-sm text-amber-700 mt-0.5">
+              Your current{" "}
+              <span className="font-semibold capitalize">{userPlan}</span> plan
+              doesn&apos;t include custom domains. Upgrade to Pro or higher to
+              connect your own domain.
+            </p>
+          </div>
+          <a
+            href="/pricing"
+            className="shrink-0 flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold px-5 py-3 rounded-2xl text-sm transition-colors"
+          >
+            <Sparkles size={16} />
+            Upgrade Plan
+          </a>
+        </div>
+      )}
+
+      <div
+        className={`grid grid-cols-1 lg:grid-cols-3 gap-8 ${!canUseDomains ? "opacity-60 pointer-events-none select-none" : ""}`}
+      >
         {/* LEFT: Connection Form */}
         <div className="lg:col-span-1 space-y-6">
           <div className="bg-white border rounded-3xl p-6 shadow-sm">
@@ -198,7 +271,8 @@ export default function DashboardDomainsScreen() {
                   required
                   value={selectedSiteId}
                   onChange={(e) => setSelectedSiteId(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none text-sm transition-all bg-slate-50"
+                  disabled={!canUseDomains}
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none text-sm transition-all bg-slate-50 disabled:cursor-not-allowed"
                 >
                   <option value="">Choose a site...</option>
                   {sites.map((site) => (
@@ -218,21 +292,22 @@ export default function DashboardDomainsScreen() {
                   type="text"
                   placeholder="e.g. mysite.com"
                   value={domainInput}
+                  disabled={!canUseDomains}
                   onChange={(e) => {
                     setDomainInput(e.target.value);
                     if (status !== "idle") setStatus("idle");
                   }}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none text-sm bg-slate-50"
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none text-sm bg-slate-50 disabled:cursor-not-allowed"
                 />
               </div>
 
               <button
-                disabled={isSubmitting}
+                disabled={isSubmitting || !canUseDomains}
                 className={`w-full py-4 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 ${
                   status === "invalid"
                     ? "bg-red-500 shadow-red-200"
                     : "bg-primary hover:scale-[1.02]"
-                } disabled:opacity-50`}
+                } disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
               >
                 {isSubmitting ? (
                   <Loader2 className="animate-spin" />
@@ -268,12 +343,10 @@ export default function DashboardDomainsScreen() {
         {/* RIGHT: DNS Instructions */}
         <div className="lg:col-span-2">
           <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
-            {/* Decorative Background Icon */}
             <Globe
               className="absolute -right-10 -bottom-10 text-white/5"
               size={200}
             />
-
             <h2 className="text-xl font-bold flex items-center gap-2 mb-6 relative z-10">
               <Server size={24} className="text-primary" />
               Configure DNS Records
@@ -346,24 +419,63 @@ export default function DashboardDomainsScreen() {
                   </div>
                 </div>
 
-                <button
-                  disabled={
-                    isSubmitting ||
-                    !selectedSiteId ||
-                    item.siteId === selectedSiteId
-                  }
-                  onClick={() => handleRelink(item.domain)}
-                  className="w-full py-3 bg-slate-50 hover:bg-primary hover:text-white disabled:opacity-30 disabled:hover:bg-slate-50 disabled:hover:text-slate-900 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 uppercase tracking-tighter"
-                >
-                  {isSubmitting ? (
-                    <Loader2 size={14} className="animate-spin" />
+                <div className="space-y-2">
+                  {/* Relink button — disabled on free plan */}
+                  {canUseDomains ? (
+                    <button
+                      disabled={
+                        isSubmitting ||
+                        !selectedSiteId ||
+                        item.siteId === selectedSiteId
+                      }
+                      onClick={() => handleRelink(item.domain)}
+                      className="w-full py-3 bg-slate-50 hover:bg-primary hover:text-white disabled:opacity-30 disabled:hover:bg-slate-50 disabled:hover:text-slate-900 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 uppercase tracking-tighter"
+                    >
+                      {isSubmitting ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <RefreshCw size={14} />
+                      )}
+                      Relink to Selected Site
+                    </button>
                   ) : (
-                    <RefreshCw size={14} />
+                    <button
+                      disabled
+                      className="w-full py-3 bg-slate-50 opacity-40 cursor-not-allowed rounded-2xl text-xs font-black flex items-center justify-center gap-2 uppercase tracking-tighter"
+                    >
+                      <Lock size={14} />
+                      Relink (Paid Only)
+                    </button>
                   )}
-                  Relink to Selected Site
-                </button>
 
-                {!selectedSiteId && (
+                  {/* Unlink button */}
+                  {canUseDomains ? (
+                    <button
+                      disabled={unlinkingDomain === item.domain}
+                      onClick={() => handleUnlink(item.domain, item.siteId)}
+                      className="w-full py-3 bg-red-50 hover:bg-red-500 hover:text-white text-red-500 disabled:opacity-40 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 uppercase tracking-tighter"
+                    >
+                      {unlinkingDomain === item.domain ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Unlink size={14} />
+                      )}
+                      {unlinkingDomain === item.domain
+                        ? "Unlinking..."
+                        : "Unlink Domain"}
+                    </button>
+                  ) : (
+                    <button
+                      disabled
+                      className="w-full py-3 bg-red-50 opacity-40 cursor-not-allowed rounded-2xl text-xs font-black flex items-center justify-center gap-2 uppercase tracking-tighter text-red-400"
+                    >
+                      <Lock size={14} />
+                      Unlink (Paid Only)
+                    </button>
+                  )}
+                </div>
+
+                {!selectedSiteId && canUseDomains && (
                   <p className="text-[9px] text-center mt-2 text-slate-400">
                     Select a site above to enable relinking
                   </p>

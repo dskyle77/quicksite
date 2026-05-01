@@ -1,12 +1,28 @@
 // src/features/pricing/PricingScreen.tsx
 "use client";
 
-import { Check, Sparkles, ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { Check, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
+import { useAuth } from "@/hooks/useAuth";
+import { useUserStore } from "@/store/useUserStore";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation"; // Make sure this is at the top of your file
 
-const PLANS = [
+import type { Plan } from "@/lib/plans";
+
+const PLANS: {
+  name: string;
+  plan: Plan;
+  price: number;
+  description: string;
+  features: string[];
+  buttonText: string;
+  isPopular?: boolean;
+}[] = [
   {
     name: "Free",
+    plan: "free",
     price: 0,
     description: "Start building your mini-site",
     features: [
@@ -16,10 +32,10 @@ const PLANS = [
       "Powered by Quicksite branding",
     ],
     buttonText: "Get Started Free",
-    href: "/signup",
   },
   {
     name: "Basic",
+    plan: "basic",
     price: 1500,
     description: "Look professional online",
     isPopular: true,
@@ -31,10 +47,10 @@ const PLANS = [
       "Basic customization",
     ],
     buttonText: "Upgrade to Basic",
-    href: "/signup",
   },
   {
     name: "Growth",
+    plan: "growth",
     price: 4000,
     description: "Grow your business",
     features: [
@@ -45,10 +61,10 @@ const PLANS = [
       "Image gallery",
     ],
     buttonText: "Upgrade to Growth",
-    href: "/signup",
   },
   {
     name: "Pro",
+    plan: "pro",
     price: 10000,
     description: "Run your business online",
     features: [
@@ -59,7 +75,6 @@ const PLANS = [
       "Priority performance",
     ],
     buttonText: "Go Pro",
-    href: "/signup",
   },
 ];
 
@@ -74,11 +89,59 @@ const FAQ = [
   },
   {
     q: "How does payment work?",
-    a: "We accept bank transfers, Paystack. All amounts are in Naira (₦).",
+    a: "We accept bank transfers and cards via Paystack. All amounts are in Naira (₦).",
   },
 ];
 
 export default function PricingScreen() {
+  const { user } = useAuth();
+  const { profile } = useUserStore();
+  const currentPlan = profile?.plan ?? "free";
+
+  const [loadingPlan, setLoadingPlan] = useState<Plan | null>(null);
+
+  const router = useRouter();
+
+  const handleUpgrade = async (plan: Plan) => {
+    // Free plan — just go to signup
+    if (plan === "free") return;
+
+    if (!user) {
+      // Not logged in — send to signup
+      router.push("/signup");
+      return;
+    }
+
+    if (currentPlan === plan) {
+      // Already on this plan
+      toast.info(`You're already on the ${plan} plan.`);
+      return;
+    }
+
+    setLoadingPlan(plan);
+    try {
+      const res = await fetch("/api/paystack/initialize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Could not start payment");
+
+      router.push(data.authorization_url as string);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      setLoadingPlan(null);
+    }
+  };
+
+  const getButtonLabel = (plan: Plan, buttonText: string) => {
+    if (plan === "free") return buttonText;
+    if (currentPlan === plan) return "Current Plan";
+    return buttonText;
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
@@ -98,55 +161,83 @@ export default function PricingScreen() {
       {/* Pricing grid */}
       <section className="px-4 pb-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
-          {PLANS.map((plan) => (
-            <div
-              key={plan.name}
-              className={`relative rounded-2xl border p-6 flex flex-col transition-all hover:-translate-y-1 hover:shadow-xl ${
-                plan.isPopular
-                  ? "border-primary shadow-lg bg-card"
-                  : "border-border bg-card"
-              }`}
-            >
-              {plan.isPopular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
-                  Most Popular
+          {PLANS.map((plan) => {
+            const isCurrentPlan = currentPlan === plan.plan;
+            const isLoading = loadingPlan === plan.plan;
+
+            return (
+              <div
+                key={plan.name}
+                className={`relative rounded-2xl border p-6 flex flex-col transition-all hover:-translate-y-1 hover:shadow-xl ${
+                  plan.isPopular
+                    ? "border-primary shadow-lg bg-card"
+                    : "border-border bg-card"
+                }`}
+              >
+                {plan.isPopular && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
+                    Most Popular
+                  </div>
+                )}
+
+                {isCurrentPlan && (
+                  <div className="absolute -top-3 right-4 bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                    Your Plan
+                  </div>
+                )}
+
+                <h3 className="text-lg font-bold mb-1">{plan.name}</h3>
+                <p className="text-sm text-muted-foreground mb-4">
+                  {plan.description}
+                </p>
+
+                <div className="mb-6">
+                  <span className="text-3xl font-bold">
+                    ₦{plan.price.toLocaleString()}
+                  </span>
+                  <span className="text-sm text-muted-foreground"> /month</span>
                 </div>
-              )}
 
-              <h3 className="text-lg font-bold mb-1">{plan.name}</h3>
-              <p className="text-sm text-muted-foreground mb-4">
-                {plan.description}
-              </p>
+                <ul className="space-y-3 mb-8 flex-1 text-sm">
+                  {plan.features.map((f, i) => (
+                    <li key={i} className="flex gap-2">
+                      <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
 
-              <div className="mb-6">
-                <span className="text-3xl font-bold">
-                  ₦{plan.price.toLocaleString()}
-                </span>
-                <span className="text-sm text-muted-foreground"> /month</span>
+                {plan.plan === "free" ? (
+                  <Link href={user ? "/dashboard" : "/signup"}>
+                    <button className="w-full py-2.5 rounded-full text-sm font-semibold transition cursor-pointer border border-border hover:bg-muted">
+                      {user ? "Go to Dashboard" : "Get Started Free"}
+                    </button>
+                  </Link>
+                ) : (
+                  <button
+                    onClick={() => handleUpgrade(plan.plan)}
+                    disabled={isCurrentPlan || isLoading}
+                    className={`w-full py-2.5 rounded-full text-sm font-semibold transition cursor-pointer flex items-center justify-center gap-2 ${
+                      isCurrentPlan
+                        ? "border border-green-200 text-green-600 bg-green-50 cursor-default"
+                        : plan.isPopular
+                          ? "bg-primary text-primary-foreground hover:opacity-90"
+                          : "border border-border hover:bg-muted"
+                    } disabled:opacity-60 disabled:cursor-not-allowed`}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Redirecting...
+                      </>
+                    ) : (
+                      getButtonLabel(plan.plan, plan.buttonText)
+                    )}
+                  </button>
+                )}
               </div>
-
-              <ul className="space-y-3 mb-8 flex-1 text-sm">
-                {plan.features.map((f, i) => (
-                  <li key={i} className="flex gap-2">
-                    <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                    <span>{f}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link href={plan.href}>
-                <button
-                  className={`w-full py-2.5 rounded-full text-sm font-semibold transition cursor-pointer ${
-                    plan.isPopular
-                      ? "bg-primary text-primary-foreground hover:opacity-90"
-                      : "border border-border hover:bg-muted"
-                  }`}
-                >
-                  {plan.buttonText}
-                </button>
-              </Link>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </section>
 

@@ -4,6 +4,7 @@
 // src/features/dashboard/DashboardScreen.tsx
 // Real data from Zustand store — no mock values.
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Users,
@@ -14,9 +15,11 @@ import {
   ChevronRight,
   ArrowUpRight,
   Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { useSearchParams } from "next/navigation";
 
 // Quick Actions data
 const QUICK_ACTIONS = [
@@ -41,6 +44,35 @@ const QUICK_ACTIONS = [
 ];
 const SITE_DOMAIN_NAME = process.env.NEXT_PUBLIC_SITE_DOMAIN_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
+
+// ─────────── COMPONENT: UpgradeSuccessAlert ──────────────
+function UpgradeSuccessAlert() {
+  const searchParams = useSearchParams();
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    // Show alert if ?upgrade=success in URL
+    if (searchParams?.get("upgrade") === "success") {
+      setTimeout(() => {
+        setShow(true);
+      }, 100);
+    }
+  }, [searchParams]);
+
+  if (!show) return null;
+
+  return (
+    <div className="mb-4 bg-emerald-100 border border-emerald-300 text-emerald-800 rounded-lg px-5 py-4 flex items-center gap-3 shadow-sm animate-in fade-in slide-in-from-top-2">
+      <CheckCircle2 className="h-5 w-5 shrink-0 text-emerald-600" />
+      <div>
+        <p className="font-semibold">Your upgrade was successful!</p>
+        <p className="text-xs mt-1">
+          Enjoy your new plan features and happy building 🚀
+        </p>
+      </div>
+    </div>
+  );
+}
 
 // ─────────── COMPONENT: StatsGrid ──────────────
 function StatsGrid({
@@ -126,7 +158,8 @@ function SiteCard({ site }: { site: any }) {
       </div>
       <p className="font-bold text-sm truncate">{site.name}</p>
       <p className="text-xs text-primary mt-0.5 truncate">
-        {SITE_DOMAIN_NAME}{DOMAIN_NAME}/s/{site.slug}
+        {SITE_DOMAIN_NAME}
+        {DOMAIN_NAME}/s/{site.slug}
       </p>
       <p className="text-xs text-muted-foreground mt-3">{site.visits} visits</p>
     </div>
@@ -220,6 +253,9 @@ export default function DashboardScreen() {
 
   return (
     <div className="space-y-8">
+      {/* ── Upgrade Success Alert (after upgrade) ────────────────────── */}
+      <UpgradeSuccessAlert />
+
       {/* ── Stats ──────────────────────────────────────────────────────── */}
       <StatsGrid stats={stats} sitesLoading={sitesLoading} />
 
