@@ -85,10 +85,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [fetchSites, fetchProfile, reset]);
 
   const afterSignIn = async (u: User) => {
-    await createOrUpdateUserProfile(u.uid, {
-      displayName: u.displayName ?? "",
-      email: u.email ?? "",
-      photoURL: u.photoURL ?? "",
+    await fetch("/api/auth/create-profile", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        uid: u.uid,
+        email: u.email,
+        displayName: u.displayName,
+        photoURL: u.photoURL,
+        phoneNumber: u.phoneNumber,
+      }),
     });
     await Promise.all([fetchProfile(u.uid), fetchSites(u.uid)]);
   };

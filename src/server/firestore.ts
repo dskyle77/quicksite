@@ -25,6 +25,16 @@ async function assertSiteOwner(siteId: string, uid: string): Promise<any> {
   return doc.data();
 }
 
+/**
+ * Fetches the plan for a user from Firestore.
+ * Returns "free" if not set or user does not exist.
+ */
+export async function getUserPlan(uid: string): Promise<Plan> {
+  const userDoc = await adminDb.collection("users").doc(uid).get();
+  if (!userDoc.exists) return "free";
+  return (userDoc.data()?.plan as Plan) || "free";
+}
+
 // ── Sites ─────────────────────────────────────────────────────────────────────
 
 export async function serverCreateSite(

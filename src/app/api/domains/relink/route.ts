@@ -1,15 +1,35 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextResponse } from "next/server";
 import { adminDb } from "@/server/firebase-admin";
+import { getUserFromSession } from "@/server/auth";
+import { getUserPlan } from "@/server/firestore";
 
 export async function POST(req: Request) {
   try {
-    const { domain, newSiteId, uid } = await req.json();
+    // Authenticate user from session (not client-supplied uid)
+    const user = await getUserFromSession();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
 
-    if (!domain || !newSiteId || !uid) {
+    const { domain, newSiteId } = await req.json();
+
+    if (!domain || !newSiteId) {
       return NextResponse.json(
         { error: "Missing parameters" },
-        { status: 400 },
+        { status: 400 }
+      );
+    }
+
+    // Check user's plan -- free users can't use custom domains
+    const plan = await getUserPlan(user.uid);
+    if (plan === "free") {
+      return NextResponse.json(
+        {
+          error:
+            "Custom domains are not available on the free plan. Please upgrade your subscription.",
+        },
+        { status: 403 }
       );
     }
 
@@ -17,10 +37,10 @@ export async function POST(req: Request) {
     const newSiteRef = adminDb.collection("sites").doc(newSiteId);
     const newSiteSnap = await newSiteRef.get();
 
-    if (!newSiteSnap.exists || newSiteSnap.data()?.uid !== uid) {
+    if (!newSiteSnap.exists || newSiteSnap.data()?.uid !== user.uid) {
       return NextResponse.json(
         { error: "Unauthorized or site not found" },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -49,7 +69,7 @@ export async function POST(req: Request) {
     // 5. Update the User's domain management record
     const userDomainRef = adminDb
       .collection("users")
-      .doc(uid)
+      .doc(user.uid)
       .collection("domains")
       .doc(domain);
 

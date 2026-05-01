@@ -90,7 +90,7 @@ export async function createOrUpdateUserProfile(uid: string, data: any) {
     await updateDoc(userRef, {
       displayName: data.displayName ?? snap.data().displayName,
       photoURL: data.photoURL ?? snap.data().photoURL,
-      phoneNumber: data.phoneNumber ?? snap.data().phoneNumber,
+      phoneNumber: data.phoneNumber ?? snap.data().phoneNumber ?? "",
       defaultMessage: data.defaultMessage ?? snap.data().defaultMessage,
       updatedAt: serverTimestamp(),
     });

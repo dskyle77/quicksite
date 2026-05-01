@@ -169,41 +169,21 @@ function SiteCard({ site }: { site: Site }) {
           <div className="flex items-center gap-2">
             <Link href={`/editor/${site.slug}`}>
               <span
-                className="p-2 rounded-lg bg-secondary/10 text-secondary hover:bg-secondary hover:text-white transition cursor-pointer"
+                className="p-2 rounded-lg bg-secondary/10 text-secondary hover:bg-secondary hover:text-white transition cursor-pointer text-sm font-medium px-3"
                 title="Edit Site"
               >
                 Edit
               </span>
             </Link>
+            <Link href={`/dashboard/sites/${site.slug}`}>
+              <span
+                className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary hover:text-white transition cursor-pointer text-sm font-medium px-3"
+                title="Manage Site"
+              >
+                Manage
+              </span>
+            </Link>
           </div>
-        </div>
-
-        <div className="flex items-center justify-between gap-3 mt-4">
-          <button
-            onClick={handleToggle}
-            disabled={toggling || !user}
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition disabled:opacity-70 ${
-              site.status === "published"
-                ? "bg-orange-500 text-white hover:bg-orange-600"
-                : "bg-emerald-500 text-white hover:bg-emerald-600"
-            }`}
-          >
-            {toggling ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : site.status === "published" ? (
-              <ToggleLeft className="h-4 w-4" />
-            ) : (
-              <ToggleRight className="h-4 w-4" />
-            )}
-            {site.status === "published" ? "Unpublish" : "Publish"}
-          </button>
-          <button
-            onClick={() => setDeleteConfirm(site.id)}
-            className="flex items-center gap-2 px-4 py-2 rounded-md bg-destructive text-white text-sm font-medium hover:bg-destructive/80 transition"
-          >
-            <Trash2 className="h-4 w-4" />
-            Delete
-          </button>
         </div>
       </div>
     </div>
@@ -260,14 +240,12 @@ export default function DashboardSiteScreen() {
             className="w-full bg-card border border-border rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
+            autoComplete="off"
+            spellCheck={false}
+            inputMode="search"
+            aria-label="Search sites"
           />
         </div>
-        <Link
-          href="/dashboard/new"
-          className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-full h-10 px-6 text-sm font-semibold hover:opacity-90 transition cursor-pointer"
-        >
-          <Plus className="h-4 w-4" /> Create New Site
-        </Link>
       </div>
 
       {sitesLoading ? (

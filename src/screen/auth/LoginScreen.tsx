@@ -18,6 +18,10 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  const SITE_STANDARD_NAME = process.env.NEXT_PUBLIC_SITE_STANDARD_NAME
+  const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME
+
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setError("");
@@ -67,8 +71,8 @@ export default function LoginScreen() {
             <Zap className="h-5 w-5 text-primary-foreground fill-current" />
           </div>
           <div>
-            <p className="font-bold text-lg leading-none">QuickSite</p>
-            <p className="text-xs text-muted-foreground">.com.ng</p>
+            <p className="font-bold text-lg leading-none">{SITE_STANDARD_NAME}</p>
+            <p className="text-xs text-muted-foreground">{DOMAIN_NAME}</p>
           </div>
         </Link>
 
