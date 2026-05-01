@@ -86,6 +86,11 @@ function StatsGrid({
   sitesLoading: boolean;
 }) {
   const { profile } = useUserStore();
+  const plan = profile?.plan;
+  let planName = "Free";
+  if (plan) planName = plan.charAt(0).toUpperCase() + plan.slice(1);
+  else planName = "Free";
+
   const STATS = [
     {
       label: "Total Visits",
@@ -108,15 +113,17 @@ function StatsGrid({
     {
       label: "Plan",
       icon: TrendingUp,
-      value: sitesLoading ? null : profile?.plan,
+      value: sitesLoading ? null : planName,
       color:
-        profile?.plan === "free"
+        planName === "Free"
           ? "bg-primary/10 text-primary"
-          : profile?.plan === "basic"
+          : planName === "Basic"
             ? "bg-secondary/10 text-secondary"
-            : profile?.plan === "growth"
+            : planName === "Growth"
               ? "bg-emerald-500/10 text-emerald-600"
-              : "bg-violet-500/10 text-violet-600",
+              : planName === "Pro"
+                ? "bg-violet-500/10 text-violet-600"
+                : "bg-gray-500/10 text-gray-600",
     },
   ];
 
