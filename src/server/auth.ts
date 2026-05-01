@@ -24,7 +24,8 @@ export async function getUserFromSession() {
 
     return {
       uid: decoded.uid,
-      email: decoded.email,
+      email: decoded.email || userData?.email,
+      displayName: decoded.displayName || userData?.displayName,
       plan: userData?.plan || "free",
     };
   } catch (err) {

@@ -8,11 +8,8 @@ import {
   Globe,
   Plus,
   ExternalLink,
-  Edit3,
   Search,
   Trash2,
-  ToggleLeft,
-  ToggleRight,
   Loader2,
   X,
 } from "lucide-react";
@@ -96,25 +93,6 @@ function DeleteModal({ site, onClose }: { site: Site; onClose: () => void }) {
 // ── Site Card ─────────────────────────────────────────────────────────────────
 
 function SiteCard({ site }: { site: Site }) {
-  const { toggleSiteStatus, setDeleteConfirm } = useDashboardStore();
-  const { user } = useAuth();
-  const [toggling, setToggling] = useState(false);
-
-  const handleToggle = async () => {
-    if (!user) return;
-    setToggling(true);
-    try {
-      const token = await user.getIdToken();
-      await toggleSiteStatus(site.id, token);
-    } catch (err) {
-      toast.error(
-        err instanceof Error ? err.message : "Failed to update status.",
-      );
-    } finally {
-      setToggling(false);
-    }
-  };
-
   return (
     <div className="group bg-card border border-border rounded-2xl overflow-hidden hover:border-primary/50 hover:shadow-lg transition-all duration-300">
       {/* Preview placeholder */}

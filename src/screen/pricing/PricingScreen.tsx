@@ -2,12 +2,14 @@
 "use client";
 
 import { useState } from "react";
+import authFetch from "@/lib/authFetch";
+
+import { useRouter } from "next/navigation"; 
 import { Check, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { useUserStore } from "@/store/useUserStore";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation"; // Make sure this is at the top of your file
 
 import type { Plan } from "@/lib/plans";
 
@@ -103,26 +105,26 @@ export default function PricingScreen() {
   const router = useRouter();
 
   const handleUpgrade = async (plan: Plan) => {
-    // Free plan — just go to signup
     if (plan === "free") return;
 
     if (!user) {
-      // Not logged in — send to signup
       router.push("/signup");
       return;
     }
 
     if (currentPlan === plan) {
-      // Already on this plan
       toast.info(`You're already on the ${plan} plan.`);
       return;
     }
 
     setLoadingPlan(plan);
+
     try {
-      const res = await fetch("/api/paystack/initialize", {
+      const res = await authFetch("/api/paystack/initialize", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ plan }),
       });
 

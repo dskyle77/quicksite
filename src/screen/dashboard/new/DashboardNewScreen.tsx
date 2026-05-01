@@ -2,6 +2,8 @@
 "use client";
 
 import { useState } from "react";
+
+import authFetch from "@/lib/authFetch";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -223,14 +225,9 @@ export default function CreateSitePage() {
     setLoading(true);
 
     try {
-      const token = await user.getIdToken();
-
-      const res = await fetch("/api/sites", {
+      const res = await authFetch("/api/sites", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: normalizedName,
           slug: normalizedSlug,

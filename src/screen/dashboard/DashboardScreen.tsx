@@ -20,6 +20,9 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useSearchParams } from "next/navigation";
+import { useUserStore } from "@/store/useUserStore";
+import type { UserProfile } from "@/lib/types";
+import type { DashboardStats } from "@/lib/types";
 
 // Quick Actions data
 const QUICK_ACTIONS = [
@@ -79,9 +82,10 @@ function StatsGrid({
   stats,
   sitesLoading,
 }: {
-  stats: any;
+  stats: DashboardStats;
   sitesLoading: boolean;
 }) {
+  const { profile } = useUserStore();
   const STATS = [
     {
       label: "Total Visits",
@@ -104,8 +108,15 @@ function StatsGrid({
     {
       label: "Plan",
       icon: TrendingUp,
-      value: sitesLoading ? null : "Free",
-      color: "bg-violet-500/10 text-violet-600",
+      value: sitesLoading ? null : profile?.plan,
+      color:
+        profile?.plan === "free"
+          ? "bg-primary/10 text-primary"
+          : profile?.plan === "basic"
+            ? "bg-secondary/10 text-secondary"
+            : profile?.plan === "growth"
+              ? "bg-emerald-500/10 text-emerald-600"
+              : "bg-violet-500/10 text-violet-600",
     },
   ];
 

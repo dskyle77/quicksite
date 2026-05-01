@@ -1,19 +1,4 @@
 // src/app/api/paystack/webhook/route.ts
-// POST /api/paystack/webhook
-// Paystack calls this after a successful charge. Verifies the signature,
-// then sets users/{uid}.plan in Firestore.
-//
-// There are two different URLs:
-//
-// 1. The **webhook URL** — this is for Paystack to notify your backend of payment status (called server-to-server). This should be registered in your Paystack dashboard:
-//     e.g. https://quicksiteio.vercel.app/api/paystack/webhook
-//
-// 2. The **callback_url** — this is sent when creating a transaction and is where Paystack redirects the *user's browser* after payment. In this project, it's set to something like:
-//     e.g. https://quicksiteio.vercel.app/dashboard?upgrade=success
-//
-// TL;DR:
-// - Webhook URL → Paystack server calls your backend (/api/paystack/webhook).
-// - Callback URL → After payment, user is redirected there (e.g. dashboard or success page).
 
 import { NextResponse } from "next/server";
 import { createHmac } from "crypto";

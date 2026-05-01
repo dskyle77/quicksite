@@ -7,6 +7,8 @@ import { useDashboardStore } from "@/store/useDashboardStore";
 import { useUserStore } from "@/store/useUserStore";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
+import authFetch from "@/lib/authFetch";
+
 import {
   Globe,
   Server,
@@ -106,7 +108,7 @@ export default function DashboardDomainsScreen() {
 
     try {
       // Step A: Verify DNS
-      const verifyRes = await fetch("/api/domains/verify", {
+      const verifyRes = await authFetch("/api/domains/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ domain: cleanDomain }),
@@ -121,13 +123,9 @@ export default function DashboardDomainsScreen() {
 
       // Step B: Register with Vercel & Firestore
       setStatus("valid");
-      const token = await user.getIdToken();
-      const res = await fetch("/api/domains/register", {
+      const res = await authFetch("/api/domains/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           siteId: selectedSiteId,
           domain: cleanDomain,
@@ -157,13 +155,9 @@ export default function DashboardDomainsScreen() {
 
     setIsSubmitting(true);
     try {
-      const token = await user?.getIdToken();
-      const res = await fetch("/api/domains/relink", {
+      const res = await authFetch("/api/domains/relink", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           domain: domainToMove,
           newSiteId: selectedSiteId,
