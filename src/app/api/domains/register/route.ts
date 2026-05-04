@@ -36,7 +36,7 @@ export async function POST(req: Request) {
       if (!admin) {
         return NextResponse.json(
           {
-            error: "Only admins can add .vercel.app domains.",
+            error: "You cannot add this domain type",
           },
           { status: 403 },
         );
