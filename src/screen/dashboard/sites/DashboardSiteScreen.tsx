@@ -2,7 +2,7 @@
 
 // src/screen/dashboard/sites/DashboardSiteScreen.tsx
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   Globe,
@@ -171,9 +171,16 @@ function SiteCard({ site }: { site: Site }) {
 // ── Main Screen ───────────────────────────────────────────────────────────────
 
 export default function DashboardSiteScreen() {
-  const { sites, sitesLoading, ui, setDeleteConfirm } = useDashboardStore();
+  const { sites, sitesLoading, ui, fetchSites, setDeleteConfirm } =
+    useDashboardStore();
   const { profile: user } = useUserStore();
   const [searchQuery, setSearchQuery] = useState("");
+
+  useEffect(() => {
+    if (user?.uid) {
+      fetchSites(user.uid);
+    }
+  }, [user?.uid, fetchSites]);
 
   if (!user) {
     return (

@@ -31,9 +31,10 @@ import { canUseFeature } from "@/lib/plans";
 
 export default function DashboardDomainsScreen() {
   const { user } = useAuth();
-  const { sites } = useDashboardStore();
   const { profile } = useUserStore();
   const userPlan = profile?.plan || "free";
+
+  const { sites, fetchSites } = useDashboardStore();
   const canUseDomains = canUseFeature(userPlan, "customDomain");
 
   const SITE_STANDARD_NAME = process.env.NEXT_PUBLIC_SITE_STANDARD_NAME;
@@ -87,6 +88,12 @@ export default function DashboardDomainsScreen() {
 
     return () => unsubscribe();
   }, [user]);
+
+  useEffect(() => {
+    if (user?.uid && typeof fetchSites === "function") {
+      fetchSites(user.uid);
+    }
+  }, [user?.uid, fetchSites]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
@@ -375,7 +382,7 @@ export default function DashboardDomainsScreen() {
         </div>
 
         {managedDomains.length === 0 ? (
-          <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-[2rem] py-20 text-center">
+          <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-4xl py-20 text-center">
             <Globe size={48} className="mx-auto text-slate-200 mb-4" />
             <p className="text-slate-400 font-medium">
               No domains connected to your account yet.

@@ -18,7 +18,7 @@ export default function DashboardAnalyticsScreen() {
   const [events, setEvents] = useState<AnalyticsEvent[]>([]);
   const [eventsLoading, setEventsLoading] = useState(true);
   const { user } = useAuth();
-  const { sites, sitesLoading } = useDashboardStore();
+  const { sites, sitesLoading, fetchSites } = useDashboardStore();
   const filteredSites = filterSitesByRange(sites, timeRange);
 
   const totalVisits = filteredSites.reduce(
@@ -104,6 +104,12 @@ export default function DashboardAnalyticsScreen() {
   }, [events, timeRange]);
 
   const maxDayVisits = Math.max(...dailySeries.map((point) => point.visits), 1);
+
+  useEffect(() => {
+    if (user?.uid) {
+      fetchSites(user.uid);
+    }
+  }, [fetchSites, user?.uid]);
 
   return (
     <div className="space-y-8">

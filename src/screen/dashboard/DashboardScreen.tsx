@@ -17,10 +17,10 @@ import {
   Loader2,
   CheckCircle2,
 } from "lucide-react";
-import { useAuth } from "@/hooks/useAuth";
-import { useDashboardStore } from "@/store/useDashboardStore";
-import { useSearchParams } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
+import { useDashboardStore } from "@/store/useDashboardStore";
+
+import { useSearchParams } from "next/navigation";
 import type { DashboardStats } from "@/lib/types";
 
 // Quick Actions data
@@ -264,8 +264,15 @@ function QuickActionsSection() {
 
 // ─────────── Main DashboardScreen ──────────────
 export default function DashboardScreen() {
-  useAuth();
-  const { sites, stats, sitesLoading } = useDashboardStore();
+  const { sites, stats, sitesLoading, fetchSites } = useDashboardStore();
+  const { profile: user } = useUserStore();
+
+  useEffect(() => {
+    if (user?.uid) {
+      fetchSites(user.uid);
+    }
+  }, [fetchSites, user?.uid]);
+
   const recentSites = sites.slice(0, 3);
 
   return (

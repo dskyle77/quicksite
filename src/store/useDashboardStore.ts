@@ -26,7 +26,6 @@ interface DashboardState {
   sitesError: string | null;
   ui: UIState;
 
-  initialize: (uid: string) => Promise<void>;
   fetchSites: (uid: string) => Promise<void>;
 
   removeSite: (siteId: string, token: string) => Promise<void>;
@@ -126,14 +125,6 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   sitesLoading: false,
   sitesError: null,
   ui: initialUI,
-
-  // ── Initialize ──────────────────────────────────────────────────────────────
-
-  initialize: async (uid) => {
-    set({ sitesLoading: true, sitesError: null });
-    await get().fetchSites(uid);
-    set({ sitesLoading: false });
-  },
 
   // ── Fetch sites (read — still direct Firestore, read-only is fine) ──────────
 

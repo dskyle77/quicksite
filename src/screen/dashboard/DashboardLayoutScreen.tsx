@@ -51,7 +51,7 @@ export default function DashboardLayoutScreen({
   const { profile } = useUserStore();
 
   // ── Zustand Store ──────────────────────────────────────────
-  const { ui, setSidebarOpen, initialize } = useDashboardStore();
+  const { ui, setSidebarOpen } = useDashboardStore();
 
   useEffect(() => setMounted(true), []);
 
@@ -60,14 +60,6 @@ export default function DashboardLayoutScreen({
     if (!loading && !user) router.push("/login");
   }, [user, loading, router]);
 
-  // ── INITIALIZE DATA ────────────────────────────────────────
-  // This triggers once when the user is logged in.
-  // Because it's in the layout, it persists across dashboard sub-pages.
-  useEffect(() => {
-    if (user?.uid) {
-      initialize(user.uid);
-    }
-  }, [user?.uid, initialize]);
   // ───────────────────────────────────────────────────────────
 
   const handleLogout = async () => {
