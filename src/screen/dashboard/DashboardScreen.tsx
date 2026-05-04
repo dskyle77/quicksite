@@ -44,7 +44,7 @@ const QUICK_ACTIONS = [
     color: "bg-violet-500/10 text-violet-600",
   },
 ];
-const SITE_DOMAIN_NAME = process.env.NEXT_PUBLIC_SITE_DOMAIN_NAME;
+const SITE_SHORT_NAME = process.env.NEXT_PUBLIC_SITE_SHORT_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
 
 // ─────────── COMPONENT: UpgradeSuccessAlert ──────────────
@@ -175,8 +175,8 @@ function SiteCard({ site }: { site: any }) {
       </div>
       <p className="font-bold text-sm truncate">{site.name}</p>
       <p className="text-xs text-primary mt-0.5 truncate">
-        {SITE_DOMAIN_NAME}
-        {DOMAIN_NAME}/s/{site.slug}
+        {SITE_SHORT_NAME}
+        {DOMAIN_NAME}/{site.slug}
       </p>
       <p className="text-xs text-muted-foreground mt-3">{site.visits} visits</p>
     </div>

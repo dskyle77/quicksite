@@ -13,7 +13,7 @@ import { isValidTemplate, templatesRegistry } from "@/lib/templates";
 import { Layout, ArrowRight, CheckCircle2, Loader2, Eye } from "lucide-react";
 import { toast } from "sonner";
 
-const SITE_DOMAIN_NAME = process.env.NEXT_PUBLIC_SITE_DOMAIN_NAME;
+const SITE_SHORT_NAME = process.env.NEXT_PUBLIC_SITE_SHORT_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
 
 function SiteFormInputs({
@@ -48,8 +48,8 @@ function SiteFormInputs({
           <span className="text-sm font-bold ml-1">Desired URL</span>
           <div className="flex mt-1">
             <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 bg-slate-50 text-slate-400 text-xs shrink-0">
-              {SITE_DOMAIN_NAME}
-              {DOMAIN_NAME}/s/
+              {SITE_SHORT_NAME}
+              {DOMAIN_NAME}/
             </span>
             <input
               required

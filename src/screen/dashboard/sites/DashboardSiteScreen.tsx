@@ -20,7 +20,7 @@ import { toast } from "sonner";
 
 import type { Site } from "@/lib/types";
 
-const SITE_DOMAIN_NAME = process.env.NEXT_PUBLIC_SITE_DOMAIN_NAME;
+const SITE_SHORT_NAME = process.env.NEXT_PUBLIC_SITE_SHORT_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
 
 // ── Delete Confirm Modal ──────────────────────────────────────────────────────
@@ -117,13 +117,13 @@ function SiteCard({ site }: { site: Site }) {
         </div>
 
         <a
-          href={`https://${SITE_DOMAIN_NAME}${DOMAIN_NAME}/s/${site.slug}`}
+          href={`https://${SITE_SHORT_NAME}${DOMAIN_NAME}/${site.slug}`}
           target="_blank"
           rel="noreferrer"
           className="text-xs text-primary hover:underline flex items-center gap-1 mb-2"
         >
-          {SITE_DOMAIN_NAME}
-          {DOMAIN_NAME}/s/{site.slug} <ExternalLink className="h-3 w-3" />
+          {SITE_SHORT_NAME}
+          {DOMAIN_NAME}/{site.slug} <ExternalLink className="h-3 w-3" />
         </a>
 
         {/* Show custom domain if exists */}

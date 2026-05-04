@@ -3,15 +3,22 @@
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
-  Globe, Edit3, ExternalLink, ToggleLeft, ToggleRight,
-  Trash2, Loader2, ArrowLeft, Link as LinkIcon,
+  Globe,
+  Edit3,
+  ExternalLink,
+  ToggleLeft,
+  ToggleRight,
+  Trash2,
+  Loader2,
+  ArrowLeft,
+  Link as LinkIcon,
 } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { useState } from "react";
 
-const SITE_DOMAIN_NAME = process.env.NEXT_PUBLIC_SITE_DOMAIN_NAME;
+const SITE_SHORT_NAME = process.env.NEXT_PUBLIC_SITE_SHORT_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
 
 export default function SiteManageScreen() {
@@ -30,7 +37,10 @@ export default function SiteManageScreen() {
       <div className="flex flex-col items-center justify-center py-32 text-center">
         <Globe className="h-10 w-10 text-muted-foreground/20 mb-4" />
         <h2 className="font-bold text-xl mb-2">Site not found</h2>
-        <Link href="/dashboard/sites" className="text-sm text-primary hover:underline mt-2">
+        <Link
+          href="/dashboard/sites"
+          className="text-sm text-primary hover:underline mt-2"
+        >
           ← Back to Sites
         </Link>
       </div>
@@ -43,9 +53,13 @@ export default function SiteManageScreen() {
     try {
       const token = await user.getIdToken();
       await toggleSiteStatus(site.id, token);
-      toast.success(site.status === "published" ? "Site unpublished." : "Site published!");
+      toast.success(
+        site.status === "published" ? "Site unpublished." : "Site published!",
+      );
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to update status.");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to update status.",
+      );
     } finally {
       setToggling(false);
     }
@@ -60,12 +74,14 @@ export default function SiteManageScreen() {
       toast.success("Site deleted.");
       router.push("/dashboard/sites");
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Failed to delete site.");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete site.",
+      );
       setDeleting(false);
     }
   };
 
-  const siteUrl = `https://${SITE_DOMAIN_NAME}${DOMAIN_NAME}/s/${site.slug}`;
+  const siteUrl = `https://${SITE_SHORT_NAME}${DOMAIN_NAME}/${site.slug}`;
 
   return (
     <div className="max-w-2xl mx-auto py-10 px-4 space-y-6">
@@ -134,7 +150,9 @@ export default function SiteManageScreen() {
             <Edit3 className="h-4 w-4 text-muted-foreground" />
             <div>
               <p className="text-sm font-semibold">Edit Site</p>
-              <p className="text-xs text-muted-foreground">Open the site editor</p>
+              <p className="text-xs text-muted-foreground">
+                Open the site editor
+              </p>
             </div>
           </div>
           <ExternalLink className="h-4 w-4 text-muted-foreground" />
@@ -150,7 +168,9 @@ export default function SiteManageScreen() {
             <div>
               <p className="text-sm font-semibold">Custom Domain</p>
               <p className="text-xs text-muted-foreground">
-                {site.customDomain ? site.customDomain : "Connect a custom domain"}
+                {site.customDomain
+                  ? site.customDomain
+                  : "Connect a custom domain"}
               </p>
             </div>
           </div>
@@ -164,12 +184,16 @@ export default function SiteManageScreen() {
           className="w-full flex items-center justify-between px-5 py-4 hover:bg-muted transition disabled:opacity-60"
         >
           <div className="flex items-center gap-3">
-            {site.status === "published"
-              ? <ToggleLeft className="h-4 w-4 text-orange-500" />
-              : <ToggleRight className="h-4 w-4 text-emerald-500" />}
+            {site.status === "published" ? (
+              <ToggleLeft className="h-4 w-4 text-orange-500" />
+            ) : (
+              <ToggleRight className="h-4 w-4 text-emerald-500" />
+            )}
             <div className="text-left">
               <p className="text-sm font-semibold">
-                {site.status === "published" ? "Unpublish Site" : "Publish Site"}
+                {site.status === "published"
+                  ? "Unpublish Site"
+                  : "Publish Site"}
               </p>
               <p className="text-xs text-muted-foreground">
                 {site.status === "published"
@@ -178,7 +202,9 @@ export default function SiteManageScreen() {
               </p>
             </div>
           </div>
-          {toggling && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+          {toggling && (
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          )}
         </button>
       </div>
 
@@ -186,7 +212,9 @@ export default function SiteManageScreen() {
       <div className="bg-card border border-destructive/20 rounded-2xl p-5 space-y-3">
         <p className="text-sm font-bold text-destructive">Danger Zone</p>
         <p className="text-xs text-muted-foreground">
-          Permanently delete <span className="font-semibold text-foreground">{site.name}</span>. This cannot be undone.
+          Permanently delete{" "}
+          <span className="font-semibold text-foreground">{site.name}</span>.
+          This cannot be undone.
         </p>
         {!confirmDelete ? (
           <button
@@ -208,7 +236,11 @@ export default function SiteManageScreen() {
               disabled={deleting}
               className="flex-1 h-10 rounded-lg bg-destructive text-white text-sm font-semibold hover:opacity-90 transition disabled:opacity-60 flex items-center justify-center gap-2"
             >
-              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirm Delete"}
+              {deleting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Confirm Delete"
+              )}
             </button>
           </div>
         )}

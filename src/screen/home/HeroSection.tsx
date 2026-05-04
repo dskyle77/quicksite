@@ -2,7 +2,7 @@
 import { ArrowRight, Star, Sparkles, MessageCircle } from "lucide-react";
 import Link from "next/link";
 
-const SITE_DOMAIN_NAME = process.env.NEXT_PUBLIC_SITE_DOMAIN_NAME;
+const SITE_SHORT_NAME = process.env.NEXT_PUBLIC_SITE_SHORT_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
 
 export default function HeroSection() {
@@ -105,8 +105,8 @@ export default function HeroSection() {
                 <div className="h-2.5 w-2.5 rounded-full bg-primary/50" />
               </div>
               <div className="flex-1 bg-background rounded-md h-5 text-[10px] flex items-center px-2 text-muted-foreground">
-                {SITE_DOMAIN_NAME}
-                {DOMAIN_NAME}/s/amakachef
+                {SITE_SHORT_NAME}
+                {DOMAIN_NAME}/amakachef
               </div>
             </div>
 
@@ -155,8 +155,8 @@ export default function HeroSection() {
             <div>
               <p className="text-xs font-semibold">Site published!</p>
               <p className="text-[10px] text-muted-foreground">
-                {SITE_DOMAIN_NAME}
-                {DOMAIN_NAME}/s/amakachef
+                {SITE_SHORT_NAME}
+                {DOMAIN_NAME}/amakachef
               </p>
             </div>
           </div>
