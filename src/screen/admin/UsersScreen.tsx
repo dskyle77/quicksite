@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { AdminUser, PlanType } from "./adminTypes";
 import { PLAN_COLORS, STATUS_COLORS } from "./adminTypes";
@@ -9,7 +9,13 @@ import { cn } from "@/lib/utils";
 
 const VALID_PLANS: PlanType[] = ["free", "basic", "growth", "pro"];
 
-export default function UsersScreen({ users: initial }: { users: AdminUser[] }) {
+export default function UsersScreen({
+  users: initial,
+  nextCursor,
+}: {
+  users: AdminUser[];
+  nextCursor: string | null;
+}) {
   const router = useRouter();
   const [users, setUsers] = useState<AdminUser[]>(initial);
   const [search, setSearch] = useState("");
@@ -51,6 +57,15 @@ export default function UsersScreen({ users: initial }: { users: AdminUser[] }) 
     router.refresh();
   };
 
+  // Pagination — just navigate with cursor query param
+  const goNext = () => {
+    if (nextCursor) router.push(`/admin/users?cursor=${nextCursor}`);
+  };
+
+  const goPrev = () => {
+    router.back();
+  };
+
   return (
     <div className="flex flex-col gap-4">
       {/* Filters */}
@@ -71,7 +86,9 @@ export default function UsersScreen({ users: initial }: { users: AdminUser[] }) 
         >
           <option value="all">All Plans</option>
           {VALID_PLANS.map((p) => (
-            <option key={p} value={p}>{p}</option>
+            <option key={p} value={p}>
+              {p}
+            </option>
           ))}
         </select>
       </div>
@@ -82,50 +99,83 @@ export default function UsersScreen({ users: initial }: { users: AdminUser[] }) 
           <table className="w-full text-[13px] border-collapse">
             <thead>
               <tr className="border-b border-slate-100 bg-slate-50">
-                {["User", "Joined", "Plan", "Sites", "Status", "Actions"].map((h) => (
-                  <th key={h} className="text-left px-4 py-2.5 text-[10px] font-black tracking-widest text-slate-400 uppercase whitespace-nowrap">
-                    {h}
-                  </th>
-                ))}
+                {["User", "Joined", "Plan", "Sites", "Status", "Actions"].map(
+                  (h) => (
+                    <th
+                      key={h}
+                      className="text-left px-4 py-2.5 text-[10px] font-black tracking-widest text-slate-400 uppercase whitespace-nowrap"
+                    >
+                      {h}
+                    </th>
+                  ),
+                )}
               </tr>
             </thead>
             <tbody>
               {filtered.map((user, i) => (
-                <tr key={user.uid} className={cn(i < filtered.length - 1 && "border-b border-slate-50")}>
+                <tr
+                  key={user.uid}
+                  className={cn(
+                    i < filtered.length - 1 && "border-b border-slate-50",
+                  )}
+                >
                   {/* User */}
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-[11px] font-black shrink-0">
-                        {user.displayName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                        {user.displayName
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .slice(0, 2) || "??"}
                       </div>
                       <div>
-                        <p className="font-bold text-slate-900">{user.displayName}</p>
-                        <p className="text-[11px] text-slate-400">{user.email}</p>
+                        <p className="font-bold text-slate-900">
+                          {user.displayName || "—"}
+                        </p>
+                        <p className="text-[11px] text-slate-400">
+                          {user.email}
+                        </p>
                       </div>
                     </div>
                   </td>
                   {/* Joined */}
-                  <td className="px-4 py-3 text-slate-500 text-xs">{user.createdAt}</td>
+                  <td className="px-4 py-3 text-slate-500 text-xs">
+                    {user.createdAt
+                      ? new Date(user.createdAt).toLocaleDateString()
+                      : "—"}
+                  </td>
                   {/* Plan */}
                   <td className="px-4 py-3">
                     <select
                       value={user.plan}
-                      onChange={(e) => changePlan(user.uid, e.target.value as PlanType)}
+                      onChange={(e) =>
+                        changePlan(user.uid, e.target.value as PlanType)
+                      }
                       className={cn(
                         "text-[11px] font-black px-2 py-1 rounded-full border-none cursor-pointer uppercase tracking-wide",
                         PLAN_COLORS[user.plan as PlanType],
                       )}
                     >
                       {VALID_PLANS.map((p) => (
-                        <option key={p} value={p}>{p}</option>
+                        <option key={p} value={p}>
+                          {p}
+                        </option>
                       ))}
                     </select>
                   </td>
                   {/* Sites */}
-                  <td className="px-4 py-3 font-bold text-slate-900">{user.siteCount}</td>
+                  <td className="px-4 py-3 font-bold text-slate-900">
+                    {user.siteCount}
+                  </td>
                   {/* Status */}
                   <td className="px-4 py-3">
-                    <span className={cn("text-[11px] font-semibold flex items-center gap-1.5", STATUS_COLORS[user.status])}>
+                    <span
+                      className={cn(
+                        "text-[11px] font-semibold flex items-center gap-1.5",
+                        STATUS_COLORS[user.status],
+                      )}
+                    >
                       <span className="w-1.5 h-1.5 rounded-full bg-current" />
                       {user.status}
                     </span>
@@ -149,8 +199,35 @@ export default function UsersScreen({ users: initial }: { users: AdminUser[] }) 
             </tbody>
           </table>
           {filtered.length === 0 && (
-            <p className="text-center text-slate-400 text-[13px] py-12">No users found.</p>
+            <p className="text-center text-slate-400 text-[13px] py-12">
+              No users found.
+            </p>
           )}
+        </div>
+
+        {/* Pagination footer */}
+        <div className="border-t border-slate-100 px-4 py-3 flex items-center justify-between bg-slate-50">
+          <p className="text-[12px] text-slate-500">
+            Showing{" "}
+            <span className="font-bold text-slate-700">{filtered.length}</span>{" "}
+            of <span className="font-bold text-slate-700">{users.length}</span>{" "}
+            loaded users
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={goPrev}
+              className="flex items-center gap-1 text-[12px] font-bold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" /> Prev
+            </button>
+            <button
+              onClick={goNext}
+              disabled={!nextCursor}
+              className="flex items-center gap-1 text-[12px] font-bold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
 

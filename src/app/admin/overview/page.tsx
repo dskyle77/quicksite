@@ -1,15 +1,23 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  getAllUsers,
+  getAllUsersSummary,
   getAllSites,
   getAllDomains,
 } from "@/server/adminFirestore";
 import OverviewScreen from "@/screen/admin/OverviewScreen";
 
 export default async function AdminOverviewPage() {
-    const [users, sites, domains] = await Promise.all([
-        getAllUsers(),
-        getAllSites(),
-        getAllDomains(),
-      ]);
-  return <OverviewScreen users={users} sites={sites} domains={domains} />;
+  const [usersSummary, sites, domains] = await Promise.all([
+    getAllUsersSummary(),
+    getAllSites(),
+    getAllDomains(),
+  ]);
+  // OverviewScreen only needs plan/status for the dist chart — pass summary
+  return (
+    <OverviewScreen
+      users={usersSummary as any}
+      sites={sites}
+      domains={domains}
+    />
+  );
 }

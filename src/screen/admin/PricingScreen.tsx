@@ -15,8 +15,8 @@ const PLAN_HEX: Record<PlanType, string> = {
 
 const BOOLEAN_FEATURES: Array<{ key: keyof PricingPlan; label: string }> = [
   { key: "customDomain", label: "Custom Domains" },
-  { key: "analytics",    label: "Analytics" },
-  { key: "payments",     label: "Payments" },
+  { key: "analytics", label: "Analytics" },
+  { key: "payments", label: "Payments" },
 ];
 
 export default function PricingScreen({
@@ -59,7 +59,11 @@ export default function PricingScreen({
     </label>
   );
 
-  const textInput = (value: string, onChange: (v: string) => void, placeholder?: string) => (
+  const textInput = (
+    value: string,
+    onChange: (v: string) => void,
+    placeholder?: string,
+  ) => (
     <input
       value={value}
       onChange={(e) => onChange(e.target.value)}
@@ -82,7 +86,9 @@ export default function PricingScreen({
       {/* Unsaved banner */}
       {dirty && (
         <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 flex items-center justify-between">
-          <span className="text-[13px] font-bold text-amber-800">You have unsaved changes.</span>
+          <span className="text-[13px] font-bold text-amber-800">
+            You have unsaved changes.
+          </span>
           <button
             onClick={save}
             disabled={saving}
@@ -96,72 +102,110 @@ export default function PricingScreen({
 
       {/* Plan editor cards */}
       <div className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-4">
-        {(Object.entries(pricing) as [PlanType, PricingPlan][]).map(([planKey, plan]) => (
-          <div
-            key={planKey}
-            className="bg-white border border-slate-200 rounded-2xl p-5"
-            style={{ borderTop: `3px solid ${PLAN_HEX[planKey]}` }}
-          >
-            {/* Header */}
-            <div className="flex items-center gap-2 mb-4">
-              <span className="w-2 h-2 rounded-full" style={{ background: PLAN_HEX[planKey] }} />
-              <span className="font-black text-[15px] text-slate-900 capitalize">{plan.name}</span>
-              <span className={cn("text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full", PLAN_COLORS[planKey])}>
-                {planKey}
-              </span>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              {/* Price */}
-              <div>
-                {fieldLabel("Monthly Price (₦)")}
-                {numInput(plan.price, (v) => update(planKey, "price", v))}
-              </div>
-              {/* Display label */}
-              <div>
-                {fieldLabel("Display Label")}
-                {textInput(plan.nairaLabel, (v) => update(planKey, "nairaLabel", v), "e.g. ₦1,500")}
-              </div>
-              {/* Description */}
-              <div>
-                {fieldLabel("Description")}
-                {textInput(plan.description, (v) => update(planKey, "description", v), "Short description")}
-              </div>
-              {/* Button text */}
-              <div>
-                {fieldLabel("CTA Button Text")}
-                {textInput(plan.buttonText, (v) => update(planKey, "buttonText", v), "e.g. Upgrade Now")}
-              </div>
-              {/* Site limit */}
-              <div>
-                {fieldLabel("Site Limit")}
-                {numInput(plan.sites, (v) => update(planKey, "sites", v))}
+        {(Object.entries(pricing) as [PlanType, PricingPlan][]).map(
+          ([planKey, plan]) => (
+            <div
+              key={planKey}
+              className="bg-white border border-slate-200 rounded-2xl p-5"
+              style={{ borderTop: `3px solid ${PLAN_HEX[planKey]}` }}
+            >
+              {/* Header */}
+              <div className="flex items-center gap-2 mb-4">
+                <span
+                  className="w-2 h-2 rounded-full"
+                  style={{ background: PLAN_HEX[planKey] }}
+                />
+                <span className="font-black text-[15px] text-slate-900 capitalize">
+                  {plan.name}
+                </span>
+                <span
+                  className={cn(
+                    "text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full",
+                    PLAN_COLORS[planKey],
+                  )}
+                >
+                  {planKey}
+                </span>
               </div>
 
-              {/* Feature toggles */}
-              <div className="border-t border-slate-100 pt-3">
-                {fieldLabel("Features")}
-                {BOOLEAN_FEATURES.map((feat) => (
-                  <label key={feat.key} className="flex items-center gap-2 mb-1.5 cursor-pointer">
-                    <div
-                      onClick={() => update(planKey, feat.key, !plan[feat.key])}
-                      className="w-9 h-5 rounded-full relative transition-colors cursor-pointer"
-                      style={{ background: plan[feat.key] ? PLAN_HEX[planKey] : "#e2e8f0" }}
+              <div className="flex flex-col gap-3">
+                {/* Price */}
+                <div>
+                  {fieldLabel("Monthly Price (₦)")}
+                  {numInput(plan.price, (v) => update(planKey, "price", v))}
+                </div>
+                {/* Display label */}
+                <div>
+                  {fieldLabel("Display Label")}
+                  {textInput(
+                    plan.nairaLabel,
+                    (v) => update(planKey, "nairaLabel", v),
+                    "e.g. ₦1,500",
+                  )}
+                </div>
+                {/* Description */}
+                <div>
+                  {fieldLabel("Description")}
+                  {textInput(
+                    plan.description,
+                    (v) => update(planKey, "description", v),
+                    "Short description",
+                  )}
+                </div>
+                {/* Button text */}
+                <div>
+                  {fieldLabel("CTA Button Text")}
+                  {textInput(
+                    plan.buttonText,
+                    (v) => update(planKey, "buttonText", v),
+                    "e.g. Upgrade Now",
+                  )}
+                </div>
+                {/* Site limit */}
+                <div>
+                  {fieldLabel("Site Limit")}
+                  {numInput(plan.sites, (v) => update(planKey, "sites", v))}
+                </div>
+
+                {/* Feature toggles */}
+                <div className="border-t border-slate-100 pt-3">
+                  {fieldLabel("Features")}
+                  {BOOLEAN_FEATURES.map((feat) => (
+                    <label
+                      key={feat.key}
+                      className="flex items-center gap-2 mb-1.5 cursor-pointer"
                     >
                       <div
-                        className="w-3.5 h-3.5 rounded-full bg-white absolute top-[3px] shadow-sm transition-all"
-                        style={{ left: plan[feat.key] ? 19 : 3 }}
-                      />
-                    </div>
-                    <span className={cn("text-xs font-semibold", plan[feat.key] ? "text-slate-900" : "text-slate-400")}>
-                      {feat.label}
-                    </span>
-                  </label>
-                ))}
+                        onClick={() =>
+                          update(planKey, feat.key, !plan[feat.key])
+                        }
+                        className="w-9 h-5 rounded-full relative transition-colors cursor-pointer"
+                        style={{
+                          background: plan[feat.key]
+                            ? PLAN_HEX[planKey]
+                            : "#e2e8f0",
+                        }}
+                      >
+                        <div
+                          className="w-3.5 h-3.5 rounded-full bg-white absolute top-[3px] shadow-sm transition-all"
+                          style={{ left: plan[feat.key] ? 19 : 3 }}
+                        />
+                      </div>
+                      <span
+                        className={cn(
+                          "text-xs font-semibold",
+                          plan[feat.key] ? "text-slate-900" : "text-slate-400",
+                        )}
+                      >
+                        {feat.label}
+                      </span>
+                    </label>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ),
+        )}
       </div>
 
       {/* Live preview */}
@@ -170,39 +214,59 @@ export default function PricingScreen({
           Live Preview (as users see it)
         </p>
         <div className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2.5">
-          {(Object.entries(pricing) as [PlanType, PricingPlan][]).map(([planKey, plan]) => (
-            <div
-              key={planKey}
-              className="rounded-xl p-4"
-              style={{ border: `2px solid ${planKey === "basic" ? PLAN_HEX[planKey] : "#f1f5f9"}` }}
-            >
-              <p className="font-black text-slate-900 mb-0.5">{plan.name}</p>
-              <p className="text-2xl font-black" style={{ color: PLAN_HEX[planKey] }}>{plan.nairaLabel}</p>
-              <p className="text-[11px] text-slate-500 mt-1 mb-2.5">{plan.description}</p>
-              <div className="text-[11px] text-slate-400 space-y-0.5">
-                <div>🏠 {plan.sites === 50 ? "Unlimited" : plan.sites} site{plan.sites !== 1 ? "s" : ""}</div>
-                {plan.customDomain && <div>🌐 Custom domain</div>}
-                {plan.analytics && <div>📊 Analytics</div>}
-                {plan.payments && <div>💳 Payments</div>}
-              </div>
+          {(Object.entries(pricing) as [PlanType, PricingPlan][]).map(
+            ([planKey, plan]) => (
               <div
-                className="mt-2.5 py-1.5 text-center rounded-lg text-[11px] font-black text-white"
-                style={{ background: PLAN_HEX[planKey] }}
+                key={planKey}
+                className="rounded-xl p-4"
+                style={{
+                  border: `2px solid ${planKey === "basic" ? PLAN_HEX[planKey] : "#f1f5f9"}`,
+                }}
               >
-                {plan.buttonText}
+                <p className="font-black text-slate-900 mb-0.5">{plan.name}</p>
+                <p
+                  className="text-2xl font-black"
+                  style={{ color: PLAN_HEX[planKey] }}
+                >
+                  {plan.nairaLabel}
+                </p>
+                <p className="text-[11px] text-slate-500 mt-1 mb-2.5">
+                  {plan.description}
+                </p>
+                <div className="text-[11px] text-slate-400 space-y-0.5">
+                  <div>
+                    🏠 {plan.sites === 50 ? "Unlimited" : plan.sites} site
+                    {plan.sites !== 1 ? "s" : ""}
+                  </div>
+                  {plan.customDomain && <div>🌐 Custom domain</div>}
+                  {plan.analytics && <div>📊 Analytics</div>}
+                  {plan.payments && <div>💳 Payments</div>}
+                </div>
+                <div
+                  className="mt-2.5 py-1.5 text-center rounded-lg text-[11px] font-black text-white"
+                  style={{ background: PLAN_HEX[planKey] }}
+                >
+                  {plan.buttonText}
+                </div>
               </div>
-            </div>
-          ))}
+            ),
+          )}
         </div>
       </div>
 
       {/* Production note */}
       <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-4">
-        <p className="text-[13px] font-bold text-emerald-800 mb-1">⚠️ Production Note</p>
+        <p className="text-[13px] font-bold text-emerald-800 mb-1">
+          ⚠️ Production Note
+        </p>
         <p className="text-xs text-emerald-700 leading-relaxed">
-          Saving updates the <code className="bg-emerald-100 px-1 rounded">config/pricing</code> document in Firestore.
-          Your <code className="bg-emerald-100 px-1 rounded">PricingScreen.tsx</code> and{" "}
-          <code className="bg-emerald-100 px-1 rounded">src/lib/plans.ts</code> must read from that document at runtime.
+          Saving updates the{" "}
+          <code className="bg-emerald-100 px-1 rounded">config/pricing</code>{" "}
+          document in Firestore. Your{" "}
+          <code className="bg-emerald-100 px-1 rounded">PricingScreen.tsx</code>{" "}
+          and{" "}
+          <code className="bg-emerald-100 px-1 rounded">src/lib/plans.ts</code>{" "}
+          must read from that document at runtime.
         </p>
       </div>
 
