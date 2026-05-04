@@ -247,7 +247,7 @@ export default function CreateSitePage() {
       router.push(`/editor/${data.slug}`);
     } catch (error: any) {
       console.error(error);
-      toast.error(error.message || "Something went wrong.");
+      toast.error("Something went wrong.");
     } finally {
       setLoading(false);
     }

@@ -147,7 +147,7 @@ export default function DashboardDomainsScreen() {
       setDomainInput("");
       setStatus("idle");
     } catch (error: any) {
-      toast.error(error.message);
+      toast.error(error?.message || "Failed to connect domain.");
     } finally {
       setIsSubmitting(false);
     }
