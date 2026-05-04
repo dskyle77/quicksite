@@ -4,10 +4,11 @@ import { adminDb } from "@/server/firebase-admin";
 
 export async function PATCH(
   req: Request,
-  { params }: { params: { uid: string } }
+  { params }: { params: Promise<{ uid: string }> },
 ) {
   const caller = await getUserFromSession();
-  if (!caller?.uid) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!caller?.uid)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const callerDoc = await adminDb.collection("users").doc(caller.uid).get();
   if (!callerDoc.data()?.isAdmin) {
@@ -20,6 +21,8 @@ export async function PATCH(
     return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
   }
 
-  await adminDb.collection("users").doc(params.uid).update({ plan });
+  const { uid } = await params;
+
+  await adminDb.collection("users").doc(uid).update({ plan });
   return NextResponse.json({ success: true });
 }

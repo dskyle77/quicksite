@@ -2,7 +2,7 @@
 // saveSite hits PATCH /api/sites/[id]/content — auth enforced server-side.
 
 import { create } from "zustand";
-import { getPrivateSiteBySlug } from "@/lib/firestore";
+import { getPrivateSite } from "@/lib/firestore";
 import type { Site } from "@/lib/types";
 
 interface SiteEditorState {
@@ -25,7 +25,7 @@ export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
   fetchSite: async (uid, slug) => {
     try {
       set({ loading: true });
-      const data = await getPrivateSiteBySlug(uid, slug);
+      const data = await getPrivateSite(uid, slug);
       if (!data) throw new Error("Site not found.");
       set({ site: data });
     } catch (err) {

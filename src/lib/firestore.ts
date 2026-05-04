@@ -1,9 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/lib/firestore.ts
-// ─────────────────────────────────────────────────────────────────────────────
-// READ-ONLY Firestore operations. Safe to import from client components.
-// All write operations live in src/server/firestore.ts
-// ─────────────────────────────────────────────────────────────────────────────
 
 import {
   doc,
@@ -24,21 +20,14 @@ import type {
   Site,
   DashboardStats,
   AnalyticsEvent,
-  AnalyticsEventType,
 } from "@/lib/types";
 import type { Plan } from "@/lib/plans";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-/**
- * Converts Firestore Timestamps to ISO strings so data is serializable
- * for Next.js Client Components.
- */
 function serializeData<T>(data: any): T {
   if (!data) return data;
-
   const serialized = { ...data };
-
   Object.keys(serialized).forEach((key) => {
     const value = serialized[key];
     if (
@@ -53,7 +42,6 @@ function serializeData<T>(data: any): T {
       );
     }
   });
-
   return serialized as T;
 }
 
@@ -65,69 +53,50 @@ export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   return serializeData<UserProfile>(snap.data());
 }
 
-export async function createOrUpdateUserProfile(uid: string, data: any) {
+/**
+ * INITIAL SIGN UP: Creates the user document.
+ * Only called once when the user first authenticates.
+ */
+export async function createUserProfile(uid: string, data: any): Promise<void> {
   const userRef = doc(db, "users", uid);
-  const snap = await getDoc(userRef);
 
-  if (!snap.exists()) {
-    // INITIAL SIGN UP: Set everything
-    await setDoc(userRef, {
-      uid,
-      email: data.email,
-      displayName: data.displayName || "",
-      photoURL: data.photoURL || "",
-      phoneNumber: data.phoneNumber || "",
-      defaultMessage:
-        data.defaultMessage || "Hi! I'm interested in your services.",
-      plan: "free", // Hardcoded safe default
-      siteCount: 0, // Hardcoded safe default
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    });
-  } else {
-    // PROFILE UPDATE: Only allow specific fields
-    // We ignore 'plan' and 'siteCount' entirely here
-    await updateDoc(userRef, {
-      displayName: data.displayName ?? snap.data().displayName,
-      photoURL: data.photoURL ?? snap.data().photoURL,
-      phoneNumber: data.phoneNumber ?? snap.data().phoneNumber ?? "",
-      defaultMessage: data.defaultMessage ?? snap.data().defaultMessage,
-      updatedAt: serverTimestamp(),
-    });
-  }
+  await setDoc(userRef, {
+    uid,
+    email: data.email,
+    displayName: data.displayName || "",
+    photoURL: data.photoURL || "",
+    phoneNumber: data.phoneNumber || "",
+    defaultMessage:
+      data.defaultMessage || "Hi! I'm interested in your services.",
+    plan: "free", // Hardcoded default
+    siteCount: 0, // Hardcoded default
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
 }
 
+/**
+ * PROFILE UPDATE: Updates existing user data.
+ * Does not touch 'plan', 'siteCount', or 'createdAt'.
+ */
 export async function updateUserProfile(
   uid: string,
-  data: Partial<Omit<UserProfile, "uid" | "createdAt" | "updatedAt">>,
+  data: Partial<
+    Omit<UserProfile, "uid" | "plan" | "siteCount" | "createdAt" | "updatedAt">
+  >,
 ): Promise<void> {
-  await updateDoc(doc(db, "users", uid), {
+  const userRef = doc(db, "users", uid);
+
+  await updateDoc(userRef, {
     ...data,
     updatedAt: serverTimestamp(),
   });
 }
 
-export async function uploadProfilePhoto(
-  uid: string,
-  file: File,
-): Promise<string> {
-  const storageRef = ref(storage, `profile-photos/${uid}`);
-  await uploadBytes(storageRef, file);
-  return getDownloadURL(storageRef);
-}
-
-/**
- * Checks if the user with the given uid is an admin.
- * Uses client Firestore SDK, not admin.
- * @param uid - User ID to check
- * @returns Promise<boolean> true if the user is admin, false otherwise
- */
 export async function checkIsAdmin(uid: string): Promise<boolean> {
   if (!uid) return false;
-  const userRef = doc(db, "users", uid);
-  const snap = await getDoc(userRef);
-  const data = snap.exists() ? snap.data() : null;
-  return !!data?.isAdmin;
+  const snap = await getDoc(doc(db, "users", uid));
+  return !!snap.data()?.isAdmin;
 }
 
 // ── Sites (read-only) ─────────────────────────────────────────────────────────
@@ -138,120 +107,82 @@ export async function getUserSites(uid: string): Promise<Site[]> {
   return snap.docs.map((d) => serializeData<Site>({ id: d.id, ...d.data() }));
 }
 
-export async function getSite(siteId: string): Promise<Site | null> {
-  if (!siteId) return null;
-  const snap = await getDoc(doc(db, "sites", siteId));
-  if (!snap.exists()) return null;
+// src/lib/firestore.ts
+
+/**
+ * PUBLIC: Fetches a site.
+ * Priority 1: Document ID (Slug)
+ * Priority 2: customDomain field
+ */
+export async function getSiteByLookup(
+  identifier: string,
+): Promise<Site | null> {
+  if (!identifier) return null;
+  const clean = identifier.toLowerCase();
+
+  // Try Slug (ID)
+  const snap = await getDoc(doc(db, "sites", clean));
+  if (snap.exists() && snap.data().status === "published") {
+    return serializeData<Site>({ id: snap.id, ...snap.data() });
+  }
+
+  // Try Domain (Field)
+  const q = query(
+    collection(db, "sites"),
+    where("customDomain", "==", clean),
+    where("status", "==", "published"),
+  );
+  const querySnap = await getDocs(q);
+
+  if (!querySnap.empty) {
+    const d = querySnap.docs[0];
+    return serializeData<Site>({ id: d.id, ...d.data() });
+  }
+
+  return null;
+}
+
+/**
+ * PRIVATE: Editor fetch
+ */
+export async function getPrivateSite(
+  uid: string,
+  slug: string,
+): Promise<Site | null> {
+  const snap = await getDoc(doc(db, "sites", slug.toLowerCase()));
+  if (!snap.exists() || snap.data().uid !== uid) return null;
   return serializeData<Site>({ id: snap.id, ...snap.data() });
 }
 
 /**
- * PUBLIC: Fetches a published site by slug only. No uid required.
- * Used on the public /s/[slug] page.
+ * Validates if a slug/domain is available.
+ * Checks both Document IDs and the customDomain field.
  */
-export async function getSiteBySlug(slug: string): Promise<Site | null> {
-  if (!slug) return null;
-
-  const q = query(
-    collection(db, "sites"),
-    where("slug", "==", slug),
-    where("status", "==", "published"),
-  );
-  const snap = await getDocs(q);
-  if (snap.empty) return null;
-
-  const d = snap.docs[0];
-  return serializeData<Site>({ id: d.id, ...d.data() });
-}
-/**
- * PUBLIC: Fetches a published site by its custom domain.
- * Used by middleware to route custom domain traffic.
- */
-export async function getSiteByDomain(domain: string): Promise<Site | null> {
-  if (!domain) return null;
-
-  // We query the 'sites' collection for a matching 'customDomain' field
-  const q = query(
-    collection(db, "sites"),
-    where("customDomain", "==", domain),
-    where("status", "==", "published"),
-  );
-
-  const snap = await getDocs(q);
-
-  if (snap.empty) return null;
-
-  const d = snap.docs[0];
-  return serializeData<Site>({ id: d.id, ...d.data() });
-}
-/**
- * PRIVATE: Fetches a site by slug for the owner (uid required).
- * Used in the editor. Returns draft or published.
- */
-export async function getPrivateSiteBySlug(
-  uid: string,
-  slug: string,
-): Promise<Site | null> {
-  if (!slug || !uid) return null;
-
-  const q = query(
-    collection(db, "sites"),
-    where("slug", "==", slug),
-    where("uid", "==", uid),
-  );
-  const snap = await getDocs(q);
-  if (snap.empty) return null;
-
-  const d = snap.docs[0];
-  return serializeData<Site>({ id: d.id, ...d.data() });
-}
-
-/**
- * Returns the site limit for a user based on their plan.
- * Uses PLAN_LIMITS as the single source of truth.
- */
-export async function getUserSiteLimit(uid: string): Promise<number> {
-  const profile = await getUserProfile(uid);
-  if (!profile) return getSiteLimit("free");
-  return getSiteLimit((profile.plan ?? "free") as Plan);
-}
-
-export async function getUserSitesCount(uid: string): Promise<number> {
-  const q = query(collection(db, "sites"), where("uid", "==", uid));
-  const snap = await getDocs(q);
-  return snap.size;
-}
-
-/**
- * Find a siteId (doc.id) for a slug, optionally filtered by UID.
- */
-export async function getSiteIdBySlug(
-  slug: string,
-  uid?: string,
-): Promise<string | null> {
-  const q = uid
-    ? query(
-        collection(db, "sites"),
-        where("slug", "==", slug),
-        where("uid", "==", uid),
-      )
-    : query(collection(db, "sites"), where("slug", "==", slug));
-
-  const snap = await getDocs(q);
-  if (snap.empty) return null;
-  return snap.docs[0].id;
-}
-
-export async function isSlugTaken(
-  slug: string,
+export async function isIdentifierTaken(
+  identifier: string,
   excludeSiteId?: string,
 ): Promise<boolean> {
-  const q = query(collection(db, "sites"), where("slug", "==", slug));
+  const cleanId = identifier.toLowerCase();
+
+  // 1. Check if an ID already exists
+  const directSnap = await getDoc(doc(db, "sites", cleanId));
+  if (directSnap.exists() && directSnap.id !== excludeSiteId) return true;
+
+  // 2. Check if a customDomain field matches
+  const q = query(
+    collection(db, "sites"),
+    where("customDomain", "==", cleanId),
+  );
   const snap = await getDocs(q);
   return snap.docs.some((d) => d.id !== excludeSiteId);
 }
 
-// ── Analytics (read-only) ─────────────────────────────────────────────────────
+// ── Dashboard & Limits ────────────────────────────────────────────────────────
+
+export async function getUserSiteLimit(uid: string): Promise<number> {
+  const profile = await getUserProfile(uid);
+  return getSiteLimit((profile?.plan ?? "free") as Plan);
+}
 
 export async function getDashboardStats(uid: string): Promise<DashboardStats> {
   const sites = await getUserSites(uid);

@@ -1,13 +1,6 @@
-export type PlanType = "free" | "basic" | "growth" | "pro";
+// src/screen/admin/adminTypes.ts
 
-export type StatusType =
-  | "active"
-  | "published"
-  | "suspended"
-  | "pending"
-  | "draft"
-  | "ACTIVE"
-  | "PENDING_VERIFICATION";
+export type PlanType = "free" | "basic" | "growth" | "pro";
 
 export interface AdminUser {
   uid: string;
@@ -16,9 +9,9 @@ export interface AdminUser {
   plan: PlanType;
   siteCount: number;
   createdAt: string;
-  updatedAt?: string;
+  updatedAt: string;
   status: string;
-  isAdmin?: boolean;
+  isAdmin: boolean;
 }
 
 export interface AdminSite {
@@ -26,99 +19,57 @@ export interface AdminSite {
   name: string;
   slug: string;
   uid: string;
-  status: "published" | "draft";
+  status: string;
   visits: number;
-  plan: PlanType;
+  plan: string;
   createdAt: string;
   customDomain: string | null;
 }
 
 export interface AdminDomain {
   id: string;
-  domain: string;
   uid: string;
+  domain: string;
   siteId: string;
   siteName: string;
+  /** Site slug — migrated from the site doc so domains are self-contained */
+  slug: string;
   linkedAt: string;
-  status: "active" | "pending";
-  vercelStatus: "ACTIVE" | "PENDING_VERIFICATION";
+  status: string;
+  vercelStatus: string;
   dnsOk: boolean;
 }
 
-export interface PricingPlan {
-  name: string;
-  price: number;
-  nairaLabel: string;
-  sites: number;
-  customDomain: boolean;
-  analytics: boolean;
-  payments: boolean;
-  description: string;
-  buttonText: string;
+export interface PricingConfig {
+  [key: string]: unknown;
 }
 
-export type PricingConfig = Record<PlanType, PricingPlan>;
+/** Server-computed aggregates for the Overview page — no full collection fetches */
+export interface OverviewStats {
+  totalUsers: number;
+  activeUsers: number;
+  totalSites: number;
+  publishedSites: number;
+  totalDomains: number;
+  verifiedDomains: number;
+  /** Estimated MRR in NGN */
+  mrr: number;
+  planDist: Record<string, number>;
+}
 
 export const PLAN_COLORS: Record<PlanType, string> = {
-  free: "bg-slate-100 text-slate-500",
-  basic: "bg-blue-50 text-blue-600",
-  growth: "bg-emerald-50 text-emerald-600",
-  pro: "bg-violet-50 text-violet-600",
+  free: "bg-slate-100 text-slate-600",
+  basic: "bg-blue-100 text-blue-700",
+  growth: "bg-emerald-100 text-emerald-700",
+  pro: "bg-violet-100 text-violet-700",
 };
 
 export const STATUS_COLORS: Record<string, string> = {
   active: "text-emerald-600",
+  draft: "text-slate-400",
   published: "text-emerald-600",
   suspended: "text-red-500",
-  pending: "text-amber-500",
-  draft: "text-slate-400",
   ACTIVE: "text-emerald-600",
   PENDING_VERIFICATION: "text-amber-500",
-};
-
-export const DEFAULT_PRICING: PricingConfig = {
-  free: {
-    name: "Free",
-    price: 0,
-    nairaLabel: "₦0",
-    sites: 1,
-    customDomain: false,
-    analytics: false,
-    payments: false,
-    description: "Start building your mini-site",
-    buttonText: "Get Started Free",
-  },
-  basic: {
-    name: "Basic",
-    price: 1500,
-    nairaLabel: "₦1,500",
-    sites: 3,
-    customDomain: true,
-    analytics: false,
-    payments: false,
-    description: "Look professional online",
-    buttonText: "Upgrade to Basic",
-  },
-  growth: {
-    name: "Growth",
-    price: 4000,
-    nairaLabel: "₦4,000",
-    sites: 10,
-    customDomain: true,
-    analytics: true,
-    payments: false,
-    description: "Grow your business",
-    buttonText: "Upgrade to Growth",
-  },
-  pro: {
-    name: "Pro",
-    price: 10000,
-    nairaLabel: "₦10,000",
-    sites: 50,
-    customDomain: true,
-    analytics: true,
-    payments: true,
-    description: "Run your business online",
-    buttonText: "Go Pro",
-  },
+  ERROR: "text-red-500",
 };

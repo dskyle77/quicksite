@@ -4,9 +4,8 @@
 import { create } from "zustand";
 import {
   getUserProfile,
-  createOrUpdateUserProfile,
+  createUserProfile,
   updateUserProfile,
-  uploadProfilePhoto,
 } from "@/lib/firestore";
 import type { UserProfile } from "@/lib/types";
 
@@ -24,7 +23,6 @@ interface UserState {
     uid: string,
     data: Partial<Omit<UserProfile, "uid" | "createdAt" | "updatedAt">>,
   ) => Promise<void>;
-  uploadPhoto: (uid: string, file: File) => Promise<string | null>;
 
   clearUser: () => void;
 }
@@ -47,7 +45,7 @@ export const useUserStore = create<UserState>((set, get) => ({
 
       // Auto-create profile if it doesn't exist
       if (!profile) {
-        await createOrUpdateUserProfile(uid, {});
+        await createUserProfile(uid, {});
         profile = await getUserProfile(uid);
       }
 
@@ -86,31 +84,6 @@ export const useUserStore = create<UserState>((set, get) => ({
       }));
     } catch (err: any) {
       set({ error: err.message || "Failed to update user" });
-    } finally {
-      set({ isSaving: false });
-    }
-  },
-
-  // ── Upload profile photo ────────────────────────
-  uploadPhoto: async (uid, file) => {
-    if (!uid) return null;
-
-    set({ isSaving: true, error: null });
-
-    try {
-      const url = await uploadProfilePhoto(uid, file);
-
-      // Save URL to profile
-      await updateUserProfile(uid, { photoURL: url });
-
-      set((state) => ({
-        profile: state.profile ? { ...state.profile, photoURL: url } : state.profile,
-      }));
-
-      return url;
-    } catch (err: any) {
-      set({ error: err.message || "Upload failed" });
-      return null;
     } finally {
       set({ isSaving: false });
     }

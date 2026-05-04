@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -23,9 +24,15 @@ import { Button } from "@/components/ui/button";
 export default function SitesScreen({
   sites: initial,
   users,
+  nextCursor,
+  currentSearch,
+  currentStatus,
 }: {
   sites: AdminSite[];
   users: AdminUser[];
+  nextCursor?: any;
+  currentSearch?: any;
+  currentStatus?: any;
 }) {
   const router = useRouter();
   const [sites, setSites] = useState<AdminSite[]>(initial);

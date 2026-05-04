@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -37,9 +38,13 @@ interface DeleteTarget {
 export default function UserDomainsScreen({
   domains: initial,
   users,
+  nextCursor,
+  currentSearch,
 }: {
   domains: AdminDomain[];
   users: AdminUser[];
+  nextCursor?: any;
+  currentSearch?: any;
 }) {
   const [domains, setDomains] = useState<AdminDomain[]>(initial);
   const [search, setSearch] = useState("");
@@ -151,8 +156,8 @@ export default function UserDomainsScreen({
               <span className="font-semibold text-slate-900">
                 {deleteTarget?.domain}
               </span>{" "}
-              from its site and remove it from Vercel. The domain itself won&apos;t
-              be deleted from your registrar.
+              from its site and remove it from Vercel. The domain itself
+              won&apos;t be deleted from your registrar.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-2">

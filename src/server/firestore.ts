@@ -11,11 +11,16 @@ import type { Plan } from "@/lib/plans";
 
 async function getSiteCount(uid: string): Promise<number> {
   const userDoc = await adminDb.collection("users").doc(uid).get();
-
-  if (!userDoc.exists) {
-    return 0;
-  }
   return userDoc.data()?.siteCount || 0;
+}
+/**
+ * Returns the user's plan as a string (e.g., "free", "pro", etc.).
+ * Defaults to "free" if not set.
+ */
+export async function getUserPlan(uid: string): Promise<string> {
+  const userDoc = await adminDb.collection("users").doc(uid).get();
+  const plan = userDoc.data()?.plan;
+  return typeof plan === "string" ? plan : "free";
 }
 
 async function assertSiteOwner(siteId: string, uid: string): Promise<any> {
@@ -26,13 +31,25 @@ async function assertSiteOwner(siteId: string, uid: string): Promise<any> {
 }
 
 /**
- * Fetches the plan for a user from Firestore.
- * Returns "free" if not set or user does not exist.
+ * Checks if a slug is used as a Doc ID OR if a domain is used in any field.
  */
-export async function getUserPlan(uid: string): Promise<Plan> {
-  const userDoc = await adminDb.collection("users").doc(uid).get();
-  if (!userDoc.exists) return "free";
-  return (userDoc.data()?.plan as Plan) || "free";
+export async function isIdentifierTaken(
+  identifier: string,
+  excludeSiteId?: string,
+): Promise<boolean> {
+  const clean = identifier.trim().toLowerCase();
+
+  // 1. Check if ID exists (Slug)
+  const idDoc = await adminDb.collection("sites").doc(clean).get();
+  if (idDoc.exists && idDoc.id !== excludeSiteId) return true;
+
+  // 2. Check if customDomain field exists
+  const domainSnap = await adminDb
+    .collection("sites")
+    .where("customDomain", "==", clean)
+    .get();
+
+  return domainSnap.docs.some((d) => d.id !== excludeSiteId);
 }
 
 // ── Sites ─────────────────────────────────────────────────────────────────────
@@ -43,53 +60,72 @@ export async function serverCreateSite(
   data: Omit<
     Site,
     "id" | "uid" | "visits" | "whatsappClicks" | "createdAt" | "updatedAt"
-  >,
+  > & { slug: string },
 ): Promise<string> {
-  const [currentCount, slugTaken] = await Promise.all([
-    getSiteCount(uid),
-    checkSlugTaken(data.slug),
-  ]);
+  const slug = data.slug.trim().toLowerCase();
 
-  const limit = getSiteLimit(plan);
+  const currentCount = await getSiteCount(uid);
 
-  if (currentCount >= limit) {
-    throw new Error(
-      `Plan limit reached. Your ${plan} plan allows ${limit} site${limit === 1 ? "" : "s"}.`,
-    );
-  }
+  if (currentCount >= getSiteLimit(plan))
+    throw new Error("Plan limit reached.");
+  if (await isIdentifierTaken(slug)) throw new Error("URL already taken.");
 
-  if (slugTaken) {
-    throw new Error("That URL slug is already taken. Please choose another.");
-  }
-
-  const newRef = adminDb.collection("sites").doc();
-  const userRef = adminDb.collection("users").doc(uid);
-
-  // We use a writeBatch to ensure both the site creation AND
-  // the user's siteCount update happen together (or not at all).
   const batch = adminDb.batch();
+  const siteRef = adminDb.collection("sites").doc(slug);
 
-  batch.set(newRef, {
+  batch.set(siteRef, {
+    ...data,
     uid,
+    slug,
+    customDomain: null,
     visits: 0,
     whatsappClicks: 0,
     createdAt: FieldValue.serverTimestamp(),
     updatedAt: FieldValue.serverTimestamp(),
-    ...data,
   });
 
-  // This ensures your Security Rules function (getUserSiteCount)
-  // actually has a value to look at!
-  batch.update(userRef, {
+  batch.update(adminDb.collection("users").doc(uid), {
     siteCount: FieldValue.increment(1),
     updatedAt: FieldValue.serverTimestamp(),
   });
 
   await batch.commit();
-
-  return newRef.id;
+  return slug;
 }
 
+/**
+ * Change the Slug (Requires Doc Copy/Delete)
+ */
+export async function serverRenameSlug(
+  oldSlug: string,
+  uid: string,
+  newSlug: string,
+): Promise<string> {
+  const normalizedNew = newSlug.trim().toLowerCase();
+  if (await isIdentifierTaken(normalizedNew)) throw new Error("Slug taken.");
+
+  const oldRef = adminDb.collection("sites").doc(oldSlug);
+  const oldDoc = await oldRef.get();
+
+  if (!oldDoc.exists || oldDoc.data()?.uid !== uid)
+    throw new Error("Unauthorized.");
+
+  const batch = adminDb.batch();
+  const newRef = adminDb.collection("sites").doc(normalizedNew);
+
+  batch.set(newRef, {
+    ...oldDoc.data(),
+    slug: normalizedNew,
+    updatedAt: FieldValue.serverTimestamp(),
+  });
+  batch.delete(oldRef);
+
+  await batch.commit();
+  return normalizedNew;
+}
+/**
+ * Standard update for site content/settings (non-ID changes).
+ */
 export async function serverUpdateSite(
   siteId: string,
   uid: string,
@@ -105,27 +141,28 @@ export async function serverUpdateSite(
       updatedAt: FieldValue.serverTimestamp(),
     });
 }
-
-export async function serverUpdateSiteBySlug(
+/**
+ * Update Custom Domain (Field Update Only)
+ */
+export async function serverUpdateDomain(
+  siteId: string,
   uid: string,
-  slug: string,
-  data: Partial<Omit<Site, "id" | "uid" | "createdAt">>,
+  domain: string | null,
 ): Promise<void> {
-  const snap = await adminDb
+  await assertSiteOwner(siteId, uid);
+
+  if (domain && (await isIdentifierTaken(domain, siteId))) {
+    throw new Error("Domain already in use.");
+  }
+
+  await adminDb
     .collection("sites")
-    .where("slug", "==", slug)
-    .where("uid", "==", uid)
-    .limit(1)
-    .get();
-
-  if (snap.empty) throw new Error("Site not found.");
-
-  await snap.docs[0].ref.update({
-    ...data,
-    updatedAt: FieldValue.serverTimestamp(),
-  });
+    .doc(siteId)
+    .update({
+      customDomain: domain ? domain.trim().toLowerCase() : null,
+      updatedAt: FieldValue.serverTimestamp(),
+    });
 }
-
 export async function serverToggleSiteStatus(
   siteId: string,
   uid: string,
@@ -140,29 +177,23 @@ export async function serverToggleSiteStatus(
 
   return nextStatus;
 }
+
 export async function serverDeleteSite(
   siteId: string,
   uid: string,
 ): Promise<void> {
-  // 1. Verify ownership first
   await assertSiteOwner(siteId, uid);
 
   const siteRef = adminDb.collection("sites").doc(siteId);
   const userRef = adminDb.collection("users").doc(uid);
-
-  // 2. Initialize a batch
   const batch = adminDb.batch();
 
-  // 3. Queue the delete operation
   batch.delete(siteRef);
-
-  // 4. Queue the decrement operation
   batch.update(userRef, {
     siteCount: FieldValue.increment(-1),
     updatedAt: FieldValue.serverTimestamp(),
   });
 
-  // 5. Commit both at once
   await batch.commit();
 }
 
@@ -171,40 +202,26 @@ export async function serverDeleteSite(
 export async function serverTrackSiteEvent(
   siteId: string,
   uid: string,
-  slug: string,
   type: AnalyticsEventType,
 ): Promise<void> {
-  await assertSiteOwner(siteId, uid);
+  // We don't necessarily need site ownership to track an event (e.g. public visits)
+  // but we do need the site to exist.
+  const siteRef = adminDb.collection("sites").doc(siteId);
+  const siteDoc = await siteRef.get();
+  if (!siteDoc.exists) throw new Error("Site not found.");
 
   const metricField = type === "visit" ? "visits" : "whatsappClicks";
 
-  await adminDb
-    .collection("sites")
-    .doc(siteId)
-    .update({
-      [metricField]: FieldValue.increment(1),
-      updatedAt: FieldValue.serverTimestamp(),
-    });
+  await siteRef.update({
+    [metricField]: FieldValue.increment(1),
+    updatedAt: FieldValue.serverTimestamp(),
+  });
 
   await adminDb.collection("analytics_events").add({
-    uid,
+    uid: siteDoc.data()?.uid,
     siteId,
-    siteSlug: slug,
+    siteSlug: siteDoc.data()?.slug,
     type,
     createdAt: FieldValue.serverTimestamp(),
   });
-}
-
-// ── Slug check ────────────────────────────────────────────────────────────────
-
-export async function checkSlugTaken(
-  slug: string,
-  excludeSiteId?: string,
-): Promise<boolean> {
-  const snap = await adminDb
-    .collection("sites")
-    .where("slug", "==", slug)
-    .get();
-
-  return snap.docs.some((d) => d.id !== excludeSiteId);
 }

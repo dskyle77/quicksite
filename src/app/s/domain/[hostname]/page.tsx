@@ -30,10 +30,7 @@ export default function CustomDomainPublicPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* We pass empty slugs because custom domains usually live at the root */}
-      <SiteRenderer
-        site={siteData}
-        slugs={{ slug: "", subslug: "" }}
-      />
+      <SiteRenderer site={siteData} slugs={{ slug: "", subslug: "" }} />
     </main>
   );
 }

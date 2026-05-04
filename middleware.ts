@@ -1,44 +1,50 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
 export function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get("host") || "";
+  const path = url.pathname;
 
-  // 1. Define your internal domains
+  // 1. Define your domains
   const rootDomain = "quicksiteio.vercel.app";
+  const shortDomain = "qsio.vercel.app"; // Your short link domain
 
-  // 2. Standard exclusions
+  // 2. Standard exclusions (Assets, API, etc.)
   if (
-    url.pathname.startsWith("/_next") ||
-    url.pathname.startsWith("/api") ||
-    url.pathname.startsWith("/static") ||
-    url.pathname.includes(".")
+    path.startsWith("/_next") ||
+    path.startsWith("/api") ||
+    path.startsWith("/static") ||
+    path.includes(".")
   ) {
     return NextResponse.next();
   }
 
-  // 3. Root Domain Logic
-  const isRootDomain =
-    hostname === rootDomain ||
-    hostname === "localhost:3000" ||
-    hostname.split(":")[0] === "127.0.0.1";
+  // 3. Root Domain Logic (The Main App)
+  const isRootDomain = hostname === rootDomain || hostname === "localhost:3000";
 
   if (isRootDomain) {
+    // If someone visits quicksiteio.vercel.app/s/[slug], let it pass through
+    // to the actual file at app/s/[slug]/page.tsx
     return NextResponse.next();
   }
 
-  // 4. CUSTOM DOMAIN / SUBDOMAIN LOGIC
+  // 4. Short Domain or Custom Domain Logic
+  const isShortDomain = hostname === shortDomain;
   const cleanHostname = hostname.split(":")[0];
 
-  // Create the rewrite URL
-  const rewriteUrl = new URL(
-    `/s/domain/${cleanHostname}${url.pathname}`,
-    req.url,
-  );
+  let rewriteUrl: URL;
+
+  if (isShortDomain) {
+    // Treat qsio.vercel.app/[slug] as a rewrite to /s/[slug]
+    // Note: path already contains the leading slash, e.g., "/my-site"
+    rewriteUrl = new URL(`/s${path}`, req.url);
+  } else {
+    // Treat everything else as a Custom Domain
+    // Rewrites to /s/domain/[hostname][path]
+    rewriteUrl = new URL(`/s/domain/${cleanHostname}${path}`, req.url);
+  }
 
   // 5. Inject the 'x-is-site' header
-  // This is the key to hiding the Navbar/Footer in your layout
   const response = NextResponse.rewrite(rewriteUrl);
   response.headers.set("x-is-site", "true");
 

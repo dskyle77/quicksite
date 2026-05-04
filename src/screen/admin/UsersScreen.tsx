@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import authFetch from "@/lib/authFetch";
 import { Search, ChevronLeft, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import type { AdminUser, PlanType } from "./adminTypes";
@@ -35,7 +36,7 @@ export default function UsersScreen({
   );
 
   const changePlan = async (uid: string, plan: PlanType) => {
-    await fetch(`/api/admin/users/${uid}/plan`, {
+    await authFetch(`/api/admin/users/${uid}/plan`, {
       method: "PATCH",
       body: JSON.stringify({ plan }),
       headers: { "Content-Type": "application/json" },
@@ -47,7 +48,7 @@ export default function UsersScreen({
 
   const toggleStatus = async (uid: string, current: string) => {
     const status = current === "active" ? "suspended" : "active";
-    await fetch(`/api/admin/users/${uid}/status`, {
+    await authFetch(`/api/admin/users/${uid}/status`, {
       method: "PATCH",
       body: JSON.stringify({ status }),
       headers: { "Content-Type": "application/json" },

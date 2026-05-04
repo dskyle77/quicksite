@@ -6,6 +6,7 @@ import type {
   AdminSite,
   AdminDomain,
   PricingConfig,
+  OverviewStats,
 } from "@/screen/admin/adminTypes";
 
 // ── Serialization helper ──────────────────────────────────────────────────────
@@ -35,10 +36,9 @@ export async function getAllUsers(
   let q = adminDb
     .collection("users")
     .orderBy("createdAt", "desc")
-    .limit(pageSize + 1); // fetch one extra to detect next page
+    .limit(pageSize + 1);
 
   if (cursor) {
-    // cursor is an ISO string — convert back to a Firestore Timestamp-comparable value
     const cursorDoc = await adminDb.collection("users").doc(cursor).get();
     if (cursorDoc.exists) {
       q = q.startAfter(cursorDoc);
@@ -70,7 +70,7 @@ export async function getAllUsers(
   };
 }
 
-// Keep a simple "get all" for the overview stats (just UIDs + plan, lightweight)
+// Lightweight summary for overview stats only
 export async function getAllUsersSummary(): Promise<
   Pick<AdminUser, "uid" | "plan" | "status">[]
 > {
@@ -100,15 +100,104 @@ export async function checkIsAdmin(uid: string): Promise<boolean> {
   return !!data?.isAdmin;
 }
 
-// ── Sites ─────────────────────────────────────────────────────────────────────
+// ── Overview aggregates ───────────────────────────────────────────────────────
 
-export async function getAllSites(): Promise<AdminSite[]> {
-  const snap = await adminDb
+export async function getOverviewStats(): Promise<OverviewStats> {
+  const users = await getAllUsersSummary();
+
+  const totalUsers = users.length;
+  const activeUsers = users.filter((u) => u.status === "active").length;
+
+  const planDist = { free: 0, basic: 0, growth: 0, pro: 0 } as Record<
+    string,
+    number
+  >;
+  users.forEach((u) => {
+    planDist[u.plan] = (planDist[u.plan] ?? 0) + 1;
+  });
+
+  // MRR computed from user plan counts (no full site scan needed)
+  const mrr =
+    (planDist.basic ?? 0) * 1500 +
+    (planDist.growth ?? 0) * 4000 +
+    (planDist.pro ?? 0) * 10000;
+
+  // Cheap server-side counts via Firestore aggregation
+  const [sitesCountSnap, domainsCountSnap, verifiedDomainsSnap] =
+    await Promise.all([
+      adminDb.collection("sites").count().get(),
+      adminDb.collection("domains").count().get(),
+      adminDb.collection("domains").where("dnsOk", "==", true).count().get(),
+    ]);
+
+  const publishedSitesSnap = await adminDb
     .collection("sites")
-    .orderBy("createdAt", "desc")
+    .where("status", "==", "published")
+    .count()
     .get();
 
-  return snap.docs.map((d) => {
+  return {
+    totalUsers,
+    activeUsers,
+    totalSites: sitesCountSnap.data().count,
+    publishedSites: publishedSitesSnap.data().count,
+    totalDomains: domainsCountSnap.data().count,
+    verifiedDomains: verifiedDomainsSnap.data().count,
+    mrr,
+    planDist,
+  };
+}
+
+// ── Sites (paginated + search) ────────────────────────────────────────────────
+
+const SITES_PAGE_SIZE = 20;
+
+export async function getSitesPaginated({
+  cursor,
+  search,
+  statusFilter,
+  pageSize = SITES_PAGE_SIZE,
+}: {
+  cursor?: string;
+  search?: string;
+  statusFilter?: string;
+  pageSize?: number;
+}): Promise<{ sites: AdminSite[]; nextCursor: string | null }> {
+  let q: FirebaseFirestore.Query = adminDb
+    .collection("sites")
+    .orderBy("createdAt", "desc")
+    .limit(pageSize + 1);
+
+  if (statusFilter && statusFilter !== "all") {
+    q = adminDb
+      .collection("sites")
+      .where("status", "==", statusFilter)
+      .orderBy("createdAt", "desc")
+      .limit(pageSize + 1);
+  }
+
+  // Server-side slug prefix search (Firestore range query)
+  if (search) {
+    const end = search + "\uf8ff";
+    q = adminDb
+      .collection("sites")
+      .where("slug", ">=", search)
+      .where("slug", "<=", end)
+      .limit(pageSize + 1);
+  }
+
+  if (cursor) {
+    const cursorDoc = await adminDb.collection("sites").doc(cursor).get();
+    if (cursorDoc.exists) {
+      q = q.startAfter(cursorDoc);
+    }
+  }
+
+  const snap = await q.get();
+  const docs = snap.docs.slice(0, pageSize);
+  const hasMore = snap.docs.length > pageSize;
+
+  const sites: AdminSite[] = docs.map((d) => {
     const data = serializeDoc(d.data());
     return {
       id: d.id,
@@ -122,11 +211,15 @@ export async function getAllSites(): Promise<AdminSite[]> {
       customDomain: data.customDomain || null,
     } as AdminSite;
   });
+
+  return {
+    sites,
+    nextCursor: hasMore ? docs[docs.length - 1].id : null,
+  };
 }
+
 /**
  * Admin-only site deletion — no ownership check.
- * Deletes the site and decrements the owner's siteCount.
- * Call this from admin API routes only.
  */
 export async function adminDeleteSite(siteId: string): Promise<void> {
   const siteRef = adminDb.collection("sites").doc(siteId);
@@ -150,33 +243,66 @@ export async function adminDeleteSite(siteId: string): Promise<void> {
   await batch.commit();
 }
 
-// ── Domains ───────────────────────────────────────────────────────────────────
+// ── Domains (top-level collection, paginated + search) ────────────────────────
+// NOTE: Run migrate-domains.ts first to populate the top-level `domains` collection.
 
-export async function getAllDomains(): Promise<AdminDomain[]> {
-  const usersSnap = await adminDb.collection("users").get();
-  const domains: AdminDomain[] = [];
+const DOMAINS_PAGE_SIZE = 20;
 
-  await Promise.all(
-    usersSnap.docs.map(async (userDoc) => {
-      const domSnap = await userDoc.ref.collection("domains").get();
-      domSnap.docs.forEach((d) => {
-        const data = serializeDoc(d.data());
-        domains.push({
-          id: d.id,
-          uid: userDoc.id,
-          domain: data.domain || "",
-          siteId: data.siteId || "",
-          siteName: data.siteName || "",
-          linkedAt: data.linkedAt || "",
-          status: data.status || "active",
-          vercelStatus: data.vercelStatus || "PENDING_VERIFICATION",
-          dnsOk: data.dnsOk || false,
-        } as AdminDomain);
-      });
-    }),
-  );
+export async function getDomainsPaginated({
+  cursor,
+  search,
+  pageSize = DOMAINS_PAGE_SIZE,
+}: {
+  cursor?: string;
+  search?: string;
+  pageSize?: number;
+}): Promise<{ domains: AdminDomain[]; nextCursor: string | null }> {
+  let q: FirebaseFirestore.Query = adminDb
+    .collection("domains")
+    .orderBy("linkedAt", "desc")
+    .limit(pageSize + 1);
 
-  return domains;
+  // Server-side domain prefix search
+  if (search) {
+    const end = search + "\uf8ff";
+    q = adminDb
+      .collection("domains")
+      .where("domain", ">=", search)
+      .where("domain", "<=", end)
+      .limit(pageSize + 1);
+  }
+
+  if (cursor) {
+    const cursorDoc = await adminDb.collection("domains").doc(cursor).get();
+    if (cursorDoc.exists) {
+      q = q.startAfter(cursorDoc);
+    }
+  }
+
+  const snap = await q.get();
+  const docs = snap.docs.slice(0, pageSize);
+  const hasMore = snap.docs.length > pageSize;
+
+  const domains: AdminDomain[] = docs.map((d) => {
+    const data = serializeDoc(d.data());
+    return {
+      id: d.id,
+      uid: data.uid || "",
+      domain: data.domain || "",
+      siteId: data.siteId || "",
+      siteName: data.siteName || "",
+      slug: data.slug || "",
+      linkedAt: data.linkedAt || "",
+      status: data.status || "active",
+      vercelStatus: data.vercelStatus || "PENDING_VERIFICATION",
+      dnsOk: data.dnsOk || false,
+    } as AdminDomain;
+  });
+
+  return {
+    domains,
+    nextCursor: hasMore ? docs[docs.length - 1].id : null,
+  };
 }
 
 // ── Pricing ───────────────────────────────────────────────────────────────────
