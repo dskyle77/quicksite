@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/server/auth";
 import { adminDb } from "@/server/firebase-admin";
-import { getAllUsers } from "@/server/adminFirestore";
+import { getDomainsPaginated } from "@/server/adminFirestore";
 
 export async function GET(req: Request) {
   const caller = await getUserFromSession();
@@ -14,13 +14,14 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url);
   const cursor = searchParams.get("cursor") ?? undefined;
+  const search = searchParams.get("search") ?? undefined;
 
   try {
-    const { users, nextCursor } = await getAllUsers(cursor);
-    return NextResponse.json({ users, nextCursor });
+    const { domains, nextCursor } = await getDomainsPaginated({ cursor, search });
+    return NextResponse.json({ domains, nextCursor });
   } catch (error) {
     return NextResponse.json(
-      { error: "Failed to fetch users", details: (error as Error).message },
+      { error: "Failed to fetch domains", details: (error as Error).message },
       { status: 500 },
     );
   }

@@ -1,12 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import authFetch from "@/lib/authFetch";
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Search, Eye, Trash2, ExternalLink, AlertTriangle } from "lucide-react";
+import {
+  Search,
+  Eye,
+  Trash2,
+  ExternalLink,
+  AlertTriangle,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+} from "lucide-react";
 
 import type { AdminSite, AdminUser, PlanType } from "./adminTypes";
 import { PLAN_COLORS, STATUS_COLORS } from "./adminTypes";
@@ -24,27 +33,79 @@ import { Button } from "@/components/ui/button";
 export default function SitesScreen({
   sites: initial,
   users,
-  nextCursor,
+  nextCursor: initialNextCursor,
   currentSearch,
   currentStatus,
 }: {
   sites: AdminSite[];
   users: AdminUser[];
-  nextCursor?: any;
-  currentSearch?: any;
-  currentStatus?: any;
+  nextCursor: string | null;
+  currentSearch?: string;
+  currentStatus?: string;
 }) {
   const router = useRouter();
+
+  // Data state
   const [sites, setSites] = useState<AdminSite[]>(initial);
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState(currentSearch || "");
+  const [filter, setFilter] = useState(currentStatus || "all");
+
+  // Pagination state (Mirrored from UsersScreen)
+  const [cursorStack, setCursorStack] = useState<string[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | null>(
+    initialNextCursor,
+  );
+  const [loading, setLoading] = useState(false);
+
+  // Action state
   const [deleteTarget, setDeleteTarget] = useState<AdminSite | null>(null);
   const [deleting, setDeleting] = useState(false);
 
+  // Fetch logic for pagination
+  const fetchPage = useCallback(
+    async (cursor?: string) => {
+      setLoading(true);
+      try {
+        const params = new URLSearchParams();
+        if (cursor) params.set("cursor", cursor);
+        if (search) params.set("search", search);
+        if (filter !== "all") params.set("status", filter);
+
+        const res = await authFetch(`/api/admin/sites?${params.toString()}`);
+        if (!res.ok) throw new Error("Failed to fetch sites");
+
+        const data = await res.json();
+        setSites(data.sites);
+        setNextCursor(data.nextCursor);
+      } catch (err) {
+        toast.error("Failed to load sites");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [search, filter],
+  );
+
+  const goNext = async () => {
+    if (!nextCursor) return;
+    // Push current first site ID to stack for "Prev" navigation
+    setCursorStack((prev) => [...prev, sites[0]?.id ?? ""]);
+    await fetchPage(nextCursor);
+  };
+
+  const goPrev = async () => {
+    if (cursorStack.length === 0) return;
+    const newStack = [...cursorStack];
+    const prevCursor = newStack.pop();
+    setCursorStack(newStack);
+    await fetchPage(newStack.length === 0 ? undefined : prevCursor);
+  };
+
+  // Client-side filtering for the current page
   const filtered = sites.filter(
     (s) =>
       (s.name.toLowerCase().includes(search.toLowerCase()) ||
-        s.slug.includes(search)) &&
+        s.slug.toLowerCase().includes(search.toLowerCase())) &&
       (filter === "all" || s.status === filter),
   );
 
@@ -130,13 +191,13 @@ export default function SitesScreen({
           onChange={(e) => setFilter(e.target.value)}
           className="px-3 py-2 border border-slate-200 rounded-xl text-[13px] bg-white cursor-pointer"
         >
-          <option value="all">All</option>
+          <option value="all">All Statuses</option>
           <option value="published">Published</option>
           <option value="draft">Draft</option>
         </select>
       </div>
 
-      {/* Table */}
+      {/* Table Container */}
       <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-[13px] border-collapse">
@@ -160,100 +221,131 @@ export default function SitesScreen({
               </tr>
             </thead>
             <tbody>
-              {filtered.map((site, i) => {
-                const owner = users.find((u) => u.uid === site.uid);
-                return (
-                  <tr
-                    key={site.id}
-                    className={cn(
-                      i < filtered.length - 1 && "border-b border-slate-50",
-                    )}
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-12">
+                    <Loader2 className="w-5 h-5 animate-spin text-slate-400 mx-auto" />
+                  </td>
+                </tr>
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="text-center text-slate-400 text-[13px] py-12"
                   >
-                    {/* Site */}
-                    <td className="px-4 py-3">
-                      <p className="font-bold text-slate-900">{site.name}</p>
-                      <p className="text-[11px] text-slate-400">
-                        /s/{site.slug}
-                      </p>
-                    </td>
-                    {/* Owner */}
-                    <td className="px-4 py-3">
-                      <p className="text-xs text-slate-600">
-                        {owner?.displayName ?? "—"}
-                      </p>
-                      {owner && (
+                    No sites found.
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((site, i) => {
+                  const owner = users.find((u) => u.uid === site.uid);
+                  return (
+                    <tr
+                      key={site.id}
+                      className={cn(
+                        i < filtered.length - 1 && "border-b border-slate-50",
+                      )}
+                    >
+                      <td className="px-4 py-3">
+                        <p className="font-bold text-slate-900">{site.name}</p>
+                        <p className="text-[11px] text-slate-400">
+                          /s/{site.slug}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3">
+                        <p className="text-xs text-slate-600">
+                          {owner?.displayName ?? "—"}
+                        </p>
+                        {owner && (
+                          <span
+                            className={cn(
+                              "text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full",
+                              PLAN_COLORS[owner.plan as PlanType],
+                            )}
+                          >
+                            {owner.plan}
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
                         <span
                           className={cn(
-                            "text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full",
-                            PLAN_COLORS[owner.plan as PlanType],
+                            "text-[11px] font-semibold flex items-center gap-1.5",
+                            STATUS_COLORS[site.status],
                           )}
                         >
-                          {owner.plan}
+                          <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                          {site.status}
                         </span>
-                      )}
-                    </td>
-                    {/* Status */}
-                    <td className="px-4 py-3">
-                      <span
-                        className={cn(
-                          "text-[11px] font-semibold flex items-center gap-1.5",
-                          STATUS_COLORS[site.status],
+                      </td>
+                      <td className="px-4 py-3">
+                        {site.customDomain ? (
+                          <a
+                            href={`https://${site.customDomain}`}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-xs text-blue-600 font-semibold flex items-center gap-1 hover:underline"
+                          >
+                            {site.customDomain}{" "}
+                            <ExternalLink className="w-2.5 h-2.5" />
+                          </a>
+                        ) : (
+                          <span className="text-[11px] text-slate-300">—</span>
                         )}
-                      >
-                        <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                        {site.status}
-                      </span>
-                    </td>
-                    {/* Custom domain */}
-                    <td className="px-4 py-3">
-                      {site.customDomain ? (
-                        <a
-                          href={`https://${site.customDomain}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-xs text-blue-600 font-semibold flex items-center gap-1 hover:underline"
-                        >
-                          {site.customDomain}{" "}
-                          <ExternalLink className="w-2.5 h-2.5" />
-                        </a>
-                      ) : (
-                        <span className="text-[11px] text-slate-300">—</span>
-                      )}
-                    </td>
-                    {/* Visits */}
-                    <td className="px-4 py-3 font-black text-slate-900">
-                      {site.visits.toLocaleString()}
-                    </td>
-                    {/* Actions */}
-                    <td className="px-4 py-3">
-                      <div className="flex gap-1.5">
-                        <a
-                          href={`/s/${site.slug}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <button className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200">
-                            <Eye className="w-3 h-3" /> View
+                      </td>
+                      <td className="px-4 py-3 font-black text-slate-900">
+                        {site.visits.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-1.5">
+                          <a
+                            href={`/s/${site.slug}`}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <button className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200">
+                              <Eye className="w-3 h-3" /> View
+                            </button>
+                          </a>
+                          <button
+                            onClick={() => setDeleteTarget(site)}
+                            className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-red-50 text-red-600 hover:bg-red-100"
+                          >
+                            <Trash2 className="w-3 h-3" />
                           </button>
-                        </a>
-                        <button
-                          onClick={() => setDeleteTarget(site)}
-                          className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-red-50 text-red-600 hover:bg-red-100"
-                        >
-                          <Trash2 className="w-3 h-3" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
             </tbody>
           </table>
-          {filtered.length === 0 && (
-            <p className="text-center text-slate-400 text-[13px] py-12">
-              No sites found.
-            </p>
-          )}
+        </div>
+
+        {/* Pagination footer (Mirrored from UsersScreen) */}
+        <div className="border-t border-slate-100 px-4 py-3 flex items-center justify-between bg-slate-50">
+          <p className="text-[12px] text-slate-500">
+            Showing{" "}
+            <span className="font-bold text-slate-700">{filtered.length}</span>{" "}
+            sites
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={goPrev}
+              disabled={cursorStack.length === 0 || loading}
+              className="flex items-center gap-1 text-[12px] font-bold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" /> Prev
+            </button>
+            <button
+              onClick={goNext}
+              disabled={!nextCursor || loading}
+              className="flex items-center gap-1 text-[12px] font-bold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

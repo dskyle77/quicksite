@@ -1,9 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import authFetch from "@/lib/authFetch";
-import { Search, ChevronLeft, ChevronRight } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Search, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import type { AdminUser, PlanType } from "./adminTypes";
 import { PLAN_COLORS, STATUS_COLORS } from "./adminTypes";
 import { cn } from "@/lib/utils";
@@ -12,20 +11,59 @@ const VALID_PLANS: PlanType[] = ["free", "basic", "growth", "pro"];
 
 export default function UsersScreen({
   users: initial,
-  nextCursor,
+  nextCursor: initialNextCursor,
 }: {
   users: AdminUser[];
   nextCursor: string | null;
 }) {
-  const router = useRouter();
   const [users, setUsers] = useState<AdminUser[]>(initial);
   const [search, setSearch] = useState("");
   const [planFilter, setPlanFilter] = useState("all");
   const [toast, setToast] = useState("");
 
+  // Pagination state
+  const [cursorStack, setCursorStack] = useState<string[]>([]); // stack of cursors for "prev"
+  const [nextCursor, setNextCursor] = useState<string | null>(
+    initialNextCursor,
+  );
+  const [loading, setLoading] = useState(false);
+
   const showToast = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(""), 3000);
+  };
+
+  const fetchPage = useCallback(async (cursor?: string) => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (cursor) params.set("cursor", cursor);
+      const res = await authFetch(`/api/admin/users?${params.toString()}`);
+      if (!res.ok) throw new Error("Failed to fetch");
+      const data = await res.json();
+      setUsers(data.users);
+      setNextCursor(data.nextCursor);
+    } catch {
+      showToast("Failed to load users");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const goNext = async () => {
+    if (!nextCursor) return;
+    // Push current "first user id" as the back-cursor
+    setCursorStack((prev) => [...prev, users[0]?.uid ?? ""]);
+    await fetchPage(nextCursor);
+  };
+
+  const goPrev = async () => {
+    if (cursorStack.length === 0) return;
+    const newStack = [...cursorStack];
+    const prevCursor = newStack.pop();
+    setCursorStack(newStack);
+    // If stack is now empty, fetch the very first page (no cursor)
+    await fetchPage(newStack.length === 0 ? undefined : prevCursor);
   };
 
   const filtered = users.filter(
@@ -43,7 +81,6 @@ export default function UsersScreen({
     });
     setUsers((prev) => prev.map((u) => (u.uid === uid ? { ...u, plan } : u)));
     showToast("Plan updated");
-    router.refresh();
   };
 
   const toggleStatus = async (uid: string, current: string) => {
@@ -55,16 +92,6 @@ export default function UsersScreen({
     });
     setUsers((prev) => prev.map((u) => (u.uid === uid ? { ...u, status } : u)));
     showToast("Status updated");
-    router.refresh();
-  };
-
-  // Pagination — just navigate with cursor query param
-  const goNext = () => {
-    if (nextCursor) router.push(`/admin/users?cursor=${nextCursor}`);
-  };
-
-  const goPrev = () => {
-    router.back();
   };
 
   return (
@@ -113,97 +140,109 @@ export default function UsersScreen({
               </tr>
             </thead>
             <tbody>
-              {filtered.map((user, i) => (
-                <tr
-                  key={user.uid}
-                  className={cn(
-                    i < filtered.length - 1 && "border-b border-slate-50",
-                  )}
-                >
-                  {/* User */}
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-[11px] font-black shrink-0">
-                        {user.displayName
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")
-                          .slice(0, 2) || "??"}
-                      </div>
-                      <div>
-                        <p className="font-bold text-slate-900">
-                          {user.displayName || "—"}
-                        </p>
-                        <p className="text-[11px] text-slate-400">
-                          {user.email}
-                        </p>
-                      </div>
-                    </div>
-                  </td>
-                  {/* Joined */}
-                  <td className="px-4 py-3 text-slate-500 text-xs">
-                    {user.createdAt
-                      ? new Date(user.createdAt).toLocaleDateString()
-                      : "—"}
-                  </td>
-                  {/* Plan */}
-                  <td className="px-4 py-3">
-                    <select
-                      value={user.plan}
-                      onChange={(e) =>
-                        changePlan(user.uid, e.target.value as PlanType)
-                      }
-                      className={cn(
-                        "text-[11px] font-black px-2 py-1 rounded-full border-none cursor-pointer uppercase tracking-wide",
-                        PLAN_COLORS[user.plan as PlanType],
-                      )}
-                    >
-                      {VALID_PLANS.map((p) => (
-                        <option key={p} value={p}>
-                          {p}
-                        </option>
-                      ))}
-                    </select>
-                  </td>
-                  {/* Sites */}
-                  <td className="px-4 py-3 font-bold text-slate-900">
-                    {user.siteCount}
-                  </td>
-                  {/* Status */}
-                  <td className="px-4 py-3">
-                    <span
-                      className={cn(
-                        "text-[11px] font-semibold flex items-center gap-1.5",
-                        STATUS_COLORS[user.status],
-                      )}
-                    >
-                      <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                      {user.status}
-                    </span>
-                  </td>
-                  {/* Actions */}
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() => toggleStatus(user.uid, user.status)}
-                      className={cn(
-                        "text-[11px] font-bold px-2.5 py-1 rounded-lg",
-                        user.status === "active"
-                          ? "bg-red-50 text-red-600 hover:bg-red-100"
-                          : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100",
-                      )}
-                    >
-                      {user.status === "active" ? "Suspend" : "Restore"}
-                    </button>
+              {loading ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-12">
+                    <Loader2 className="w-5 h-5 animate-spin text-slate-400 mx-auto" />
                   </td>
                 </tr>
-              ))}
+              ) : filtered.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={6}
+                    className="text-center text-slate-400 text-[13px] py-12"
+                  >
+                    No users found.
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((user, i) => (
+                  <tr
+                    key={user.uid}
+                    className={cn(
+                      i < filtered.length - 1 && "border-b border-slate-50",
+                    )}
+                  >
+                    {/* User */}
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-[11px] font-black shrink-0">
+                          {user.displayName
+                            .split(" ")
+                            .map((n) => n[0])
+                            .join("")
+                            .slice(0, 2) || "??"}
+                        </div>
+                        <div>
+                          <p className="font-bold text-slate-900">
+                            {user.displayName || "—"}
+                          </p>
+                          <p className="text-[11px] text-slate-400">
+                            {user.email}
+                          </p>
+                        </div>
+                      </div>
+                    </td>
+                    {/* Joined */}
+                    <td className="px-4 py-3 text-slate-500 text-xs">
+                      {user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString()
+                        : "—"}
+                    </td>
+                    {/* Plan */}
+                    <td className="px-4 py-3">
+                      <select
+                        value={user.plan}
+                        onChange={(e) =>
+                          changePlan(user.uid, e.target.value as PlanType)
+                        }
+                        className={cn(
+                          "text-[11px] font-black px-2 py-1 rounded-full border-none cursor-pointer uppercase tracking-wide",
+                          PLAN_COLORS[user.plan as PlanType],
+                        )}
+                      >
+                        {VALID_PLANS.map((p) => (
+                          <option key={p} value={p}>
+                            {p}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
+                    {/* Sites */}
+                    <td className="px-4 py-3 font-bold text-slate-900">
+                      {user.siteCount}
+                    </td>
+                    {/* Status */}
+                    <td className="px-4 py-3">
+                      <span
+                        className={cn(
+                          "text-[11px] font-semibold flex items-center gap-1.5",
+                          STATUS_COLORS[user.status],
+                        )}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                        {user.status}
+                      </span>
+                    </td>
+                    {/* Actions */}
+                    <td className="px-4 py-3">
+                      <button
+                        onClick={() => toggleStatus(user.uid, user.status)}
+                        className={cn(
+                          "text-[11px] font-bold px-2.5 py-1 rounded-lg",
+                          user.status === "active"
+                            ? "bg-red-50 text-red-600 hover:bg-red-100"
+                            : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100",
+                        )}
+                      >
+                        {user.status === "active" ? "Suspend" : "Restore"}
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
-          {filtered.length === 0 && (
-            <p className="text-center text-slate-400 text-[13px] py-12">
-              No users found.
-            </p>
-          )}
         </div>
 
         {/* Pagination footer */}
@@ -217,13 +256,14 @@ export default function UsersScreen({
           <div className="flex gap-2">
             <button
               onClick={goPrev}
-              className="flex items-center gap-1 text-[12px] font-bold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40"
+              disabled={cursorStack.length === 0 || loading}
+              className="flex items-center gap-1 text-[12px] font-bold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ChevronLeft className="w-3.5 h-3.5" /> Prev
             </button>
             <button
               onClick={goNext}
-              disabled={!nextCursor}
+              disabled={!nextCursor || loading}
               className="flex items-center gap-1 text-[12px] font-bold px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               Next <ChevronRight className="w-3.5 h-3.5" />
