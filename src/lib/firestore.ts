@@ -116,6 +116,20 @@ export async function uploadProfilePhoto(
   return getDownloadURL(storageRef);
 }
 
+/**
+ * Checks if the user with the given uid is an admin.
+ * Uses client Firestore SDK, not admin.
+ * @param uid - User ID to check
+ * @returns Promise<boolean> true if the user is admin, false otherwise
+ */
+export async function checkIsAdmin(uid: string): Promise<boolean> {
+  if (!uid) return false;
+  const userRef = doc(db, "users", uid);
+  const snap = await getDoc(userRef);
+  const data = snap.exists() ? snap.data() : null;
+  return !!data?.isAdmin;
+}
+
 // ── Sites (read-only) ─────────────────────────────────────────────────────────
 
 export async function getUserSites(uid: string): Promise<Site[]> {

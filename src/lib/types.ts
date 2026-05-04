@@ -14,6 +14,7 @@ export interface UserProfile {
   maxSites: number; // ← NEW
   createdAt: Timestamp | null;
   updatedAt: Timestamp | null;
+  isAdmin?: boolean;
 }
 
 export interface Site {

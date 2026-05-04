@@ -1,0 +1,165 @@
+"use client";
+
+import { useState } from "react";
+import { Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import type { AdminUser, PlanType } from "./adminTypes";
+import { PLAN_COLORS, STATUS_COLORS } from "./adminTypes";
+import { cn } from "@/lib/utils";
+
+const VALID_PLANS: PlanType[] = ["free", "basic", "growth", "pro"];
+
+export default function UsersScreen({ users: initial }: { users: AdminUser[] }) {
+  const router = useRouter();
+  const [users, setUsers] = useState<AdminUser[]>(initial);
+  const [search, setSearch] = useState("");
+  const [planFilter, setPlanFilter] = useState("all");
+  const [toast, setToast] = useState("");
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 3000);
+  };
+
+  const filtered = users.filter(
+    (u) =>
+      (u.displayName.toLowerCase().includes(search.toLowerCase()) ||
+        u.email.toLowerCase().includes(search.toLowerCase())) &&
+      (planFilter === "all" || u.plan === planFilter),
+  );
+
+  const changePlan = async (uid: string, plan: PlanType) => {
+    await fetch(`/api/admin/users/${uid}/plan`, {
+      method: "PATCH",
+      body: JSON.stringify({ plan }),
+      headers: { "Content-Type": "application/json" },
+    });
+    setUsers((prev) => prev.map((u) => (u.uid === uid ? { ...u, plan } : u)));
+    showToast("Plan updated");
+    router.refresh();
+  };
+
+  const toggleStatus = async (uid: string, current: string) => {
+    const status = current === "active" ? "suspended" : "active";
+    await fetch(`/api/admin/users/${uid}/status`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+      headers: { "Content-Type": "application/json" },
+    });
+    setUsers((prev) => prev.map((u) => (u.uid === uid ? { ...u, status } : u)));
+    showToast("Status updated");
+    router.refresh();
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Filters */}
+      <div className="flex gap-2.5 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search users…"
+            className="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-[13px] outline-none bg-white"
+          />
+        </div>
+        <select
+          value={planFilter}
+          onChange={(e) => setPlanFilter(e.target.value)}
+          className="px-3 py-2 border border-slate-200 rounded-xl text-[13px] bg-white cursor-pointer"
+        >
+          <option value="all">All Plans</option>
+          {VALID_PLANS.map((p) => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[13px] border-collapse">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50">
+                {["User", "Joined", "Plan", "Sites", "Status", "Actions"].map((h) => (
+                  <th key={h} className="text-left px-4 py-2.5 text-[10px] font-black tracking-widest text-slate-400 uppercase whitespace-nowrap">
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((user, i) => (
+                <tr key={user.uid} className={cn(i < filtered.length - 1 && "border-b border-slate-50")}>
+                  {/* User */}
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-slate-900 flex items-center justify-center text-white text-[11px] font-black shrink-0">
+                        {user.displayName.split(" ").map((n) => n[0]).join("").slice(0, 2)}
+                      </div>
+                      <div>
+                        <p className="font-bold text-slate-900">{user.displayName}</p>
+                        <p className="text-[11px] text-slate-400">{user.email}</p>
+                      </div>
+                    </div>
+                  </td>
+                  {/* Joined */}
+                  <td className="px-4 py-3 text-slate-500 text-xs">{user.createdAt}</td>
+                  {/* Plan */}
+                  <td className="px-4 py-3">
+                    <select
+                      value={user.plan}
+                      onChange={(e) => changePlan(user.uid, e.target.value as PlanType)}
+                      className={cn(
+                        "text-[11px] font-black px-2 py-1 rounded-full border-none cursor-pointer uppercase tracking-wide",
+                        PLAN_COLORS[user.plan as PlanType],
+                      )}
+                    >
+                      {VALID_PLANS.map((p) => (
+                        <option key={p} value={p}>{p}</option>
+                      ))}
+                    </select>
+                  </td>
+                  {/* Sites */}
+                  <td className="px-4 py-3 font-bold text-slate-900">{user.siteCount}</td>
+                  {/* Status */}
+                  <td className="px-4 py-3">
+                    <span className={cn("text-[11px] font-semibold flex items-center gap-1.5", STATUS_COLORS[user.status])}>
+                      <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                      {user.status}
+                    </span>
+                  </td>
+                  {/* Actions */}
+                  <td className="px-4 py-3">
+                    <button
+                      onClick={() => toggleStatus(user.uid, user.status)}
+                      className={cn(
+                        "text-[11px] font-bold px-2.5 py-1 rounded-lg",
+                        user.status === "active"
+                          ? "bg-red-50 text-red-600 hover:bg-red-100"
+                          : "bg-emerald-50 text-emerald-600 hover:bg-emerald-100",
+                      )}
+                    >
+                      {user.status === "active" ? "Suspend" : "Restore"}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {filtered.length === 0 && (
+            <p className="text-center text-slate-400 text-[13px] py-12">No users found.</p>
+          )}
+        </div>
+      </div>
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl px-4 py-3 text-[13px] font-bold shadow-lg z-50">
+          {toast}
+        </div>
+      )}
+    </div>
+  );
+}

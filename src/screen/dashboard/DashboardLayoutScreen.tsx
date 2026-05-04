@@ -9,6 +9,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useAuth } from "@/hooks/useAuth";
 import { useDashboardStore } from "@/store/useDashboardStore";
+import { useUserStore } from "@/store/useUserStore";
+import { ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import {
   Zap,
@@ -46,6 +48,7 @@ export default function DashboardLayoutScreen({
   const pathname = usePathname();
 
   const { user, loading, logOut } = useAuth();
+  const { profile } = useUserStore();
 
   // ── Zustand Store ──────────────────────────────────────────
   const { ui, setSidebarOpen, initialize } = useDashboardStore();
@@ -137,6 +140,14 @@ export default function DashboardLayoutScreen({
               </div>
             </Link>
           ))}
+          {profile?.isAdmin && (
+            <Link href="/admin" onClick={() => setSidebarOpen(false)}>
+              <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all cursor-pointer">
+                <ShieldAlert className="h-4 w-4" />
+                Admin Panel
+              </div>
+            </Link>
+          )}
         </nav>
 
         <div className="p-4 border-t border-sidebar-border space-y-4">

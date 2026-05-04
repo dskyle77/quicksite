@@ -1,0 +1,195 @@
+"use client";
+
+import { useState } from "react";
+import { Search, Eye, Trash2, ExternalLink } from "lucide-react";
+import { useRouter } from "next/navigation";
+import type { AdminSite, AdminUser, PlanType } from "./adminTypes";
+import { PLAN_COLORS, STATUS_COLORS } from "./adminTypes";
+import { cn } from "@/lib/utils";
+
+export default function SitesScreen({
+  sites: initial,
+  users,
+}: {
+  sites: AdminSite[];
+  users: AdminUser[];
+}) {
+  const router = useRouter();
+  const [sites, setSites] = useState<AdminSite[]>(initial);
+  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("all");
+  const [toast, setToast] = useState("");
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 3000);
+  };
+
+  const filtered = sites.filter(
+    (s) =>
+      (s.name.toLowerCase().includes(search.toLowerCase()) ||
+        s.slug.includes(search)) &&
+      (filter === "all" || s.status === filter),
+  );
+
+  const deleteSite = async (id: string) => {
+    if (!confirm("Delete this site? This cannot be undone.")) return;
+    await fetch(`/api/admin/sites/${id}`, { method: "DELETE" });
+    setSites((prev) => prev.filter((s) => s.id !== id));
+    showToast("Site deleted");
+    router.refresh();
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Filters */}
+      <div className="flex gap-2.5 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
+          <input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search sites…"
+            className="w-full pl-8 pr-3 py-2 border border-slate-200 rounded-xl text-[13px] outline-none bg-white"
+          />
+        </div>
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="px-3 py-2 border border-slate-200 rounded-xl text-[13px] bg-white cursor-pointer"
+        >
+          <option value="all">All</option>
+          <option value="published">Published</option>
+          <option value="draft">Draft</option>
+        </select>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-[13px] border-collapse">
+            <thead>
+              <tr className="border-b border-slate-100 bg-slate-50">
+                {[
+                  "Site",
+                  "Owner",
+                  "Status",
+                  "Custom Domain",
+                  "Visits",
+                  "Actions",
+                ].map((h) => (
+                  <th
+                    key={h}
+                    className="text-left px-4 py-2.5 text-[10px] font-black tracking-widest text-slate-400 uppercase"
+                  >
+                    {h}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((site, i) => {
+                const owner = users.find((u) => u.uid === site.uid);
+                return (
+                  <tr
+                    key={site.id}
+                    className={cn(
+                      i < filtered.length - 1 && "border-b border-slate-50",
+                    )}
+                  >
+                    {/* Site */}
+                    <td className="px-4 py-3">
+                      <p className="font-bold text-slate-900">{site.name}</p>
+                      <p className="text-[11px] text-slate-400">
+                        /s/{site.slug}
+                      </p>
+                    </td>
+                    {/* Owner */}
+                    <td className="px-4 py-3">
+                      <p className="text-xs text-slate-600">
+                        {owner?.displayName ?? "—"}
+                      </p>
+                      {owner && (
+                        <span
+                          className={cn(
+                            "text-[10px] font-black uppercase tracking-wide px-2 py-0.5 rounded-full",
+                            PLAN_COLORS[owner.plan as PlanType],
+                          )}
+                        >
+                          {owner.plan}
+                        </span>
+                      )}
+                    </td>
+                    {/* Status */}
+                    <td className="px-4 py-3">
+                      <span
+                        className={cn(
+                          "text-[11px] font-semibold flex items-center gap-1.5",
+                          STATUS_COLORS[site.status],
+                        )}
+                      >
+                        <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                        {site.status}
+                      </span>
+                    </td>
+                    {/* Custom domain */}
+                    <td className="px-4 py-3">
+                      {site.customDomain ? (
+                        <a
+                          href={`https://${site.customDomain}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-blue-600 font-semibold flex items-center gap-1 hover:underline"
+                        >
+                          {site.customDomain}{" "}
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </a>
+                      ) : (
+                        <span className="text-[11px] text-slate-300">—</span>
+                      )}
+                    </td>
+                    {/* Visits */}
+                    <td className="px-4 py-3 font-black text-slate-900">
+                      {site.visits.toLocaleString()}
+                    </td>
+                    {/* Actions */}
+                    <td className="px-4 py-3">
+                      <div className="flex gap-1.5">
+                        <a
+                          href={`/s/${site.slug}`}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          <button className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200">
+                            <Eye className="w-3 h-3" /> View
+                          </button>
+                        </a>
+                        <button
+                          onClick={() => deleteSite(site.id)}
+                          className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-red-50 text-red-600 hover:bg-red-100"
+                        >
+                          <Trash2 className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          {filtered.length === 0 && (
+            <p className="text-center text-slate-400 text-[13px] py-12">
+              No sites found.
+            </p>
+          )}
+        </div>
+      </div>
+
+      {toast && (
+        <div className="fixed bottom-6 right-6 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl px-4 py-3 text-[13px] font-bold shadow-lg z-50">
+          {toast}
+        </div>
+      )}
+    </div>
+  );
+}

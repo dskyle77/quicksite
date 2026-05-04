@@ -21,7 +21,6 @@ import { useAuth } from "@/hooks/useAuth";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useSearchParams } from "next/navigation";
 import { useUserStore } from "@/store/useUserStore";
-import type { UserProfile } from "@/lib/types";
 import type { DashboardStats } from "@/lib/types";
 
 // Quick Actions data
