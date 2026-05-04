@@ -1,60 +1,8 @@
 // src/features/home/PricingSection.tsx
 import { Check, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { PLANS } from "@/lib/plans";
 
-const PLANS = [
-  {
-    name: "Free",
-    price: "0",
-    features: [
-      "1 mini-site",
-      "Basic templates",
-      "Up to 5 sections",
-      "MakeSite branding",
-    ],
-    buttonText: "Start Free",
-    isPopular: false,
-  },
-  {
-    name: "Basic",
-    price: "1,500",
-    features: [
-      "Remove branding",
-      "Up to 10 sections",
-      "Better templates",
-      "Social links",
-      "Basic customization",
-    ],
-    buttonText: "Upgrade to Basic",
-    isPopular: true,
-  },
-  {
-    name: "Growth",
-    price: "3,000",
-    features: [
-      "Unlimited sections",
-      "Image gallery",
-      "Contact form",
-      "Basic analytics",
-      "Everything in Basic",
-    ],
-    buttonText: "Go Growth",
-    isPopular: false,
-  },
-  {
-    name: "Pro",
-    price: "6,000",
-    features: [
-      "Accept payments",
-      "Sell products",
-      "Advanced customization",
-      "Priority performance",
-      "Everything in Growth",
-    ],
-    buttonText: "Go Pro",
-    isPopular: false,
-  },
-];
 
 export default function PricingSection() {
   return (

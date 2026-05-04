@@ -12,7 +12,6 @@ export default async function AdminOverviewPage() {
     getAllSites(),
     getAllDomains(),
   ]);
-  // OverviewScreen only needs plan/status for the dist chart — pass summary
   return (
     <OverviewScreen
       users={usersSummary as any}

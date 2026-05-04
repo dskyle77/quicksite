@@ -7,7 +7,7 @@ import {
   Users,
   Globe,
   Link2,
-  Tag,
+  
   Shield,
   LogOut,
   PanelLeftClose,
@@ -17,11 +17,11 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/admin/overview",      label: "Overview",      icon: LayoutDashboard },
-  { href: "/admin/users",         label: "Users",         icon: Users },
-  { href: "/admin/sites",         label: "Sites",         icon: Globe },
-  { href: "/admin/user-domains",  label: "Domains",       icon: Link2 },
-  { href: "/admin/pricing",       label: "Pricing",       icon: Tag },
+  { href: "/admin/overview", label: "Overview", icon: LayoutDashboard },
+  { href: "/admin/users", label: "Users", icon: Users },
+  { href: "/admin/sites", label: "Sites", icon: Globe },
+  { href: "/admin/user-domains", label: "Domains", icon: Link2 },
+  { href: "/dashboard", label: "Dashboard", icon:  LayoutDashboard},
 ];
 
 export default function AdminSidebar() {
