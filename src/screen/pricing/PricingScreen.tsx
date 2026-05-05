@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/features/pricing/PricingScreen.tsx
 "use client";
 
 import { useState } from "react";
 import authFetch from "@/lib/authFetch";
 
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 import { Check, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
@@ -39,7 +40,10 @@ export default function PricingScreen() {
   const router = useRouter();
 
   const handleUpgrade = async (plan: Plan) => {
-    if (plan === "free") return;
+    toast.info(
+      "Payments are not available right now. Please check back later.",
+    );
+    return;
 
     if (!user) {
       router.push("/signup");
@@ -66,7 +70,7 @@ export default function PricingScreen() {
       if (!res.ok) throw new Error(data.error || "Could not start payment");
 
       router.push(data.authorization_url as string);
-    } catch (err) {
+    } catch (err: any) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
       setLoadingPlan(null);
     }
