@@ -193,7 +193,7 @@ function Projects({ isEditor, content, onUpdate }: TemplateComponentProps) {
                   href={project.previewLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-6 inline-block rounded-lg px-4 py-2 font-medium text-white transition-colors"
+                  className="mt-6 inline-block rounded-lg px-4 py-2 font-medium transition-colors"
                   style={{
                     background: "var(--qs-primary)",
                     color: "var(--qs-primary-fg)",
@@ -241,25 +241,6 @@ function Projects({ isEditor, content, onUpdate }: TemplateComponentProps) {
                   "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
                 imagePId: "",
                 previewLink: "",
-              };
-              newProjects.push(newProject);
-              onUpdate("pages.projects", newProjects);
-            }}
-          >
-            Add Project
-          </AddButton>
-        )}
-        {isEditor && (
-          <AddButton
-            onClick={() => {
-              const newProjects = [...projects];
-              const newProject = {
-                title: "New Project",
-                desc: "New Project description",
-                tags: ["tag1", "tag2", "tag3"],
-                image:
-                  "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
-                imagePId: "",
               };
               newProjects.push(newProject);
               onUpdate("pages.projects", newProjects);

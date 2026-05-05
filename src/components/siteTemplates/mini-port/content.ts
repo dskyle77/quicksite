@@ -33,7 +33,7 @@ export const templateMiniStarterContent = ({
       secondaryButton: "Get in Touch",
       secondaryButtonLink: getWhatsappButtonLink(),
       image1:
-        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
+        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
       image1PId: "",
     },
     about: {
@@ -47,7 +47,7 @@ export const templateMiniStarterContent = ({
         category: "Design",
         desc: "Full brand refresh for a Lagos-based fintech startup — logo, colours, typography, and usage guidelines.",
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
+          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
         imagePId: "",
         link: {},
       },
@@ -56,7 +56,7 @@ export const templateMiniStarterContent = ({
         category: "UI/UX",
         desc: "End-to-end product design for a savings and payments app targeting young professionals.",
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
+          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
         imagePId: "",
         link: {},
       },
@@ -65,7 +65,7 @@ export const templateMiniStarterContent = ({
         category: "Development",
         desc: "Custom Next.js portfolio with a CMS, dark mode, and fast load times.",
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
+          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
         imagePId: "",
         link: {},
       },

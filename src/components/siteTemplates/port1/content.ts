@@ -28,7 +28,7 @@ export const template2StarterContent = ({
     hero: {
       badge: "👋 Available for Work",
       image1:
-        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
+        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
       image1PId: "",
       title: "Hi, I'm Alex — Creative Developer",
       desc: "I craft beautiful digital experiences — from sleek web apps to polished mobile products. Let's build something extraordinary together.",
@@ -44,7 +44,7 @@ export const template2StarterContent = ({
       desc2:
         "When I'm not coding, you'll find me exploring new technologies, contributing to open source, or enjoying a great cup of coffee.",
       image1:
-        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
+        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
       image1PId: "",
       stat1Value: "20+",
       stat1Label: "Projects Done",
@@ -140,7 +140,7 @@ export const template2StarterContent = ({
           desc: "A full-stack online store with real-time inventory, Stripe payments, and an intuitive admin dashboard.",
           tags: ["Next.js", "Stripe", "PostgreSQL"],
           image:
-            "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
+            "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
           imagePId: "",
         },
         {
@@ -148,7 +148,7 @@ export const template2StarterContent = ({
           desc: "A collaborative productivity app with drag-and-drop boards, real-time updates, and team workspaces.",
           tags: ["React", "Node.js", "WebSockets"],
           image:
-            "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
+            "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
           imagePId: "",
         },
         {
@@ -156,7 +156,7 @@ export const template2StarterContent = ({
           desc: "A SaaS tool that uses AI to generate blog posts, social captions, and marketing copy at scale.",
           tags: ["OpenAI", "Next.js", "Tailwind"],
           image:
-            "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
+            "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
           imagePId: "",
         },
       ],

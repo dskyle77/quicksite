@@ -26,7 +26,7 @@ export const template1StarterContent = ({
     hero: {
       badge: "✨ New & Improved",
       image1:
-        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
+        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
       image1PId: "",
       title: "Transform Your Business With Our Solution",
       desc: "We help businesses grow faster with innovative solutions designed to simplify your workflow and maximize results.",

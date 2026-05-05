@@ -533,7 +533,7 @@ function Projects({
         </div>
 
         <a
-          href={`/${isEditor ? "editor" : "s"}/${slug}/projects`}
+          href={`/${isEditor ? "editor" : ""}/${slug}/projects`}
           className="rounded-xl px-5 py-2 text-sm font-semibold transition-opacity hover:opacity-70 inline-block"
           style={{
             background: "var(--qs-bg-alt)",
@@ -587,6 +587,45 @@ function Projects({
                   </span>
                 ))}
               </div>
+              {/* Preview Link Button at the right */}
+              {project.previewLink && (
+                <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <a
+                    href={project.previewLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-6 inline-block rounded-lg px-3 py-1 font-medium transition-colors shadow-sm hover:shadow-lg"
+                    style={{
+                      background: "var(--qs-primary)",
+                      color: "var(--qs-primary-fg)",
+                      marginTop: "1.5rem",
+                      textDecoration: "none",
+                      boxShadow: "0 3px 12px 0 rgba(0,0,0,.06)",
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "0.5em",
+                      }}
+                    >
+                      Preview
+                      <svg
+                        width="18"
+                        height="18"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        viewBox="0 0 24 24"
+                        style={{ verticalAlign: "middle" }}
+                      >
+                        <path d="M7 17L17 7M17 7H8M17 7V16" />
+                      </svg>
+                    </span>
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         ))}
