@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // @/assets/siteTemplates/templatesRegistry.tsx
 
-import { template1 } from "@/components/siteTemplates/template_1/index";
-import { template2 } from "@/components/siteTemplates/template_2/index";
-import { template3 } from "@/components/siteTemplates/landing-page-2";
+import { template1 } from "@/components/siteTemplates/landing-page1/index";
+import { template2 } from "@/components/siteTemplates/port1/index";
+import { templateMini } from "@/components/siteTemplates/mini-port";
 
 /* -------------- TEMPLATES TYPES ---------------- */
 export interface TemplateProps {
@@ -25,7 +25,7 @@ type AnyObject = Record<string, any>;
 
 /* ---------------- REGISTRY ---------------- */
 
-export const templatesRegistry = [template1, template2];
+export const templatesRegistry = [template1, template2, templateMini];
 
 export const templatesCategories = Array.from(
   new Set(

@@ -4,12 +4,17 @@ import {
   template1Meta,
   template1StarterContent,
   template1Config,
-} from "@/components/siteTemplates/template_1/content";
+} from "@/components/siteTemplates/landing-page1/content";
 import {
   template2Meta,
   template2StarterContent,
   template2Config,
-} from "@/components/siteTemplates/template_2/content";
+} from "@/components/siteTemplates/port1/content";
+import {
+  templateMiniMeta,
+  templateMiniConfig,
+  templateMiniStarterContent,
+} from "@/components/siteTemplates/mini-port/content";
 
 /* This registry contains ONLY data and logic. 
    Safe for use in API Routes (Server Side).
@@ -24,6 +29,11 @@ export const contentRegistry = [
     template2Meta,
     config: template2Config,
     starterContent: template2StarterContent,
+  },
+  {
+    templateMiniMeta,
+    config: templateMiniConfig,
+    starterContent: templateMiniStarterContent,
   },
 ];
 
