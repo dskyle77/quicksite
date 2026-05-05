@@ -186,9 +186,69 @@ function Projects({ isEditor, content, onUpdate }: TemplateComponentProps) {
                   </AddButton>
                 )}
               </div>
+
+              {/* Preview Link Button */}
+              {project.previewLink && (
+                <a
+                  href={project.previewLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-6 inline-block rounded-lg px-4 py-2 font-medium text-white transition-colors"
+                  style={{
+                    background: "var(--qs-primary)",
+                    color: "var(--qs-primary-fg)",
+                    marginTop: "1.5rem",
+                  }}
+                >
+                  Preview
+                </a>
+              )}
+
+              {isEditor && (
+                <div className="mt-4">
+                  <input
+                    type="text"
+                    className="w-full rounded border px-2 py-1 text-xs"
+                    style={{
+                      border: "1px solid var(--qs-border)",
+                      marginTop: "0.5rem",
+                    }}
+                    placeholder="Preview Link"
+                    value={project.previewLink || ""}
+                    onChange={(e) => {
+                      const newProjects = [...projects];
+                      newProjects[i].previewLink = e.target.value;
+                      onUpdate("pages.projects", newProjects);
+                    }}
+                  />
+                  <span className="block text-xs text-gray-400 mt-1">
+                    (Optional) Link to live preview
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         ))}
+        {isEditor && (
+          <AddButton
+            onClick={() => {
+              const newProjects = [...projects];
+              const newProject = {
+                title: "New Project",
+                desc: "New Project description",
+                tags: ["tag1", "tag2", "tag3"],
+                image:
+                  "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
+                imagePId: "",
+                previewLink: "",
+              };
+              newProjects.push(newProject);
+              onUpdate("pages.projects", newProjects);
+            }}
+          >
+            Add Project
+          </AddButton>
+        )}
         {isEditor && (
           <AddButton
             onClick={() => {
