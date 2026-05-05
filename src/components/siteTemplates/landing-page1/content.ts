@@ -102,12 +102,13 @@ export const template1StarterContent = ({
 
 export const template1Meta = {
   title: "Business Landing Page",
+  image: "/ti/lp1.png",
   category: "Landing Page",
   description:
     "A versatile landing page template perfect for businesses, products, services, or personal brands. Clean, professional, and fully customizable.",
 };
 export const template1Config = {
   type: "template-1",
-  theme: "light",
+  theme: "forest",
   category: "landing-page",
 };

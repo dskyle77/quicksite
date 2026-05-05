@@ -168,6 +168,7 @@ export const template2StarterContent = ({
 
 export const template2Meta = {
   title: "Portfolio",
+  image: "/ti/p1.png",
   category: "Portfolio",
   description:
     "A clean, modern portfolio template for developers, designers, and creatives. Showcase your skills, projects, and experience with style.",
@@ -175,6 +176,6 @@ export const template2Meta = {
 
 export const template2Config = {
     type: "template-2",
-  theme: "light",
+  theme: "warm",
   category: "portfolio",
 };

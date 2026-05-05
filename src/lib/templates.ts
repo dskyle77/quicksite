@@ -25,7 +25,7 @@ type AnyObject = Record<string, any>;
 
 /* ---------------- REGISTRY ---------------- */
 
-export const templatesRegistry = [template1, template2, templateMini];
+export const templatesRegistry = [template1, templateMini, template2];
 
 export const templatesCategories = Array.from(
   new Set(

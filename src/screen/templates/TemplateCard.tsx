@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 // src/features/templates/TemplateCard.tsx
 import Link from "next/link";
 import { Eye, ArrowRight } from "lucide-react";
@@ -7,6 +8,7 @@ interface TemplateCardProps {
   title: string;
   description: string;
   category: string;
+  image?: string;
   previewHref: string;
   useHref: string;
   delay?: number;
@@ -15,7 +17,7 @@ interface TemplateCardProps {
 export function TemplateCard({
   title,
   description,
-  category,
+  image,
   previewHref,
   useHref,
   delay = 0,
@@ -26,13 +28,19 @@ export function TemplateCard({
       style={{ animationDelay: `${delay}ms` }}
     >
       {/* Placeholder image */}
-      <div className="relative aspect-4/3 overflow-hidden bg-linear-to-br from-muted to-muted/50 flex items-center justify-center">
-        <div className="text-4xl font-bold text-muted-foreground/20">
-          {title[0]}
-        </div>
-        <div className="absolute top-3 left-3 bg-background/90 backdrop-blur px-2.5 py-0.5 rounded-full text-xs font-semibold border border-transparent">
-          {category}
-        </div>
+      <div className="relative aspect-video overflow-hidden bg-linear-to-br from-muted to-muted/50 flex items-center justify-center">
+        {image ? (
+          <img
+            src={image}
+            alt={title}
+            className="w-full h-full object-cover"
+            style={{ objectFit: "cover", width: "100%", height: "100%" }}
+          />
+        ) : (
+          <div className="text-4xl font-bold text-muted-foreground/20">
+            {title[0]}
+          </div>
+        )}
         {/* Hover overlay */}
         <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/30 transition-all duration-300 grid place-items-center opacity-0 group-hover:opacity-100">
           <Link

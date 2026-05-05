@@ -127,6 +127,7 @@ export default function TemplateGallery() {
                       title={template.meta.title}
                       description={template.meta.description}
                       category={template.meta.category}
+                      image={template.meta.image}
                       previewHref={buildQuery(`/templates/${template.config.type}`)}
                       useHref={buildQuery(
                         `/dashboard/new?template=${encodeURIComponent(template.config.type)}`,

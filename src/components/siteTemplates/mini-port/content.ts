@@ -91,6 +91,7 @@ export const templateMiniStarterContent = ({
 
 export const templateMiniMeta = {
   title: "Mini Portfolio",
+  image: "/ti/pm1.png",
   category: "Portfolio",
   description:
     "A clean, minimal one-page portfolio for designers, developers, and creatives. No clutter — just your work.",
@@ -98,6 +99,6 @@ export const templateMiniMeta = {
 
 export const templateMiniConfig = {
   type: "template-mini",
-  theme: "light",
+  theme: "ocean",
   category: "portfolio",
 };

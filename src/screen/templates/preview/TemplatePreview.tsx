@@ -43,7 +43,8 @@ export default function TemplatesPreview({ type }: { type: string }) {
   const Template = templateEntry.template;
 
   // Prepare URL logic
-  let from = "/";
+  // DEFAULT BACK BUTTON IS /templates
+  let from = "/templates";
   if (fromParam) {
     const queryParams: string[] = [];
     if (paramsName) queryParams.push(`name=${encodeURIComponent(paramsName)}`);
@@ -70,7 +71,7 @@ export default function TemplatesPreview({ type }: { type: string }) {
   return (
     <div className={`min-h-screen bg-white text-slate-900 ${theme.className}`}>
       {/* Inject the dynamic CSS from the theme */}
-      <style dangerouslySetInnerHTML={{ __html: theme.css }} />
+      <style>{theme.css}</style>
 
       <header className="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-50 shadow-sm">
         <div className="flex items-center gap-4">
