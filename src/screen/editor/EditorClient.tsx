@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { ReactNode } from "react";
-import { Loader2, Save, ArrowLeft } from "lucide-react";
+import { ReactNode, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Loader2, Save, ArrowLeft, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/useAuth";
 import { getAllThemes } from "@/lib/themes";
@@ -20,102 +21,158 @@ export default function EditorClient({
   subslug,
   headerExtra,
 }: EditorClientProps) {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const router = useRouter();
+
+  // Destructure store with selective selectors for better performance
   const siteData = useSiteEditorStore((s) => s.site);
-  const loading = useSiteEditorStore((s) => s.loading);
+  const dataLoading = useSiteEditorStore((s) => s.loading);
   const isSaving = useSiteEditorStore((s) => s.isSaving);
-  const updateSite = useSiteEditorStore((s) => s.updateSite);
-  const saveSite = useSiteEditorStore((s) => s.saveSite);
+  const { updateSite, saveSite, fetchSite, reset } = useSiteEditorStore();
+
+  // 1. Auth & Data Sync Logic
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.replace("/login");
+      return;
+    }
+
+    if (user?.uid) {
+      fetchSite(user.uid, slug).catch((err) => {
+        console.error("Fetch Error:", err);
+        toast.error("Failed to load site data.");
+      });
+    }
+
+    return () => reset();
+  }, [user, authLoading, slug, fetchSite, reset, router]);
 
   const handleSave = async () => {
     if (!user) return;
     try {
       const token = await user.getIdToken();
       await saveSite(token);
-      toast.success("All changes saved!");
+      toast.success("Changes saved successfully");
     } catch (error) {
-      console.error("Save Error:", error);
-      toast.error("Could not save changes.");
+      toast.error("Error saving changes");
     }
   };
 
-  if (loading) {
+  // We show loading if auth is working OR if we're waiting for data
+  const isInitialLoading = authLoading || (dataLoading && !siteData);
+
+  if (isInitialLoading) {
     return (
-      <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-50 gap-4">
-        <Loader2 className="h-10 w-10 text-blue-600 animate-spin" />
-        <p className="text-slate-500 font-medium">Powering up the editor...</p>
+      <div className="fixed inset-0 z-100 flex flex-col items-center justify-center bg-white">
+        <div className="relative flex items-center justify-center">
+          <Loader2 className="h-12 w-12 text-primary animate-spin" />
+          <div className="absolute h-2 w-2 bg-primary rounded-full" />
+        </div>
+        <div className="mt-6 flex flex-col items-center gap-2">
+          <p className="text-lg font-semibold text-slate-900">
+            Preparing Editor
+          </p>
+          <p className="text-sm text-slate-500 animate-pulse">
+            Syncing your workspace...
+          </p>
+        </div>
       </div>
     );
   }
 
-  if (!siteData) {
+  // 4. Robust Error/Not Found State
+  if (!siteData && !dataLoading) {
     return (
-      <div className="h-screen w-full flex flex-col items-center justify-center gap-4">
-        <h2 className="text-xl font-bold">Site Not Found</h2>
-        <Link href="/dashboard" className="text-blue-600 hover:underline">
-          Return to Dashboard
+      <div className="h-screen w-full flex flex-col items-center justify-center bg-slate-50 p-6 text-center">
+        <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+          <AlertCircle className="h-8 w-8 text-red-600" />
+        </div>
+        <h2 className="text-2xl font-bold text-slate-900">Site not found</h2>
+        <p className="text-slate-600 mt-2 max-w-sm">
+          We couldn&apos;t retrieve the data for{" "}
+          <span className="font-mono font-bold text-black">
+            &quot;{slug}&quot;
+          </span>
+          . It may have been deleted or you may have insufficient permissions.
+        </p>
+        <Link
+          href="/dashboard/sites"
+          className="mt-8 px-6 py-3 bg-white border border-slate-200 rounded-xl font-medium shadow-sm hover:bg-slate-50 transition-all"
+        >
+          Back to Sites
         </Link>
       </div>
     );
   }
 
+  // 5. Main Render
   return (
-    <div className="flex flex-col h-screen overflow-hidden">
-      <header className="h-16 border-b bg-background flex items-center justify-between px-6 shrink-0 z-50 shadow-sm">
-        <div className="flex items-center gap-4">
+    <div className="flex flex-col h-screen overflow-hidden bg-slate-50/50">
+      <header className="h-16 border-b bg-white flex items-center justify-between px-4 sm:px-6 shrink-0 z-50">
+        <div className="flex items-center gap-3 min-w-0">
           <Link
             href="/dashboard/sites"
-            className="p-2 rounded-full transition-colors"
+            className="p-2 hover:bg-slate-100 rounded-full transition-all"
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20} className="text-slate-600" />
           </Link>
-          <div>
-            <h1 className="font-bold text-foreground leading-none">
-              {siteData.name || "Untitled Site"}
+          <div className="min-w-0 flex flex-col">
+            <h1 className="font-bold text-slate-900 truncate text-sm sm:text-base leading-tight">
+              {siteData?.name || "Untitled Site"}
             </h1>
-            <p className="text-[10px] text-foreground/60 font-mono mt-1 uppercase tracking-wider">
-              Mode: Editing
-            </p>
+            <div className="flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                Live Editor
+              </span>
+            </div>
           </div>
-          {headerExtra}
+          <div className="hidden lg:block ml-2">{headerExtra}</div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-400 italic hidden sm:block">
-            Theme
-          </span>
-          <select
-            className="border border-black rounded-full px-3 py-1 text-xs text-black bg-white/80 focus:ring-2 focus:ring-primary outline-none transition-all"
-            value={siteData.theme}
-            onChange={(e) => updateSite({ theme: e.target.value })}
-            disabled={isSaving}
-          >
-            {getAllThemes().map(({ id }) => (
-              <option key={id} value={id}>
-                {id}
-              </option>
-            ))}
-          </select>
+        <div className="flex items-center gap-2 sm:gap-4 ">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-100 rounded-lg">
+            <span className="text-[11px] font-bold text-slate-400 uppercase hidden md:inline">
+              Theme
+            </span>
+            <select
+              className="bg-transparent text-xs font-bold text-slate-900 outline-none cursor-pointer"
+              value={siteData?.theme}
+              onChange={(e) => updateSite({ theme: e.target.value })}
+              disabled={isSaving}
+            >
+              {getAllThemes().map(({ id }) => (
+                <option key={id} value={id}>
+                  {id}
+                </option>
+              ))}
+            </select>
+          </div>
 
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="flex items-center gap-2 bg-primary text-white px-5 py-2 rounded-full font-bold text-sm transition-all shadow-md active:scale-95 disabled:opacity-50"
+            className="relative flex items-center gap-2 bg-black text-white px-4 sm:px-6 py-2.5 rounded-xl font-bold text-sm transition-all hover:bg-slate-800 active:scale-95 disabled:opacity-50 disabled:active:scale-100"
           >
             {isSaving ? (
-              <Loader2 size={16} className="animate-spin" />
+              <>
+                <Loader2 size={16} className="animate-spin" />
+                <span className="hidden sm:inline">Saving...</span>
+              </>
             ) : (
-              <Save size={16} />
+              <>
+                <Save size={16} />
+                <span className="hidden sm:inline">Save Changes</span>
+              </>
             )}
-            {isSaving ? "Saving..." : "Save Changes"}
           </button>
         </div>
       </header>
 
-      <main className="flex-1 overflow-y-auto bg-slate-100 p-4 md:p-8">
-        <div className="max-w-300 mx-auto min-h-full">
+      <main className="flex-1 overflow-y-auto p-3 sm:p-6">
+        <div className="max-w-[1400px] mx-auto min-h-full">
           <EditorScreen
-            data={siteData}
+            data={siteData!}
             onChange={(updated) => updateSite(updated)}
             slugs={{ slug, subslug }}
           />

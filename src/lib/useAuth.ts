@@ -11,7 +11,7 @@ export function useAuth() {
       setUser(u);
       setLoading(false);
     });
-    return unsubscribe; // cleanup on unmount
+    return unsubscribe; 
   }, []);
 
   return { user, loading };

@@ -11,6 +11,7 @@ export interface TemplateProps {
   content: AnyObject;
   onUpdate?: (path: string, value: any) => void;
   slugs?: Record<string, string>;
+  isCustomDomain?: boolean;
 }
 
 export interface TemplateComponentProps {

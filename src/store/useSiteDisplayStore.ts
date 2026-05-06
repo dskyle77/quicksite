@@ -4,6 +4,7 @@ import { getSiteByLookup } from "@/lib/firestore";
 import type { Site } from "@/lib/types";
 
 interface SiteDisplayState {
+  slug: string | null;
   site: Site | null;
   loading: boolean;
 
@@ -13,6 +14,7 @@ interface SiteDisplayState {
 }
 
 export const useSiteDisplayStore = create<SiteDisplayState>((set) => ({
+  slug: null,
   site: null,
   loading: true,
 
@@ -21,9 +23,9 @@ export const useSiteDisplayStore = create<SiteDisplayState>((set) => ({
     try {
       set({ loading: true });
 
-      const data = await getSiteByLookup(slug);
+      const site = await getSiteByLookup(slug);
 
-      set({ site: data ?? null });
+      set({ site, slug: site?.slug });
     } catch (err) {
       console.error("Public fetch error:", err);
       set({ site: null });
@@ -36,10 +38,11 @@ export const useSiteDisplayStore = create<SiteDisplayState>((set) => ({
     set({ loading: true });
     try {
       const site = await getSiteByLookup(domain);
-      set({ site, loading: false });
+      set({ site, slug: site?.slug });
     } catch (error) {
-      set({ loading: false });
       console.error(error);
+    } finally {
+      set({ loading: false });
     }
   },
 

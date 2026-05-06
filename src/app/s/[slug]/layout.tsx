@@ -1,29 +1,17 @@
 "use client";
-
-import { ReactNode } from "react";
-import { useEffect, use } from "react";
+import { ReactNode, use } from "react";
 import { useSiteDisplayStore } from "@/store/useSiteDisplayStore";
-import { toast } from "sonner";
+import { useSiteLayout } from "@/hooks/useSiteLayout";
 
-// Explicit types for layout props
-interface EditorLayoutProps {
+export default function EditorLayout({
+  children,
+  params,
+}: {
   children: ReactNode;
-  params: Promise<{ slug: string; subslug?: string }>;
-}
-
-export default function EditorLayout({ children, params }: EditorLayoutProps) {
-  const { slug } = use(params) as { slug: string };
-
+  params: Promise<{ slug: string }>;
+}) {
+  const { slug } = use(params);
   const fetchPublicSite = useSiteDisplayStore((s) => s.fetchPublicSite);
-  const reset = useSiteDisplayStore((s) => s.reset);
-
-  useEffect(() => {
-    fetchPublicSite(slug).catch(() => {
-      toast.error("Failed to load site");
-    });
-
-    return () => reset();
-  }, [slug]);
-
+  useSiteLayout(() => fetchPublicSite(slug));
   return <>{children}</>;
 }

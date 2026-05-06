@@ -12,23 +12,6 @@ interface EditorLayoutProps {
   params: Promise<{ slug: string; subslug?: string }>;
 }
 
-export default function EditorLayout({ children, params }: EditorLayoutProps) {
-  const { user } = useAuth();
-  // Unwrap params and type slug
-  const { slug } = use(params) as { slug: string };
-
-  const fetchSite = useSiteEditorStore((s) => s.fetchSite);
-  const reset = useSiteEditorStore((s) => s.reset);
-
-  useEffect(() => {
-    if (!user?.uid) return;
-
-    fetchSite(user.uid, slug).catch(() => {
-      toast.error("Failed to load site");
-    });
-
-    return () => reset();
-  }, [user, slug]);
-
+export default function EditorLayout({ children }: EditorLayoutProps) {
   return <>{children}</>;
 }

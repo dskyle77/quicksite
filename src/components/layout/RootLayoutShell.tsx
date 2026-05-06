@@ -27,10 +27,10 @@ export default function RootLayoutShell({
       <main className="flex-1">{children}</main>
       {showShell && <Footer />}
 
-      {/* Toaster is always mounted, works on every page */}
       <Toaster
         richColors
         position="top-right"
+        closeButton
         theme={resolvedTheme as "light" | "dark"}
         toastOptions={{
           style: {

@@ -7,7 +7,7 @@ import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
 
 function Hero({ isEditor, content, onUpdate }: TemplateComponentProps) {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20 md:py-28">
+    <section className="mx-auto max-w-6xl px-4 py-20 md:py-28">
       <div className="grid gap-12 md:grid-cols-2 md:items-center">
         <div>
           <div
@@ -51,18 +51,17 @@ function Hero({ isEditor, content, onUpdate }: TemplateComponentProps) {
           </p>
 
           <div className="mt-8 flex flex-wrap gap-4">
-            <CtaLink
-              isEditor={isEditor}
-              label={content?.hero?.primaryButton ?? "View My Work"}
-              linkConfig={content?.hero?.primaryButtonLink}
-              onLabelChange={(v) => onUpdate("hero.primaryButton", v)}
-              onLinkChange={(cfg) => onUpdate("hero.primaryButtonLink", cfg)}
+            <a
+              href="#projects"
               className="rounded-xl px-6 py-3 font-semibold transition-transform hover:scale-[1.02] inline-block"
               style={{
                 background: "var(--qs-primary)",
                 color: "var(--qs-primary-fg)",
+                textDecoration: "none",
               }}
-            />
+            >
+              {content?.hero?.primaryButton ?? "View My Work"}
+            </a>
 
             <CtaLink
               isEditor={isEditor}
@@ -113,9 +112,9 @@ function Hero({ isEditor, content, onUpdate }: TemplateComponentProps) {
 
 function About({ isEditor, content, onUpdate }: TemplateComponentProps) {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16" id="about">
+    <section className="mx-auto max-w-6xl px-4 py-16" id="about">
       <div
-        className="rounded-3xl p-8 md:p-12"
+        className="rounded-3xl p-6 md:p-12"
         style={{
           background: "var(--qs-bg-alt)",
           border: "1px solid var(--qs-border)",
@@ -276,7 +275,7 @@ function Skills({ isEditor, content, onUpdate }: TemplateComponentProps) {
   ];
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16" id="skills">
+    <section className="mx-auto max-w-6xl px-4 py-16" id="skills">
       <div className="mx-auto mb-10 max-w-2xl text-center">
         <h3
           className="text-3xl font-bold tracking-tight md:text-4xl"
@@ -462,7 +461,7 @@ function Projects({
   const slug = slugs?.slug;
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16">
+    <section className="mx-auto max-w-6xl px-4 py-16" id="projects">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h3
@@ -657,7 +656,7 @@ function Experience({ isEditor, content, onUpdate }: TemplateComponentProps) {
   ];
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16">
+    <section className="mx-auto max-w-6xl px-4 py-16">
       <div className="mx-auto mb-10 max-w-2xl text-center">
         <h3
           className="text-3xl font-bold tracking-tight md:text-4xl"
@@ -785,7 +784,7 @@ function Testimonials({ isEditor, content, onUpdate }: TemplateComponentProps) {
   ];
 
   return (
-    <section className="mx-auto max-w-6xl px-6 py-16">
+    <section className="mx-auto max-w-6xl px-4 py-16">
       <div className="mx-auto mb-10 max-w-2xl text-center">
         <h3
           className="text-3xl font-bold tracking-tight md:text-4xl"
@@ -874,21 +873,20 @@ function Testimonials({ isEditor, content, onUpdate }: TemplateComponentProps) {
     </section>
   );
 }
-
 function Contact({ isEditor, content, onUpdate }: TemplateComponentProps) {
   return (
-    <section className="mx-auto max-w-6xl px-6 py-20" id="contact">
+    <section className="mx-auto max-w-6xl px-4 py-12 md:py-20" id="contact">
       <div
-        className="rounded-4xl px-6 py-12 text-center md:px-10"
+        className="rounded-3xl md:rounded-4xl px-5 py-10 md:px-10 md:py-16 text-center"
         style={{
           background: "var(--qs-primary)",
           color: "var(--qs-primary-fg)",
         }}
       >
-        <div className="mx-auto mb-2 text-4xl">🤝</div>
+        <div className="mx-auto mb-4 text-3xl md:text-4xl">🤝</div>
 
         <h3
-          className="text-3xl font-bold tracking-tight md:text-5xl"
+          className="text-2xl font-bold tracking-tight sm:text-3xl md:text-5xl"
           contentEditable={isEditor}
           suppressContentEditableWarning
           onBlur={(e) =>
@@ -899,7 +897,7 @@ function Contact({ isEditor, content, onUpdate }: TemplateComponentProps) {
         </h3>
 
         <p
-          className="mx-auto mt-4 max-w-2xl text-base md:text-lg"
+          className="mx-auto mt-4 max-w-2xl text-sm leading-relaxed sm:text-base md:text-lg"
           style={{ opacity: 0.92 }}
           contentEditable={isEditor}
           suppressContentEditableWarning
@@ -911,14 +909,15 @@ function Contact({ isEditor, content, onUpdate }: TemplateComponentProps) {
             "Have a project in mind? I'd love to hear about it. Let's chat and see how I can help."}
         </p>
 
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
+        {/* Improved Button Container: Stack on mobile, side-by-side on tablet+ */}
+        <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center sm:gap-4">
           <CtaLink
             isEditor={isEditor}
             label={content?.contact?.primaryButton ?? "Send a Message"}
             linkConfig={content?.contact?.primaryButtonLink}
             onLabelChange={(v) => onUpdate("contact.primaryButton", v)}
             onLinkChange={(cfg) => onUpdate("contact.primaryButtonLink", cfg)}
-            className="rounded-xl bg-white px-6 py-3 font-semibold text-black transition-transform hover:scale-[1.02] inline-block"
+            className="rounded-xl bg-white px-6 py-4 sm:py-3 font-bold text-black transition-transform active:scale-95 sm:hover:scale-[1.02] text-center"
           />
 
           <CtaLink
@@ -927,7 +926,7 @@ function Contact({ isEditor, content, onUpdate }: TemplateComponentProps) {
             linkConfig={content?.contact?.secondaryButtonLink}
             onLabelChange={(v) => onUpdate("contact.secondaryButton", v)}
             onLinkChange={(cfg) => onUpdate("contact.secondaryButtonLink", cfg)}
-            className="rounded-xl px-6 py-3 font-semibold transition-transform hover:scale-[1.02] inline-block"
+            className="rounded-xl px-6 py-4 sm:py-3 font-bold transition-transform active:scale-95 sm:hover:scale-[1.02] text-center"
             style={{
               background: "transparent",
               color: "var(--qs-primary-fg)",

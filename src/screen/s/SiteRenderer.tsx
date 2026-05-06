@@ -6,9 +6,11 @@ import type { Site } from "@/lib/types";
 export default function SiteRenderer({
   site,
   slugs,
+  isCustomDomain,
 }: {
   site: Site;
   slugs?: Record<string, string>;
+  isCustomDomain?: boolean;
 }) {
   // Validate template exists
   const templateEntry = getTemplateByType(site.type);
@@ -51,6 +53,7 @@ export default function SiteRenderer({
         isEditor={false}
         content={site.content || {}}
         slugs={slugs}
+        isCustomDomain={isCustomDomain}
       />
     </div>
   );
