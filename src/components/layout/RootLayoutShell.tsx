@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
-const MARKETING_PATHS = ["/", "/pricing", "/templates"];
+const MARKETING_PATHS = ["/", "/pricing", "/templates", "/support"];
 
 export default function RootLayoutShell({
   children,

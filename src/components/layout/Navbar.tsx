@@ -23,6 +23,7 @@ const NAV_LINKS = [
   { label: "Features", href: "/" },
   { label: "Templates", href: "/templates" },
   { label: "Pricing", href: "/pricing" },
+  { label: "Support", href: "/support" },
 ];
 
 const SITE_STANDARD_NAME = process.env.NEXT_PUBLIC_SITE_STANDARD_NAME;

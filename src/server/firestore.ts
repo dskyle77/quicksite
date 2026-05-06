@@ -4,7 +4,7 @@
 import { adminDb } from "./firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { getSiteLimit } from "@/lib/plans";
-import type { Site, AnalyticsEventType } from "@/lib/types";
+import type { Site } from "@/lib/types";
 import type { Plan } from "@/lib/plans";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -195,33 +195,4 @@ export async function serverDeleteSite(
   });
 
   await batch.commit();
-}
-
-// ── Analytics ─────────────────────────────────────────────────────────────────
-
-export async function serverTrackSiteEvent(
-  siteId: string,
-  uid: string,
-  type: AnalyticsEventType,
-): Promise<void> {
-  // We don't necessarily need site ownership to track an event (e.g. public visits)
-  // but we do need the site to exist.
-  const siteRef = adminDb.collection("sites").doc(siteId);
-  const siteDoc = await siteRef.get();
-  if (!siteDoc.exists) throw new Error("Site not found.");
-
-  const metricField = type === "visit" ? "visits" : "whatsappClicks";
-
-  await siteRef.update({
-    [metricField]: FieldValue.increment(1),
-    updatedAt: FieldValue.serverTimestamp(),
-  });
-
-  await adminDb.collection("analytics_events").add({
-    uid: siteDoc.data()?.uid,
-    siteId,
-    siteSlug: siteDoc.data()?.slug,
-    type,
-    createdAt: FieldValue.serverTimestamp(),
-  });
 }

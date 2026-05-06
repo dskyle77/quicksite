@@ -13,20 +13,20 @@ const LINKS = [
       { label: "Dashboard", href: "/dashboard" },
     ],
   },
-  {
-    title: "Company",
-    links: [
-      { label: "About", href: "/about" },
-      { label: "Blog", href: "/blog" },
-      { label: "Careers", href: "/careers" },
-      { label: "Contact", href: "/contact" },
-    ],
-  },
+  // {
+  //   title: "Company",
+  //   links: [
+  //     { label: "About", href: "/about" },
+  //     { label: "Blog", href: "/blog" },
+  //     { label: "Careers", href: "/careers" },
+  //     { label: "Contact", href: "/contact" },
+  //   ],
+  // },
   {
     title: "Support",
     links: [
-      { label: "Help Center", href: "/help" },
-      { label: "WhatsApp Us", href: "https://wa.me/2348000000000" },
+      { label: "Help", href: "/support" },
+      { label: "WhatsApp Us", href: "https://wa.me/2348161592059" },
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms of Service", href: "/terms" },
     ],
@@ -36,7 +36,7 @@ const LINKS = [
 const SOCIALS = [
   {
     label: "Instagram",
-    href: "https://instagram.com/quicksite_ng",
+    href: "https://www.instagram.com/dskyle77/",
     icon: () => (
       <svg
         viewBox="0 0 24 24"
@@ -52,8 +52,8 @@ const SOCIALS = [
     ),
   },
   {
-    label: "Twitter / X",
-    href: "https://twitter.com/quicksite_ng",
+    label: "X",
+    href: "https://x.com/dskyle77",
     icon: () => (
       <svg
         viewBox="0 0 24 24"
@@ -62,13 +62,15 @@ const SOCIALS = [
         strokeWidth="2"
         className="h-4 w-4"
       >
-        <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z" />
+        <path d="M6.21 3h3.67l4.07 5.55L18.87 3H22l-6.48 8.55L22 21h-3.77l-4.38-6.1L6.09 21H3l6.71-8.86L2 3zm2.7 2.16L18.11 19h1.13l-9.2-13.84zm6.08-.02l-9.1 13.86h-1.1l9.1-13.86z" />
+   
       </svg>
     ),
   },
+
   {
-    label: "TikTok",
-    href: "https://tiktok.com/@quicksite_ng",
+    label: "Facebook",
+    href: "https://www.facebook.com/profile.php?id=61578315550045",
     icon: () => (
       <svg
         viewBox="0 0 24 24"
@@ -77,7 +79,8 @@ const SOCIALS = [
         strokeWidth="2"
         className="h-4 w-4"
       >
-        <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" />
+        <rect x="2" y="2" width="20" height="20" rx="5" />
+        <path d="M16 8h-2a2 2 0 0 0-2 2v2h4l-.5 3.5H12v7H9v-7H7v-3h2v-2a4 4 0 0 1 4-4h3v3z" />
       </svg>
     ),
   },
