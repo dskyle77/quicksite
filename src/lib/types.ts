@@ -10,8 +10,7 @@ export interface UserProfile {
   whatsappNumber?: string;
   defaultMessage?: string;
   defaultAuthor?: string;
-  plan: "free" | "basic" | "growth" | "pro";
-  maxSites: number; // ← NEW
+  plan: "free" | "growth" | "pro";
   createdAt: Timestamp | null;
   updatedAt: Timestamp | null;
   isAdmin?: boolean;
@@ -38,15 +37,4 @@ export interface DashboardStats {
   totalWhatsappClicks: number;
   totalSites: number;
   sitesLeft: number;
-}
-
-export type AnalyticsEventType = "visit" | "whatsapp_click";
-
-export interface AnalyticsEvent {
-  id: string;
-  uid: string;
-  siteId: string;
-  siteSlug: string;
-  type: AnalyticsEventType;
-  createdAt: string | null;
 }

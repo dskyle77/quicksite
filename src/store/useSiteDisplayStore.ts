@@ -18,7 +18,6 @@ export const useSiteDisplayStore = create<SiteDisplayState>((set) => ({
   site: null,
   loading: true,
 
-  // 🌐 Load public site (visitor view)
   fetchPublicSite: async (slug) => {
     try {
       set({ loading: true });
@@ -33,7 +32,7 @@ export const useSiteDisplayStore = create<SiteDisplayState>((set) => ({
       set({ loading: false });
     }
   },
-  // Inside useSiteDisplayStore
+
   fetchSiteByDomain: async (domain: string) => {
     set({ loading: true });
     try {
@@ -46,10 +45,10 @@ export const useSiteDisplayStore = create<SiteDisplayState>((set) => ({
     }
   },
 
-  // 🧹 Reset public state
   reset: () =>
     set({
       site: null,
+      slug: null,
       loading: true,
     }),
 }));

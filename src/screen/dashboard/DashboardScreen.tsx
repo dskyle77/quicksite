@@ -17,33 +17,12 @@ import {
   Loader2,
   CheckCircle2,
 } from "lucide-react";
-import { useUserStore } from "@/store/useUserStore";
+import { useProfileStore } from "@/store/useProfileStore";
 import { useDashboardStore } from "@/store/useDashboardStore";
 
 import { useSearchParams } from "next/navigation";
 import type { DashboardStats } from "@/lib/types";
 
-// Quick Actions data
-const QUICK_ACTIONS = [
-  {
-    label: "Browse Templates",
-    sub: "Find the perfect design",
-    href: "/templates",
-    color: "bg-primary/10 text-primary",
-  },
-  {
-    label: "Upgrade to Basic",
-    sub: "Remove branding — ₦1,500/mo",
-    href: "/pricing",
-    color: "bg-secondary/10 text-secondary",
-  },
-  {
-    label: "Connect Domain",
-    sub: "Use your own .com.ng domain",
-    href: "#",
-    color: "bg-violet-500/10 text-violet-600",
-  },
-];
 const SITE_SHORT_NAME = process.env.NEXT_PUBLIC_SITE_SHORT_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
 
@@ -84,7 +63,7 @@ function StatsGrid({
   stats: DashboardStats;
   sitesLoading: boolean;
 }) {
-  const { profile } = useUserStore();
+  const { profile } = useProfileStore();
   const plan = profile?.plan;
   let planName = "Free";
   if (plan) planName = plan.charAt(0).toUpperCase() + plan.slice(1);
@@ -238,6 +217,27 @@ function SitesSection({
 
 // ─────────── COMPONENT: QuickActionsSection ──────────────
 function QuickActionsSection() {
+
+  const QUICK_ACTIONS = [
+    {
+      label: "Browse Templates",
+      sub: "Find the perfect design",
+      href: "/templates",
+      color: "bg-primary/10 text-primary",
+    },
+    {
+      label: "Connect Domain",
+      sub: "Use your own .com.ng domain",
+      href: "/dashboard/domains",
+      color: "bg-violet-500/10 text-violet-600",
+    },
+    {
+      label: "Get Support",
+      sub: "Contact our support team for help",
+      href: "/support",
+      color: "bg-orange-100 text-orange-600",
+    },
+  ];
   return (
     <div>
       <h2 className="font-bold text-lg mb-4">Quick Actions</h2>
@@ -265,7 +265,7 @@ function QuickActionsSection() {
 // ─────────── Main DashboardScreen ──────────────
 export default function DashboardScreen() {
   const { sites, stats, sitesLoading, fetchSites } = useDashboardStore();
-  const { profile: user } = useUserStore();
+  const { profile: user } = useProfileStore();
 
   useEffect(() => {
     if (user?.uid) {

@@ -27,7 +27,7 @@ interface UserState {
   clearUser: () => void;
 }
 
-export const useUserStore = create<UserState>((set) => ({
+export const useProfileStore = create<UserState>((set) => ({
   profile: null,
 
   isLoading: false,

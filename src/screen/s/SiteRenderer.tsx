@@ -3,13 +3,15 @@ import { getTheme } from "@/lib/themes";
 
 import type { Site } from "@/lib/types";
 
+import SiteTracker from "./SiteTracker";
+
 export default function SiteRenderer({
   site,
   slugs,
   isCustomDomain,
 }: {
   site: Site;
-  slugs?: Record<string, string>;
+  slugs: Record<string, string>;
   isCustomDomain?: boolean;
 }) {
   // Validate template exists
@@ -55,6 +57,7 @@ export default function SiteRenderer({
         slugs={slugs}
         isCustomDomain={isCustomDomain}
       />
+      <SiteTracker slug={slugs.slug} />
     </div>
   );
 }

@@ -12,15 +12,9 @@ import {
   getDocs,
   serverTimestamp,
 } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db, storage } from "@/lib/firebase";
+import { db } from "@/lib/firebase";
 import { getSiteLimit } from "@/lib/plans";
-import type {
-  UserProfile,
-  Site,
-  DashboardStats,
-  AnalyticsEvent,
-} from "@/lib/types";
+import type { UserProfile, Site, DashboardStats } from "@/lib/types";
 import type { Plan } from "@/lib/plans";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -182,25 +176,4 @@ export async function isIdentifierTaken(
 export async function getUserSiteLimit(uid: string): Promise<number> {
   const profile = await getUserProfile(uid);
   return getSiteLimit((profile?.plan ?? "free") as Plan);
-}
-
-export async function getDashboardStats(uid: string): Promise<DashboardStats> {
-  const sites = await getUserSites(uid);
-  const siteLimit = await getUserSiteLimit(uid);
-  return {
-    totalVisits: sites.reduce((a, s) => a + (s.visits ?? 0), 0),
-    totalWhatsappClicks: sites.reduce((a, s) => a + (s.whatsappClicks ?? 0), 0),
-    totalSites: sites.length,
-    sitesLeft: Math.max(siteLimit - sites.length, 0),
-  };
-}
-
-export async function getAnalyticsEventsForUser(
-  uid: string,
-): Promise<AnalyticsEvent[]> {
-  const q = query(collection(db, "analytics_events"), where("uid", "==", uid));
-  const snap = await getDocs(q);
-  return snap.docs.map((d) =>
-    serializeData<AnalyticsEvent>({ id: d.id, ...d.data() }),
-  );
 }

@@ -7,7 +7,7 @@ import authFetch from "@/lib/authFetch";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
-import { useUserStore } from "@/store/useUserStore";
+import { useProfileStore } from "@/store/useProfileStore";
 
 import { isValidTemplate, templatesRegistry } from "@/lib/templates";
 import { Layout, ArrowRight, CheckCircle2, Loader2, Eye } from "lucide-react";
@@ -185,7 +185,7 @@ export default function CreateSitePage() {
   const paramsName = searchParams.get("name");
   const paramsSlug = searchParams.get("slug");
 
-  const userProfile = useUserStore().profile;
+  const userProfile = useProfileStore().profile;
   const defaultMessage = userProfile?.defaultMessage;
   const whatsappNumber = userProfile?.whatsappNumber;
 

@@ -68,6 +68,7 @@ export default function EditorClient({
           <Loader2 className="h-12 w-12 text-primary animate-spin" />
           <div className="absolute h-2 w-2 bg-primary rounded-full" />
         </div>
+        
         <div className="mt-6 flex flex-col items-center gap-2">
           <p className="text-lg font-semibold text-slate-900">
             Preparing Editor

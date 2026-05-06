@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 import { Check, Sparkles, ArrowRight, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
-import { useUserStore } from "@/store/useUserStore";
+import { useProfileStore } from "@/store/useProfileStore";
 import { toast } from "sonner";
 
 import { PLANS } from "@/lib/plans";
@@ -32,7 +32,7 @@ const FAQ = [
 
 export default function PricingScreen() {
   const { user } = useAuth();
-  const { profile } = useUserStore();
+  const { profile } = useProfileStore();
   const currentPlan = profile?.plan ?? "free";
 
   const [loadingPlan, setLoadingPlan] = useState<Plan | null>(null);

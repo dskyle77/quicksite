@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from "react";
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { useUserStore } from "@/store/useUserStore";
+import { useProfileStore } from "@/store/useProfileStore";
 import { useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import authFetch from "@/lib/authFetch";
@@ -31,7 +31,7 @@ import { canUseFeature } from "@/lib/plans";
 
 export default function DashboardDomainsScreen() {
   const { user } = useAuth();
-  const { profile } = useUserStore();
+  const { profile } = useProfileStore();
   const userPlan = profile?.plan || "free";
 
   const { sites, fetchSites } = useDashboardStore();

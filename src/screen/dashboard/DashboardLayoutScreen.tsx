@@ -6,15 +6,18 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { useTheme } from "next-themes";
-import { useAuth } from "@/hooks/useAuth";
-import { useDashboardStore } from "@/store/useDashboardStore";
-import { useUserStore } from "@/store/useUserStore";
-import { ShieldAlert } from "lucide-react";
 import Link from "next/link";
+import { useTheme } from "next-themes";
+
+import { useAuth } from "@/hooks/useAuth";
+
+import { useDashboardStore } from "@/store/useDashboardStore";
+import { useProfileStore } from "@/store/useProfileStore";
+import { canUseFeature } from "@/lib/plans";
 import {
   Zap,
   LayoutDashboard,
+  ShieldAlert,
   Globe,
   BarChart2,
   Settings,
@@ -24,14 +27,6 @@ import {
   Moon,
   Menu,
 } from "lucide-react";
-
-const SIDEBAR_LINKS = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
-  { icon: Globe, label: "My Sites", href: "/dashboard/sites" },
-  { icon: Globe, label: "Domains", href: "/dashboard/domains" },
-  { icon: BarChart2, label: "Analytics", href: "/dashboard/analytics" },
-  { icon: Settings, label: "Settings", href: "/dashboard/settings" },
-];
 
 const SITE_STANDARD_NAME = process.env.NEXT_PUBLIC_SITE_STANDARD_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
@@ -48,7 +43,16 @@ export default function DashboardLayoutScreen({
   const pathname = usePathname();
 
   const { user, loading, logOut } = useAuth();
-  const { profile } = useUserStore();
+  const { profile } = useProfileStore();
+
+  
+  const sidebarLinks = () => [
+    { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
+    { icon: Globe, label: "My Sites", href: "/dashboard/sites" },
+    { icon: Globe, label: "Domains", href: "/dashboard/domains" },
+    { icon: BarChart2, label: "Analytics", href: "/dashboard/analytics" },
+    { icon: Settings, label: "Settings", href: "/dashboard/settings" },
+  ];
 
   // ── Zustand Store ──────────────────────────────────────────
   const { ui, setSidebarOpen } = useDashboardStore();
@@ -118,7 +122,7 @@ export default function DashboardLayoutScreen({
         </div>
 
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {SIDEBAR_LINKS.map(({ icon: Icon, label, href }) => (
+          {sidebarLinks().map(({ icon: Icon, label, href }) => (
             <Link key={label} href={href} onClick={() => setSidebarOpen(false)}>
               <div
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${
@@ -143,17 +147,19 @@ export default function DashboardLayoutScreen({
         </nav>
 
         <div className="p-4 border-t border-sidebar-border space-y-4">
-          <div className="bg-primary/10 rounded-xl p-4">
-            <p className="text-xs font-semibold mb-1">Free Plan</p>
-            <p className="text-[11px] text-muted-foreground mb-3">
-              Upgrade to remove branding.
-            </p>
-            <Link href="/pricing">
-              <button className="w-full bg-primary text-primary-foreground rounded-lg text-xs font-semibold py-2 hover:opacity-90 transition cursor-pointer">
-                Upgrade Now
-              </button>
-            </Link>
-          </div>
+          {profile?.plan === "free" && (
+            <div className="bg-primary/10 rounded-xl p-4">
+              <p className="text-xs font-semibold mb-1">Free Plan</p>
+              <p className="text-[11px] text-muted-foreground mb-3">
+                Upgrade to remove branding.
+              </p>
+              <Link href="/pricing">
+                <button className="w-full bg-primary text-primary-foreground rounded-lg text-xs font-semibold py-2 hover:opacity-90 transition cursor-pointer">
+                  Upgrade Now
+                </button>
+              </Link>
+            </div>
+          )}
 
           <div className="flex items-center gap-3">
             <div className="h-9 w-9 rounded-full bg-primary grid place-items-center text-xs font-bold text-white shrink-0">

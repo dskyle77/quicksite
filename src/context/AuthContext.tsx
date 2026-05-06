@@ -21,7 +21,7 @@ import {
   AuthError,
 } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
-import { useUserStore } from "@/store/useUserStore";
+import { useProfileStore } from "@/store/useProfileStore";
 import { useDashboardStore } from "@/store/useDashboardStore";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -63,7 +63,7 @@ function friendlyError(err: unknown): string {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const { fetchProfile } = useUserStore();
+  const { fetchProfile } = useProfileStore();
   const { fetchSites, reset } = useDashboardStore();
 
   useEffect(() => {

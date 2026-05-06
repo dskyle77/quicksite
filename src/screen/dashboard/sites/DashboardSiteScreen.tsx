@@ -14,7 +14,7 @@ import {
   X,
 } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
-import { useUserStore } from "@/store/useUserStore";
+import { useProfileStore } from "@/store/useProfileStore";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 
@@ -187,7 +187,7 @@ function SiteCard({ site }: { site: Site }) {
 export default function DashboardSiteScreen() {
   const { sites, sitesLoading, ui, fetchSites, setDeleteConfirm } =
     useDashboardStore();
-  const { profile: user } = useUserStore();
+  const { profile: user } = useProfileStore();
   const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {

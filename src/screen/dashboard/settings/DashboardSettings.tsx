@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useUserStore } from "@/store/useUserStore";
+import { useProfileStore } from "@/store/useProfileStore";
 import {
   User,
   Lock,
@@ -285,7 +285,7 @@ function FooterActions({
 // Main Dashboard Settings component
 export default function DashboardSettings() {
   const { user, sendReset } = useAuth();
-  const { profile, updateProfile, isLoading } = useUserStore();
+  const { profile, updateProfile, isLoading } = useProfileStore();
   const [activeTab, setActiveTab] = useState<Tab>("profile");
 
   // Profile fields
