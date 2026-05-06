@@ -11,9 +11,8 @@ const PAYSTACK_SECRET = process.env.PAYSTACK_SECRET_KEY!;
 // Must match your Paystack dashboard plan codes exactly (or use price amounts)
 // Amount is in KOBO (multiply Naira by 100)
 const PLAN_AMOUNTS: Record<Exclude<Plan, "free">, number> = {
-  basic: 150000, // ₦1,500
-  growth: 400000, // ₦4,000
-  pro: 1000000, // ₦10,000
+  growth: 200000, // ₦2,000
+  pro: 800000, // ₦8,000
 };
 
 export async function POST(req: Request) {

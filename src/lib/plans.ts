@@ -1,6 +1,6 @@
 // src/lib/plans.ts
 
-export type Plan = "free" | "basic" | "growth" | "pro";
+export type Plan = "free" | "growth" | "pro";
 
 export const PLANS: {
   name: string;
@@ -15,55 +15,41 @@ export const PLANS: {
     name: "Free",
     plan: "free",
     price: 0,
-    description: "Start building your mini-site",
+    description: "Get online quickly with a clean mini-site",
     features: [
       "1 mini-site",
       "Quicksite subdomain",
       "Basic templates",
-      "Powered by Quicksite branding",
+      "Powered by QuickSite branding",
     ],
     buttonText: "Get Started Free",
   },
   {
-    name: "Basic",
-    plan: "basic",
-    price: 1500,
-    description: "Look professional online",
-    isPopular: true,
-    features: [
-      "Custom domain",
-      "Remove Quicksite branding",
-      "Better templates",
-      "Social links",
-      "Basic customization",
-    ],
-    buttonText: "Upgrade to Basic",
-  },
-  {
     name: "Growth",
     plan: "growth",
-    price: 4000,
-    description: "Grow your business",
+    price: 2000,
+    description: "Build your presence and attract visitors",
     features: [
-      "Everything in Basic",
-      "Analytics (views & clicks)",
+      "Up to 5 mini-sites",
+      "Custom domain",
+      "More templates",
+      "Basic SEO",
       "Contact forms",
-      "More sections",
-      "Image gallery",
     ],
+    isPopular: true,
     buttonText: "Upgrade to Growth",
   },
   {
     name: "Pro",
     plan: "pro",
-    price: 10000,
-    description: "Run your business online",
+    price: 8000,
+    description: "Run and scale your online business",
     features: [
-      "Everything in Growth",
+      "Up to 50 mini-sites",
+      "Premium templates",
+      "Analytics",
       "Accept payments",
       "Sell products",
-      "Advanced customization",
-      "Priority performance",
     ],
     buttonText: "Go Pro",
   },
@@ -75,16 +61,10 @@ export const PLAN_LIMITS = {
     analytics: false,
     payments: false,
   },
-  basic: {
-    sites: 3,
+  growth: {
+    sites: 5,
     customDomain: true,
     analytics: false,
-    payments: false,
-  },
-  growth: {
-    sites: 10,
-    customDomain: true,
-    analytics: true,
     payments: false,
   },
   pro: {

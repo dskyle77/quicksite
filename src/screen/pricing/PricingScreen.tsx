@@ -100,7 +100,7 @@ export default function PricingScreen() {
 
       {/* Pricing grid */}
       <section className="px-4 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-6xl mx-auto">
           {PLANS.map((plan) => {
             const isCurrentPlan = currentPlan === plan.plan;
             const isLoading = loadingPlan === plan.plan;
