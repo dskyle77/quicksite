@@ -1,6 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
+import { generalApiLimiter } from "@/lib/rateLimit"; // Ensure this path is correct
 
-export function middleware(req: NextRequest) {
+export async function middleware(req: NextRequest) {
   const url = req.nextUrl;
   const hostname = req.headers.get("host") || "";
   const path = url.pathname;
@@ -8,39 +9,72 @@ export function middleware(req: NextRequest) {
   const rootDomain = "quicksiteio.vercel.app";
   const shortDomain = "qsio.vercel.app";
 
-  // 1. Standard exclusions
+  /**
+   * 1. Rate Limiting for API Routes
+   * We apply this first to block spam before any other logic runs.
+   */
+  if (path.startsWith("/api")) {
+    // Robust IP detection to satisfy TypeScript
+    const forwarded = req.headers.get("x-forwarded-for");
+    const ip = forwarded ? forwarded.split(",")[0] : "127.0.0.1";
+
+    const { success, reset } = await generalApiLimiter.limit(ip);
+
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        {
+          status: 429,
+          headers: { "X-RateLimit-Reset": reset.toString() },
+        },
+      );
+    }
+    // If successful, allow the request to proceed to the actual API route
+    return NextResponse.next();
+  }
+
+  /**
+   * 2. Standard exclusions
+   * Ignore Next.js internals, static files, and files with extensions (favicon.ico, etc.)
+   */
   if (
     path.startsWith("/_next") ||
-    path.startsWith("/api") ||
     path.startsWith("/static") ||
     path.includes(".")
   ) {
     return NextResponse.next();
   }
 
-  // 2. Root Domain Logic
+  /**
+   * 3. Root Domain Logic
+   */
   const isRootDomain = hostname === rootDomain || hostname === "localhost:3000";
   if (isRootDomain) {
     return NextResponse.next();
   }
 
-  // 3. Short Domain Logic
+  /**
+   * 4. Short Domain Logic (qsio.vercel.app)
+   */
   const isShortDomain = hostname === shortDomain;
 
   if (isShortDomain) {
-    // REDIRECT logic: If it's just the root domain, send to the main site
+    // If user hits the base short domain, send them to the landing page
     if (path === "/") {
       return NextResponse.redirect(`https://${rootDomain}`);
     }
 
-    // REWRITE logic: Treat qsio.vercel.app/[slug] as /s/[slug]
+    // Rewrite: qsio.vercel.app/my-site -> /s/my-site
     const rewriteUrl = new URL(`/s${path}`, req.url);
     const response = NextResponse.rewrite(rewriteUrl);
     response.headers.set("x-is-site", "true");
     return response;
   }
 
-  // 4. Custom Domain Logic
+  /**
+   * 5. Custom Domain Logic
+   * Maps customdomain.com/path to /s/domain/customdomain.com/path
+   */
   const cleanHostname = hostname.split(":")[0];
   const rewriteUrl = new URL(`/s/domain/${cleanHostname}${path}`, req.url);
   const response = NextResponse.rewrite(rewriteUrl);
@@ -48,3 +82,16 @@ export function middleware(req: NextRequest) {
 
   return response;
 }
+
+// Ensure the middleware only runs on relevant paths to keep the app fast
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    "/((?!_next/static|_next/image|favicon.ico).*)",
+  ],
+};

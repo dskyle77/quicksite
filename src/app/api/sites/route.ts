@@ -4,6 +4,8 @@ import { getUserFromSession } from "@/server/auth";
 import { serverCreateSite, getUserPlan } from "@/server/firestore";
 import { getTemplateContentByType } from "@/lib/templatesContent";
 import { generateSiteContentWithAI } from "@/server/ai-content";
+
+import { aiRateLimiter } from "@/lib/rateLimit";
 import type { Plan } from "@/lib/plans";
 
 export async function POST(req: Request) {
@@ -53,6 +55,17 @@ export async function POST(req: Request) {
 
     // 1. Try to generate with AI if requested
     if (generateWithAI === true && description && plan !== "free") {
+      const { success, reset } = await aiRateLimiter.limit(user.uid);
+
+      if (!success) {
+        return NextResponse.json(
+          { error: "AI Generation limit reached. Try again in an hour." },
+          {
+            status: 429,
+            headers: { "X-RateLimit-Reset": reset.toString() },
+          },
+        );
+      }
       try {
         finalContent = await generateSiteContentWithAI({
           selectedTitle: normalizedName,
