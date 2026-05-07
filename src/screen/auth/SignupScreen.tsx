@@ -58,7 +58,7 @@ export default function SignupScreen() {
     setLoading(true);
     try {
       await signUp(form.name, form.email, form.password);
-      router.push("/dashboard");
+      router.push("/verify-email");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Sign up failed.");
     } finally {

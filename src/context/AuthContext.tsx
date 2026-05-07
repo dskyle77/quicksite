@@ -18,6 +18,7 @@ import {
   signOut,
   updateProfile,
   sendPasswordResetEmail,
+  sendEmailVerification,
   AuthError,
 } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
@@ -32,6 +33,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (name: string, email: string, password: string) => Promise<void>;
   signInWithGoogle: () => Promise<void>;
+  sendVerification: () => Promise<void>;
   sendReset: (email: string) => Promise<void>;
   logOut: () => Promise<void>;
 }
@@ -119,7 +121,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password,
       );
       await updateProfile(u, { displayName: name });
+
+      await sendEmailVerification(u);
+
       setUser({ ...u, displayName: name } as User);
+
       await afterSignIn({ ...u, displayName: name } as User);
     } catch (err) {
       throw new Error(friendlyError(err));
@@ -142,6 +148,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       throw new Error(friendlyError(err));
     }
   };
+  const sendVerification = async () => {
+    if (!user) {
+      throw new Error("User not logged in");
+    }
+    try {
+      await sendEmailVerification(user);
+    } catch (err) {
+      throw new Error(friendlyError(err));
+    }
+  };
 
   const logOut = async () => {
     await signOut(auth);
@@ -156,6 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signUp,
         signInWithGoogle,
+        sendVerification,
         sendReset,
         logOut,
       }}

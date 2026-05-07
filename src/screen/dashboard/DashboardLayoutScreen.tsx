@@ -44,7 +44,6 @@ export default function DashboardLayoutScreen({
   const { user, loading, logOut } = useAuth();
   const { profile } = useProfileStore();
 
-  
   const sidebarLinks = () => [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: Globe, label: "My Sites", href: "/dashboard/sites" },
@@ -60,7 +59,13 @@ export default function DashboardLayoutScreen({
 
   // Handle Authentication Redirect
   useEffect(() => {
-    if (!loading && !user) router.push("/login");
+    if (!loading) {
+      if (!user) {
+        router.push("/login");
+      } else if (!user.emailVerified) {
+        router.push("/verify-email");
+      }
+    }
   }, [user, loading, router]);
 
   // ───────────────────────────────────────────────────────────

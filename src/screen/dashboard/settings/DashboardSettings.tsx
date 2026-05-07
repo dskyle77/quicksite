@@ -225,7 +225,7 @@ function SecurityTab({
         {resetSent ? (
           <div className="flex items-center gap-2 text-sm text-emerald-600 bg-emerald-500/10 rounded-xl px-4 py-3">
             <CheckCircle2 className="h-4 w-4" />
-            Reset email sent! Check your inbox.
+            Reset email sent! Check your inbox (including your Spam folder).
           </div>
         ) : (
           <button
