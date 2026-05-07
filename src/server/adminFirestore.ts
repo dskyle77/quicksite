@@ -304,14 +304,3 @@ export async function getDomainsPaginated({
     nextCursor: hasMore ? docs[docs.length - 1].id : null,
   };
 }
-
-// ── Pricing ───────────────────────────────────────────────────────────────────
-
-export async function getPricing(): Promise<PricingConfig | null> {
-  const doc = await adminDb.collection("config").doc("pricing").get();
-  return doc.exists ? (doc.data() as PricingConfig) : null;
-}
-
-export async function savePricing(pricing: PricingConfig): Promise<void> {
-  await adminDb.collection("config").doc("pricing").set(pricing);
-}

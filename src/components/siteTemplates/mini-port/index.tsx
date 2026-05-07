@@ -2,11 +2,7 @@
 "use client";
 
 import type { TemplateProps } from "@/lib/templates";
-import {
-  templateMiniMeta,
-  templateMiniConfig,
-  templateMiniStarterContent,
-} from "./content";
+import { templateMiniContent } from "./content";
 import Home from "./home";
 
 export default function TemplateMini({
@@ -35,8 +31,6 @@ export default function TemplateMini({
 }
 
 export const templateMini = {
-  meta: templateMiniMeta,
-  config: templateMiniConfig,
+  ...templateMiniContent,
   template: TemplateMini,
-  starterContent: templateMiniStarterContent,
 };

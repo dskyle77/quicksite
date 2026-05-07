@@ -20,7 +20,7 @@ export const PLANS: {
       "1 mini-site",
       "Quicksite subdomain",
       "Basic templates",
-      "Powered by QuickSite branding",
+      "Quicksite branding",
     ],
     buttonText: "Get Started Free",
   },
@@ -28,13 +28,15 @@ export const PLANS: {
     name: "Growth",
     plan: "growth",
     price: 2000,
-    description: "Build your presence and attract visitors",
+    description: "Build your brand and grow your online presence",
     features: [
       "Up to 5 mini-sites",
       "Custom domain",
       "More templates",
+      "AI starter content",
       "Basic SEO",
       "Contact forms",
+      "Remove Quicksite branding",
     ],
     isPopular: true,
     buttonText: "Upgrade to Growth",
@@ -42,36 +44,46 @@ export const PLANS: {
   {
     name: "Pro",
     plan: "pro",
-    price: 8000,
-    description: "Run and scale your online business",
+    price: 5000,
+    description: "Advanced tools for creators and businesses",
     features: [
-      "Up to 50 mini-sites",
+      "Up to 15 mini-sites",
       "Premium templates",
       "Analytics",
-      "Accept payments",
       "Sell products",
+      "Advanced SEO",
+      "Priority support",
     ],
     buttonText: "Go Pro",
   },
 ];
+
 export const PLAN_LIMITS = {
   free: {
     sites: 1,
     customDomain: false,
     analytics: false,
     payments: false,
+    ai: false,
+    removeBranding: false,
   },
+
   growth: {
     sites: 5,
     customDomain: true,
     analytics: false,
     payments: false,
+    ai: true,
+    removeBranding: true,
   },
+
   pro: {
-    sites: 50,
+    sites: 15,
     customDomain: true,
     analytics: true,
-    payments: true,
+    payments: false,
+    ai: true,
+    removeBranding: true,
   },
 } as const;
 

@@ -1,4 +1,4 @@
-export const templateMiniStarterContent = ({
+const getStarterContent = ({
   selectedTitle,
   whatsappNumber,
   defaultMessage,
@@ -89,7 +89,84 @@ export const templateMiniStarterContent = ({
   };
 };
 
-export const templateMiniMeta = {
+// lib/ai-schemas.ts
+
+const getSchema = ({
+  selectedTitle,
+  whatsappNumber,
+  defaultMessage,
+}: {
+  selectedTitle?: string;
+  whatsappNumber?: string;
+  defaultMessage?: string;
+}) => {
+  // We pre-calculate the technical link so the AI just maps it to buttons
+  const whatsappLink = whatsappNumber
+    ? { type: "whatsapp", phone: whatsappNumber, message: defaultMessage || "" }
+    : {};
+
+  return {
+    navbar: {
+      logo: "✦",
+      title: selectedTitle || "", // AI should confirm or refine this
+      ctaButton: "",
+    },
+    hero: {
+      name: selectedTitle || "",
+      role: "", // AI fills this
+      tagline: "", // AI fills this
+      primaryButton: "",
+      primaryButtonLink: whatsappLink, // Fixed technical field
+      secondaryButton: "",
+      secondaryButtonLink: whatsappLink, // Fixed technical field
+      image1:
+        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      image1PId: "",
+    },
+    about: {
+      heading: "",
+      body: "",
+    },
+    projectsHeading: "",
+    projects: [
+      {
+        title: "",
+        category: "",
+        desc: "",
+        image:
+          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+        imagePId: "",
+        link: {},
+      },
+      {
+        title: "",
+        category: "",
+        desc: "",
+        image:
+          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+        imagePId: "",
+        link: {},
+      },
+    ],
+    contact: {
+      heading: "",
+      subheading: "",
+      primaryButton: "",
+      primaryButtonLink: whatsappLink,
+    },
+    footer: {
+      name: selectedTitle || "",
+      copyright: `© ${new Date().getFullYear()}`,
+      socials: [
+        { label: "Twitter", url: "#" },
+        { label: "GitHub", url: "#" },
+        { label: "LinkedIn", url: "#" },
+      ],
+    },
+  };
+};
+
+const meta = {
   title: "Mini Portfolio",
   image: "/ti/pm1.png",
   category: "Portfolio",
@@ -97,8 +174,15 @@ export const templateMiniMeta = {
     "A clean, minimal one-page portfolio for designers, developers, and creatives. No clutter — just your work.",
 };
 
-export const templateMiniConfig = {
+const config = {
   type: "template-mini",
   theme: "ocean",
   category: "portfolio",
+};
+
+export const templateMiniContent = {
+  meta,
+  config,
+  getSchema,
+  getStarterContent,
 };

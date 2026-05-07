@@ -1,6 +1,6 @@
 // ─── Starter Content ───────────────────────────────────────────────────────────
 
-export const template2StarterContent = ({
+const getStarterContent = ({
   selectedTitle,
   whatsappNumber,
   defaultMessage,
@@ -164,9 +164,109 @@ export const template2StarterContent = ({
   };
 };
 
+// lib/ai-schemas.ts
+const getSchema = ({
+  selectedTitle,
+  whatsappNumber,
+  defaultMessage,
+}: {
+  selectedTitle?: string;
+  whatsappNumber?: string;
+  defaultMessage?: string;
+}) => {
+  const whatsappLink = whatsappNumber
+    ? {
+        type: "whatsapp",
+        phone: whatsappNumber,
+        message: typeof defaultMessage === "string" ? defaultMessage : "",
+      }
+    : {};
+
+  const defaultImage =
+    "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg";
+
+  return {
+    navbar: {
+      logo: "✦",
+      title: selectedTitle || "",
+      ctaButton: "", // AI Fills (e.g., "Hire Me")
+      ctaButtonLink: whatsappLink,
+    },
+    hero: {
+      badge: "", // AI Fills (e.g., "👋 Available for Work")
+      image1: defaultImage,
+      image1PId: "",
+      title: "", // AI Fills
+      desc: "", // AI Fills
+      primaryButton: "",
+      primaryButtonLink: whatsappLink,
+      secondaryButton: "",
+      secondaryButtonLink: {}, // Usually a "Download CV" or internal link, AI can name button
+    },
+    about: {
+      label: "", // AI Fills (e.g., "About Me")
+      title: "", // AI Fills
+      desc: "", // AI Fills
+      desc2: "", // AI Fills
+      image1: defaultImage,
+      image1PId: "",
+      stat1Value: "", // AI Fills (e.g., "20+")
+      stat1Label: "", // AI Fills (e.g., "Projects Done")
+      stat2Value: "",
+      stat2Label: "",
+      stat3Value: "",
+      stat3Label: "",
+      stat4Value: "",
+      stat4Label: "",
+    },
+    skillsHeading: "",
+    skillsSubheading: "",
+    skills: [
+      { name: "", level: "" }, // AI fills name and numeric level string (e.g., "95")
+      { name: "", level: "" },
+      { name: "", level: "" },
+      { name: "", level: "" },
+    ],
+    skillTags: [], // AI fills array of strings
+    projectsHeading: "",
+    projectsSubheading: "",
+    experienceHeading: "",
+    experienceSubheading: "",
+    experience: [
+      { role: "", company: "", period: "", desc: "" },
+      { role: "", company: "", period: "", desc: "" },
+    ],
+    testimonialsHeading: "",
+    testimonials: [
+      { quote: "", name: "", role: "" },
+      { quote: "", name: "", role: "" },
+    ],
+    contact: {
+      title: "",
+      desc: "",
+      primaryButton: "",
+      primaryButtonLink: whatsappLink,
+      secondaryButton: "",
+      secondaryButtonLink: whatsappLink,
+    },
+    footer: {
+      brand: selectedTitle || "",
+      copyright: `© ${new Date().getFullYear()} All rights reserved.`,
+      socials: ["GitHub", "LinkedIn", "Twitter"],
+    },
+    pages: {
+      projects: [
+        { title: "", desc: "", tags: [], image: defaultImage, imagePId: "" },
+        { title: "", desc: "", tags: [], image: defaultImage, imagePId: "" },
+        { title: "", desc: "", tags: [], image: defaultImage, imagePId: "" },
+      ],
+    },
+  };
+};
+
 // ─── Meta & Config ─────────────────────────────────────────────────────────────
 
-export const template2Meta = {
+const meta = {
   title: "Portfolio",
   image: "/ti/p1.png",
   category: "Portfolio",
@@ -174,8 +274,15 @@ export const template2Meta = {
     "A clean, modern portfolio template for developers, designers, and creatives. Showcase your skills, projects, and experience with style.",
 };
 
-export const template2Config = {
-    type: "template-2",
+const config = {
+  type: "template-2",
   theme: "warm",
   category: "portfolio",
+};
+
+export const template2Content = {
+  meta,
+  config,
+  getSchema,
+  getStarterContent,
 };

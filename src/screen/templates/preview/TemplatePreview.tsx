@@ -55,7 +55,7 @@ export default function TemplatesPreview({ type }: { type: string }) {
 
   const starterContentArgs: Record<string, string | undefined> = {};
   if (paramsName) starterContentArgs.selectedTitle = paramsName;
-  const templateData = templateEntry.starterContent(starterContentArgs);
+  const templateData = templateEntry.getStarterContent(starterContentArgs);
 
   let useTemplateHref = `/dashboard/new?template=${encodeURIComponent(type)}`;
   const useQueryParams: string[] = [];

@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-// src/store/useUserStore.ts
-
 import { create } from "zustand";
 import {
   getUserProfile,
@@ -18,6 +15,7 @@ interface UserState {
 
   // ── Actions ─────────────────────────────────────
   fetchProfile: (uid: string) => Promise<void>;
+  getUserPlan: () => "free" | "growth" | "pro" | null;
   refreshProfile: (uid: string) => Promise<void>;
   updateProfile: (
     uid: string,
@@ -27,7 +25,8 @@ interface UserState {
   clearUser: () => void;
 }
 
-export const useProfileStore = create<UserState>((set) => ({
+// Explicitly typed useProfileStore to fix lint errors
+export const useProfileStore = create<UserState>((set, get) => ({
   profile: null,
 
   isLoading: false,
@@ -35,7 +34,7 @@ export const useProfileStore = create<UserState>((set) => ({
   error: null,
 
   // ── Fetch user (with auto-create fallback) ──────
-  fetchProfile: async (uid) => {
+  async fetchProfile(uid: string): Promise<void> {
     if (!uid) return;
 
     set({ isLoading: true, error: null });
@@ -50,27 +49,39 @@ export const useProfileStore = create<UserState>((set) => ({
       }
 
       set({ profile: profile });
-    } catch (err: any) {
-      set({ error: err.message || "Failed to fetch user" });
+    } catch (err) {
+      // Using type-safe error message access
+      set({
+        error: err instanceof Error ? err.message : "Failed to fetch user",
+      });
     } finally {
       set({ isLoading: false });
     }
   },
+  getUserPlan() {
+    const { profile } = get();
+    return profile?.plan ?? null;
+  },
 
   // ── Force refresh (no caching logic yet) ────────
-  refreshProfile: async (uid) => {
+  async refreshProfile(uid: string): Promise<void> {
     if (!uid) return;
 
     try {
       const profile = await getUserProfile(uid);
       set({ profile: profile });
-    } catch (err: any) {
-      set({ error: err.message || "Failed to refresh user" });
+    } catch (err) {
+      set({
+        error: err instanceof Error ? err.message : "Failed to refresh user",
+      });
     }
   },
 
   // ── Update profile ──────────────────────────────
-  updateProfile: async (uid, data) => {
+  async updateProfile(
+    uid: string,
+    data: Partial<Omit<UserProfile, "uid" | "createdAt" | "updatedAt">>,
+  ): Promise<void> {
     if (!uid) return;
 
     set({ isSaving: true, error: null });
@@ -82,15 +93,17 @@ export const useProfileStore = create<UserState>((set) => ({
       set((state) => ({
         profile: state.profile ? { ...state.profile, ...data } : state.profile,
       }));
-    } catch (err: any) {
-      set({ error: err.message || "Failed to update user" });
+    } catch (err) {
+      set({
+        error: err instanceof Error ? err.message : "Failed to update user",
+      });
     } finally {
       set({ isSaving: false });
     }
   },
 
   // ── Clear (on logout) ───────────────────────────
-  clearUser: () => {
+  clearUser() {
     set({ profile: null, error: null });
   },
 }));

@@ -1,11 +1,9 @@
 // src/app/api/sites/route.ts
-// POST /api/sites — create a new site
-// Auth + plan limit enforced server-side.
-
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/server/auth";
-import { serverCreateSite } from "@/server/firestore";
+import { serverCreateSite, getUserPlan } from "@/server/firestore";
 import { getTemplateContentByType } from "@/lib/templatesContent";
+import { generateSiteContentWithAI } from "@/server/ai-content";
 import type { Plan } from "@/lib/plans";
 
 export async function POST(req: Request) {
@@ -16,7 +14,15 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const { name, slug, type, defaultMessage, whatsappNumber } = body;
+    const {
+      name,
+      slug,
+      type,
+      defaultMessage,
+      whatsappNumber,
+      description,
+      generateWithAI,
+    } = body;
 
     if (!name || !slug || !type) {
       return NextResponse.json(
@@ -36,12 +42,39 @@ export async function POST(req: Request) {
       );
     }
 
-    const content = templateEntry.starterContent({
+    const plan = await getUserPlan(user.uid);
+
+    let finalContent = null;
+    const schemaBase = templateEntry.getSchema({
       selectedTitle: normalizedName,
       defaultMessage,
       whatsappNumber,
     });
 
+    // 1. Try to generate with AI if requested
+    if (generateWithAI === true && description && plan !== "free") {
+      try {
+        finalContent = await generateSiteContentWithAI({
+          selectedTitle: normalizedName,
+          description,
+          schemaBase,
+        });
+      } catch (error) {
+        console.error("AI Generation failed, falling back to default:", error);
+        finalContent = null;
+      }
+    }
+
+    // 2. Fallback: If AI failed or wasn't requested, use the standard template starter
+    if (!finalContent) {
+      finalContent = templateEntry.getStarterContent({
+        selectedTitle: normalizedName,
+        defaultMessage,
+        whatsappNumber,
+      });
+    }
+
+    // 3. Create the site in Firestore
     const siteId = await serverCreateSite(
       user.uid,
       (user.plan ?? "free") as Plan,
@@ -51,7 +84,7 @@ export async function POST(req: Request) {
         name: normalizedName,
         theme: templateEntry.config.theme,
         status: "draft",
-        content,
+        content: finalContent, // Use the final merged content
       },
     );
 
@@ -63,6 +96,7 @@ export async function POST(req: Request) {
   } catch (err) {
     const message = err instanceof Error ? err.message : "Server error.";
     const isPlanError = message.includes("Plan limit");
+
     return NextResponse.json(
       { error: message },
       { status: isPlanError ? 403 : 500 },

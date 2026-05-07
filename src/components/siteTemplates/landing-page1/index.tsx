@@ -2,11 +2,7 @@
 "use client";
 
 import type { TemplateProps } from "@/lib/templates";
-import {
-  template1Meta,
-  template1Config,
-  template1StarterContent,
-} from "./content";
+import { template1Content } from "./content";
 import Home from "./HomePage";
 
 export default function Template1({
@@ -29,8 +25,6 @@ export default function Template1({
 }
 
 export const template1 = {
-  meta: template1Meta,
-  config: template1Config,
+  ...template1Content,
   template: Template1,
-  starterContent: template1StarterContent,
 };

@@ -1,4 +1,4 @@
-export const template1StarterContent = ({
+const getStarterContent = ({
   selectedTitle,
   whatsappNumber,
   defaultMessage,
@@ -100,15 +100,92 @@ export const template1StarterContent = ({
   };
 };
 
-export const template1Meta = {
+// lib/ai-schemas.ts
+
+const getSchema = ({
+  selectedTitle,
+  whatsappNumber,
+  defaultMessage,
+}: {
+  selectedTitle?: string;
+  whatsappNumber?: string;
+  defaultMessage?: string;
+}) => {
+  // Pre-calculate the WhatsApp object so AI doesn't hallucinate the format
+  const whatsappLink = whatsappNumber
+    ? {
+        type: "whatsapp",
+        phone: whatsappNumber,
+        message: typeof defaultMessage === "string" ? defaultMessage : "",
+      }
+    : {};
+
+  return {
+    navbar: {
+      logo: "🚀",
+      title: selectedTitle || "",
+      links: ["Features", "About", "Pricing", "Contact"],
+    },
+    hero: {
+      badge: "", // AI fills (e.g., "✨ New & Improved")
+      image1:
+        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      image1PId: "",
+      title: "", // AI fills
+      desc: "", // AI fills
+      primaryButton: "", // AI fills
+      primaryButtonLink: whatsappLink,
+      secondaryButton: "", // AI fills
+      secondaryButtonLink: whatsappLink,
+    },
+    trustedByLabel: "Trusted by",
+    trustedBy: [], // AI fills with 5 relevant industry names
+    featuresHeading: "", // AI fills
+    featuresSubheading: "", // AI fills
+    features: [
+      { title: "", desc: "" },
+      { title: "", desc: "" },
+      { title: "", desc: "" },
+    ],
+    stats: [
+      { value: "", label: "" },
+      { value: "", label: "" },
+      { value: "", label: "" },
+    ],
+    testimonialsHeading: "",
+    testimonials: [
+      { quote: "", name: "", role: "" },
+      { quote: "", name: "", role: "" },
+    ],
+    cta: {
+      title: "",
+      desc: "",
+      button: "",
+      buttonLink: whatsappLink,
+    },
+    footer: {
+      brand: selectedTitle || "",
+      copyright: `© ${new Date().getFullYear()} ${selectedTitle || "Business"}. All rights reserved.`,
+    },
+  };
+};
+
+const meta = {
   title: "Business Landing Page",
   image: "/ti/lp1.png",
   category: "Landing Page",
   description:
     "A versatile landing page template perfect for businesses, products, services, or personal brands. Clean, professional, and fully customizable.",
 };
-export const template1Config = {
+const config = {
   type: "template-1",
   theme: "forest",
   category: "landing-page",
+};
+
+export const template1Content = {
+  meta,
+  config,
+  getSchema,
+  getStarterContent,
 };

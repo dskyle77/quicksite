@@ -2,11 +2,7 @@
 "use client";
 
 import type { TemplateProps } from "@/lib/templates";
-import {
-  template2StarterContent,
-  template2Config,
-  template2Meta,
-} from "./content";
+import { template2Content } from "./content";
 import { Navbar, Footer } from "./layout";
 
 import Home from "./home";
@@ -104,8 +100,6 @@ const template2Subpages = {
 };
 
 export const template2 = {
-  meta: template2Meta,
-  config: template2Config,
+  ...template2Content,
   template: Template2,
-  starterContent: template2StarterContent,
 };

@@ -13,7 +13,6 @@ import { useAuth } from "@/hooks/useAuth";
 
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useProfileStore } from "@/store/useProfileStore";
-import { canUseFeature } from "@/lib/plans";
 import {
   Zap,
   LayoutDashboard,
