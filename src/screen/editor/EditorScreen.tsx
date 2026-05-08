@@ -9,7 +9,7 @@ import { getTheme } from "@/lib/themes";
 interface EditorScreenProps {
   data: Site;
   onChange: (updated: Site) => void;
-  slugs?: Record<string, any>;
+  slugs: Record<string, any>;
 }
 
 export default function EditorScreen({

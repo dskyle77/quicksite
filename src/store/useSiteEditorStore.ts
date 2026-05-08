@@ -4,6 +4,7 @@
 import { create } from "zustand";
 import { getPrivateSite } from "@/lib/firestore";
 import type { Site } from "@/lib/types";
+import authFetch from "@/lib/authFetch";
 
 interface SiteEditorState {
   site: Site | null;
@@ -12,7 +13,7 @@ interface SiteEditorState {
 
   fetchSite: (uid: string, slug: string) => Promise<void>;
   updateSite: (updates: Partial<Site>) => void;
-  saveSite: (token: string) => Promise<void>;
+  saveSite: () => Promise<void>;
   reset: () => void;
 }
 
@@ -21,7 +22,6 @@ export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
   loading: true,
   isSaving: false,
 
-  // 🔄 Load private site (editor) — read-only, direct Firestore is fine
   fetchSite: async (uid, slug) => {
     try {
       set({ loading: true });
@@ -37,7 +37,6 @@ export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
     }
   },
 
-  // ✏️ Local updates only — no network call
   updateSite: (updates) => {
     const current = get().site;
     if (!current) return;
@@ -45,18 +44,17 @@ export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
   },
 
   // 💾 Save via API route — auth validated server-side
-  saveSite: async (token) => {
+  saveSite: async () => {
     const { site } = get();
     if (!site) return;
 
     try {
       set({ isSaving: true });
 
-      const res = await fetch(`/api/sites/${site.id}/content`, {
+      const res = await authFetch(`/api/sites/${site.id}/content`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           content: site.content,

@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ReactNode, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { ReactNode } from "react";
 import { Loader2, Save, ArrowLeft, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/useAuth";
@@ -12,46 +11,22 @@ import EditorScreen from "@/screen/editor/EditorScreen";
 
 interface EditorClientProps {
   slug: string;
-  subslug?: string;
-  headerExtra?: ReactNode;
+  subslug: string | null;
 }
 
-export default function EditorClient({
-  slug,
-  subslug,
-  headerExtra,
-}: EditorClientProps) {
+export default function EditorClient({ slug, subslug }: EditorClientProps) {
   const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
 
   // Destructure store with selective selectors for better performance
   const siteData = useSiteEditorStore((s) => s.site);
   const dataLoading = useSiteEditorStore((s) => s.loading);
   const isSaving = useSiteEditorStore((s) => s.isSaving);
-  const { updateSite, saveSite, fetchSite, reset } = useSiteEditorStore();
-
-  // 1. Auth & Data Sync Logic
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.replace("/login");
-      return;
-    }
-
-    if (user?.uid) {
-      fetchSite(user.uid, slug).catch((err) => {
-        console.error("Fetch Error:", err);
-        toast.error("Failed to load site data.");
-      });
-    }
-
-    return () => reset();
-  }, [user, authLoading, slug, fetchSite, reset, router]);
+  const { updateSite, saveSite } = useSiteEditorStore();
 
   const handleSave = async () => {
     if (!user) return;
     try {
-      const token = await user.getIdToken();
-      await saveSite(token);
+      await saveSite();
       toast.success("Changes saved successfully");
     } catch (error) {
       toast.error("Error saving changes");
@@ -68,7 +43,7 @@ export default function EditorClient({
           <Loader2 className="h-12 w-12 text-primary animate-spin" />
           <div className="absolute h-2 w-2 bg-primary rounded-full" />
         </div>
-        
+
         <div className="mt-6 flex flex-col items-center gap-2">
           <p className="text-lg font-semibold text-slate-900">
             Preparing Editor
@@ -112,7 +87,7 @@ export default function EditorClient({
       <header className="h-16 border-b bg-white flex items-center justify-between px-4 sm:px-6 shrink-0 z-50">
         <div className="flex items-center gap-3 min-w-0">
           <Link
-            href="/dashboard/sites"
+            href={subslug ? `${slug}` : `/dashboard/sites`}
             className="p-2 hover:bg-slate-100 rounded-full transition-all"
           >
             <ArrowLeft size={20} className="text-slate-600" />
@@ -128,7 +103,15 @@ export default function EditorClient({
               </span>
             </div>
           </div>
-          <div className="hidden lg:block ml-2">{headerExtra}</div>
+          {subslug && (
+            <Link
+              href={`/editor/${slug}`}
+              className="hidden lg:inline-flex ml-2 items-center gap-1 px-3 py-1.5 bg-slate-100 rounded-lg text-xs font-semibold text-slate-700 hover:bg-slate-200 transition"
+              title="Go to site home"
+            >
+              Home
+            </Link>
+          )}
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4 ">

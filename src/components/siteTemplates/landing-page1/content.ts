@@ -106,10 +106,12 @@ const getSchema = ({
   selectedTitle,
   whatsappNumber,
   defaultMessage,
+  defaultImage,
 }: {
   selectedTitle?: string;
   whatsappNumber?: string;
   defaultMessage?: string;
+  defaultImage?: string;
 }) => {
   // Pre-calculate the WhatsApp object so AI doesn't hallucinate the format
   const whatsappLink = whatsappNumber
@@ -129,7 +131,7 @@ const getSchema = ({
     hero: {
       badge: "", // AI fills (e.g., "✨ New & Improved")
       image1:
-        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+        defaultImage,
       image1PId: "",
       title: "", // AI fills
       desc: "", // AI fills

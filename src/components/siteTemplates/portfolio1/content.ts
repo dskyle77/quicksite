@@ -2,10 +2,12 @@ const getStarterContent = ({
   selectedTitle,
   whatsappNumber,
   defaultMessage,
+  defaultImage,
 }: {
   selectedTitle?: string;
   whatsappNumber?: string;
   defaultMessage?: string;
+  defaultImage?: string;
 }) => {
   const getWhatsappButtonLink = () => {
     if (!whatsappNumber) return {};
@@ -15,6 +17,7 @@ const getStarterContent = ({
       message: typeof defaultMessage === "string" ? defaultMessage : "",
     };
   };
+
 
   return {
     navbar: {
@@ -32,8 +35,7 @@ const getStarterContent = ({
       primaryButtonLink: getWhatsappButtonLink(),
       secondaryButton: "Get in Touch",
       secondaryButtonLink: getWhatsappButtonLink(),
-      image1:
-        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      image1: defaultImage,
       image1PId: "",
     },
     about: {
@@ -46,8 +48,7 @@ const getStarterContent = ({
         title: "Brand Identity System",
         category: "Design",
         desc: "Full brand refresh for a Lagos-based fintech startup — logo, colours, typography, and usage guidelines.",
-        image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+        image: defaultImage,
         imagePId: "",
         link: {},
       },
@@ -55,8 +56,7 @@ const getStarterContent = ({
         title: "Mobile Banking App",
         category: "UI/UX",
         desc: "End-to-end product design for a savings and payments app targeting young professionals.",
-        image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+        image: defaultImage,
         imagePId: "",
         link: {},
       },
@@ -64,8 +64,7 @@ const getStarterContent = ({
         title: "Portfolio Website",
         category: "Development",
         desc: "Custom Next.js portfolio with a CMS, dark mode, and fast load times.",
-        image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+        image: defaultImage,
         imagePId: "",
         link: {},
       },
@@ -95,10 +94,12 @@ const getSchema = ({
   selectedTitle,
   whatsappNumber,
   defaultMessage,
+  defaultImage,
 }: {
   selectedTitle?: string;
   whatsappNumber?: string;
   defaultMessage?: string;
+  defaultImage?: string;
 }) => {
   // We pre-calculate the technical link so the AI just maps it to buttons
   const whatsappLink = whatsappNumber
@@ -119,8 +120,7 @@ const getSchema = ({
       primaryButtonLink: whatsappLink, // Fixed technical field
       secondaryButton: "",
       secondaryButtonLink: whatsappLink, // Fixed technical field
-      image1:
-        "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      image1: defaultImage,
       image1PId: "",
     },
     about: {
@@ -133,8 +133,7 @@ const getSchema = ({
         title: "",
         category: "",
         desc: "",
-        image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+        image: defaultImage,
         imagePId: "",
         link: {},
       },
@@ -142,8 +141,7 @@ const getSchema = ({
         title: "",
         category: "",
         desc: "",
-        image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+        image: defaultImage,
         imagePId: "",
         link: {},
       },

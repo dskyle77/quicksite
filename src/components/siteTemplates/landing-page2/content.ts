@@ -242,10 +242,12 @@ const getSchema = ({
   selectedTitle,
   whatsappNumber,
   defaultMessage,
+  defaultImage
 }: {
   selectedTitle?: string;
   whatsappNumber?: string;
   defaultMessage?: string;
+  defaultImage?: string
 }) => {
   const whatsappLink = whatsappNumber
     ? {
@@ -254,9 +256,6 @@ const getSchema = ({
         message: typeof defaultMessage === "string" ? defaultMessage : "",
       }
     : {};
-
-  const defaultImage =
-    "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg";
 
   return {
     navbar: {

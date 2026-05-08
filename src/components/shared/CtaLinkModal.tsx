@@ -288,7 +288,7 @@ export default function CtaLink({
 
       {linkConfig && (
         <span
-          className="mt-0.5 truncate max-w-[160px] text-[10px] font-medium"
+          className="truncate max-w-[160px] text-[10px] font-medium absolute -bottom-3"
           style={{
             color:
               linkConfig.type === "whatsapp"

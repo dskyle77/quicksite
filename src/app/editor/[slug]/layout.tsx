@@ -1,17 +1,12 @@
 "use client";
 
 import { ReactNode } from "react";
-import { useEffect, use } from "react";
-import { useAuth } from "@/lib/useAuth";
-import { useSiteEditorStore } from "@/store/useSiteEditorStore";
-import { toast } from "sonner";
+import EditorLayout from "@/screen/editor/EditorLayout";
 
-// Explicit types for layout props
 interface EditorLayoutProps {
   children: ReactNode;
-  params: Promise<{ slug: string; subslug?: string }>;
 }
 
-export default function EditorLayout({ children }: EditorLayoutProps) {
-  return <>{children}</>;
+export default function Layout({ children }: EditorLayoutProps) {
+  return <EditorLayout>{children}</EditorLayout>;
 }

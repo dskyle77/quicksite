@@ -26,7 +26,6 @@ export async function POST(req: Request) {
       generateWithAI,
     } = body;
 
-    
     if (!name || !slug || !type) {
       return NextResponse.json(
         { error: "name, slug, and type are required." },
@@ -37,7 +36,6 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { error: "Description is required to generate with AI." },
         { status: 400 },
-   
       );
     }
 
@@ -54,11 +52,15 @@ export async function POST(req: Request) {
 
     const plan = await getUserPlan(user.uid);
 
+    const defaultImage =
+      "https://image-source-sk.vercel.app/projects/default-image.jpg";
+
     let finalContent = null;
     const schemaBase = templateEntry.getSchema({
       selectedTitle: normalizedName,
       defaultMessage,
       whatsappNumber,
+      defaultImage,
     });
 
     // 1. Try to generate with AI if requested

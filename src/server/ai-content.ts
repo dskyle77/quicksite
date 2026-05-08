@@ -15,12 +15,14 @@ export async function generateSiteContentWithAI({
   You are a professional web copywriter. 
   Return a JSON object for a website named "${selectedTitle}".
   Business Description: "${description}"
-
+  
   STRICT INSTRUCTIONS:
   1. Use this exact JSON structure: ${JSON.stringify(schemaBase)}
   2. Do NOT change the structure or keys.
   3. Fill empty strings with high-converting, creative copy based on the description.
-  4. Keep "primaryButtonLink" and "secondaryButtonLink" exactly as they are provided in the structure.
+  4. For fields containing options (e.g., "side | background"), YOU MUST pick exactly one option that best fits the business description.
+  5. Keep "primaryButtonLink" and "secondaryButtonLink" exactly as they are provided in the structure.
+  6. Return ONLY valid JSON.
 `;
 
   const response = await groq.chat.completions.create({

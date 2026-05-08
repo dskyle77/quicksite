@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { Menu, X } from "lucide-react";
 import { TemplateComponentProps } from "@/lib/templates";
 import CtaLink from "@/components/shared/CtaLinkModal";
@@ -15,21 +16,26 @@ export function Navbar({
   const [isOpen, setIsOpen] = useState(false);
   const slug = slugs?.slug;
 
-  const buildLink = (
-    value: string,
-    slug?: string,
-    type: "section" | "page" = "section",
-  ) => {
+  const buildAnchorLink = (value: string, slug?: string) => {
     if (!slug) return "#";
-    const base = (isEditor ? "/editor/" : "/s/") + slug;
-    return type === "section" ? `${base}#${value}` : `${base}/${value}`;
+    return isEditor ? `/editor/${slug}#${value}` : `${slug}#${value}`;
   };
 
+  const buildSubPageLink = (
+    slug?: string,
+    subPage: string = "",
+    forEditor: boolean = false,
+  ) =>
+    slug ? (forEditor ? `/editor/${slug}?sp=${subPage}` : `/${slug}/${subPage}`) : "#";
+
   const links = [
-    { title: "About", link: buildLink("about", slug) },
-    { title: "Skills", link: buildLink("skills", slug) },
-    { title: "Projects", link: buildLink("projects", slug, "page") },
-    { title: "Contact", link: buildLink("contact", slug) },
+    { title: "About", link: buildAnchorLink("about", slug) },
+    { title: "Skills", link: buildAnchorLink("skills", slug) },
+    {
+      title: "Projects",
+      link: buildSubPageLink(slug, "projects", isEditor),
+    },
+    { title: "Contact", link: buildAnchorLink("contact", slug) },
   ];
 
   return (
@@ -73,14 +79,14 @@ export function Navbar({
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center gap-1 text-sm">
           {links.map((link, i) => (
-            <a
+            <Link
               key={i}
               href={link.link}
               className="rounded-xl px-4 py-2 font-medium transition-colors hover:bg-(--qs-primary) hover:text-(--qs-primary-fg)"
               style={{ color: "var(--qs-text-muted)" }}
             >
               {link.title}
-            </a>
+            </Link>
           ))}
         </nav>
 
@@ -102,7 +108,7 @@ export function Navbar({
           </div>
 
           {/* Mobile Dropdown Wrapper */}
-          <div className="relative md:hidden">
+          <div className="relative md:hidden z-50">
             <button
               onClick={() => setIsOpen(!isOpen)}
               className="flex h-10 w-10 items-center justify-center rounded-xl transition-colors active:bg-black/5"
@@ -125,7 +131,7 @@ export function Navbar({
             >
               <div className="flex flex-col p-1.5">
                 {links.map((link, i) => (
-                  <a
+                  <Link
                     key={i}
                     href={link.link}
                     onClick={() => setIsOpen(false)}
@@ -133,7 +139,7 @@ export function Navbar({
                     style={{ color: "var(--qs-text)" }}
                   >
                     {link.title}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>

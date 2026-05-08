@@ -27,6 +27,7 @@ const getStarterContent = ({
     },
     hero: {
       badge: "👋 Available for Work",
+      type: "background",
       image1:
         "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
       image1PId: "",
@@ -169,10 +170,12 @@ const getSchema = ({
   selectedTitle,
   whatsappNumber,
   defaultMessage,
+  defaultImage,
 }: {
   selectedTitle?: string;
   whatsappNumber?: string;
   defaultMessage?: string;
+  defaultImage?: string;
 }) => {
   const whatsappLink = whatsappNumber
     ? {
@@ -182,36 +185,34 @@ const getSchema = ({
       }
     : {};
 
-  const defaultImage =
-    "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg";
-
   return {
     navbar: {
       logo: "✦",
       title: selectedTitle || "",
-      ctaButton: "", // AI Fills (e.g., "Hire Me")
+      ctaButton: "",
       ctaButtonLink: whatsappLink,
     },
     hero: {
-      badge: "", // AI Fills (e.g., "👋 Available for Work")
+      type: "CHOOSE ONE: 'side' | 'background'",
+      badge: "",
       image1: defaultImage,
       image1PId: "",
-      title: "", // AI Fills
-      desc: "", // AI Fills
+      title: "",
+      desc: "",
       primaryButton: "",
       primaryButtonLink: whatsappLink,
       secondaryButton: "",
-      secondaryButtonLink: {}, // Usually a "Download CV" or internal link, AI can name button
+      secondaryButtonLink: {},
     },
     about: {
-      label: "", // AI Fills (e.g., "About Me")
-      title: "", // AI Fills
-      desc: "", // AI Fills
-      desc2: "", // AI Fills
+      label: "",
+      title: "",
+      desc: "",
+      desc2: "",
       image1: defaultImage,
       image1PId: "",
-      stat1Value: "", // AI Fills (e.g., "20+")
-      stat1Label: "", // AI Fills (e.g., "Projects Done")
+      stat1Value: "",
+      stat1Label: "",
       stat2Value: "",
       stat2Label: "",
       stat3Value: "",
@@ -222,12 +223,12 @@ const getSchema = ({
     skillsHeading: "",
     skillsSubheading: "",
     skills: [
-      { name: "", level: "" }, // AI fills name and numeric level string (e.g., "95")
-      { name: "", level: "" },
-      { name: "", level: "" },
-      { name: "", level: "" },
+      { name: "", level: "1-100" },
+      { name: "", level: "1-100" },
+      { name: "", level: "1-100" },
+      { name: "", level: "1-100" },
     ],
-    skillTags: [], // AI fills array of strings
+    skillTags: [],
     projectsHeading: "",
     projectsSubheading: "",
     experienceHeading: "",
