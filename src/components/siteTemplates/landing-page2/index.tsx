@@ -2,10 +2,10 @@
 "use client";
 
 import type { TemplateProps } from "@/lib/templates";
-import { templateMiniContent } from "./content";
+import { landingPage2Content } from "./content";
 import Home from "./home";
 
-export default function TemplateMini({
+function LandingPage2({
   isEditor,
   content,
   onUpdate,
@@ -30,7 +30,7 @@ export default function TemplateMini({
   );
 }
 
-export const templateMini = {
-  ...templateMiniContent,
-  template: TemplateMini,
+export const landingPage2 = {
+  ...landingPage2Content,
+  template: LandingPage2,
 };

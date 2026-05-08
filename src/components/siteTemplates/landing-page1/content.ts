@@ -180,7 +180,6 @@ const meta = {
 const config = {
   type: "template-1",
   theme: "forest",
-  category: "landing-page",
 };
 
 export const template1Content = {

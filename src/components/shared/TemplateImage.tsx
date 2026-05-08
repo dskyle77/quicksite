@@ -72,7 +72,7 @@ export default function TemplateImage({
 
       const res = await fetch("/api/imageUpload", {
         method: "POST",
-        body: formData,
+        body: formData, 
       });
 
       if (!res.ok) {

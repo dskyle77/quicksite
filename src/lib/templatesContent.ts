@@ -1,16 +1,18 @@
 // @/assets/siteTemplates/contentRegistry.ts
 
 import { template1Content } from "@/components/siteTemplates/landing-page1/content";
-import { template2Content } from "@/components/siteTemplates/port1/content";
-import { templateMiniContent } from "@/components/siteTemplates/mini-port/content";
+import { landingPage2Content } from "@/components/siteTemplates/landing-page2/content";
+import { portfolio1Content } from "@/components/siteTemplates/portfolio1/content";
+import { portfolio2Content } from "@/components/siteTemplates/portfolio2/content";
 
 /* This registry contains ONLY data and logic. 
    Safe for use in API Routes (Server Side).
 */
 export const contentRegistry = [
   template1Content,
-  template2Content,
-  templateMiniContent,
+  landingPage2Content,
+  portfolio1Content,
+  portfolio2Content,
 ];
 
 export const getTemplateContentByType = (type: string) =>

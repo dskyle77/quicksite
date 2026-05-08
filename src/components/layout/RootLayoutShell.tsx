@@ -7,18 +7,25 @@ import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
-const MARKETING_PATHS = ["/", "/pricing", "/templates", "/support"];
+const MARKETING_PATHS = [
+  "/",
+  "/pricing",
+  "/templates",
+  "/support",
+  "/terms",
+  "/privacy",
+];
 
 export default function RootLayoutShell({
   children,
-  isSite
+  isSite,
 }: {
   children: React.ReactNode;
   isSite: boolean;
 }) {
   const pathname = usePathname();
   const isMarketing = MARKETING_PATHS.includes(pathname);
-  const showShell = isMarketing && !isSite
+  const showShell = isMarketing && !isSite;
   const { resolvedTheme } = useTheme();
 
   return (

@@ -2,8 +2,9 @@
 // @/assets/siteTemplates/templatesRegistry.tsx
 
 import { template1 } from "@/components/siteTemplates/landing-page1/index";
-import { template2 } from "@/components/siteTemplates/port1/index";
-import { templateMini } from "@/components/siteTemplates/mini-port";
+import { landingPage2 } from "@/components/siteTemplates/landing-page2";
+import { portfolio1 } from "@/components/siteTemplates/portfolio1";
+import { portfolio2 } from "@/components/siteTemplates/portfolio2";
 
 /* -------------- TEMPLATES TYPES ---------------- */
 export interface TemplateProps {
@@ -26,7 +27,12 @@ type AnyObject = Record<string, any>;
 
 /* ---------------- REGISTRY ---------------- */
 
-export const templatesRegistry = [template1, templateMini, template2];
+export const templatesRegistry = [
+  template1,
+  landingPage2,
+  portfolio1,
+  portfolio2,
+];
 
 export const templatesCategories = Array.from(
   new Set(
@@ -40,3 +46,4 @@ export const getTemplateByType = (type: string) =>
   templatesRegistry.find((t) => t.config.type === type);
 
 export const isValidTemplate = (type: string) => !!getTemplateByType(type);
+

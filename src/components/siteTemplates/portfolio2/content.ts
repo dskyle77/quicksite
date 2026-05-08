@@ -275,12 +275,11 @@ const meta = {
 };
 
 const config = {
-  type: "template-2",
+  type: "portfolio-2",
   theme: "warm",
-  category: "portfolio",
 };
 
-export const template2Content = {
+export const portfolio2Content = {
   meta,
   config,
   getSchema,

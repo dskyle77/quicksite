@@ -14,11 +14,13 @@ export default function TemplateGallery() {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
 
-  const buildQuery = (base: string) => {
+  const buildQuery = (base: string, c: string = "?") => {
     const queryParams: string[] = [];
     if (paramsName) queryParams.push(`name=${encodeURIComponent(paramsName)}`);
     if (paramsSlug) queryParams.push(`slug=${encodeURIComponent(paramsSlug)}`);
-    return queryParams.length > 0 ? `${base}?${queryParams.join("&")}` : base;
+    return queryParams.length > 0
+      ? `${base}${c}${queryParams.join("&")}`
+      : base;
   };
 
   const categories = ["all", ...templatesCategories];
@@ -128,9 +130,13 @@ export default function TemplateGallery() {
                       description={template.meta.description}
                       category={template.meta.category}
                       image={template.meta.image}
-                      previewHref={buildQuery(`/templates/${template.config.type}`)}
+                      previewHref={buildQuery(
+                        `/templates/${template.config.type}`,
+                        "?",
+                      )}
                       useHref={buildQuery(
                         `/dashboard/new?template=${encodeURIComponent(template.config.type)}`,
+                        "&",
                       )}
                       delay={i * 40}
                     />

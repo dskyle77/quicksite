@@ -2,7 +2,7 @@
 "use client";
 
 import type { TemplateProps } from "@/lib/templates";
-import { template2Content } from "./content";
+import { portfolio2Content } from "./content";
 import { Navbar, Footer } from "./layout";
 
 import Home from "./home";
@@ -10,12 +10,7 @@ import Projects from "./projects";
 
 // ─── Root Template ────────────────────────────────────────────────────────────
 
-export default function Template2({
-  isEditor,
-  content,
-  onUpdate,
-  slugs,
-}: TemplateProps) {
+function Portfolio2({ isEditor, content, onUpdate, slugs }: TemplateProps) {
   const handleUpdate = (path: string, value: any) => {
     if (onUpdate) onUpdate(path, value);
   };
@@ -99,7 +94,7 @@ const template2Subpages = {
   projects: Projects,
 };
 
-export const template2 = {
-  ...template2Content,
-  template: Template2,
+export const portfolio2 = {
+  ...portfolio2Content,
+  template: Portfolio2,
 };

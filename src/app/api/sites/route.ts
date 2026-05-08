@@ -26,10 +26,18 @@ export async function POST(req: Request) {
       generateWithAI,
     } = body;
 
+    
     if (!name || !slug || !type) {
       return NextResponse.json(
         { error: "name, slug, and type are required." },
         { status: 400 },
+      );
+    }
+    if (!description && generateWithAI) {
+      return NextResponse.json(
+        { error: "Description is required to generate with AI." },
+        { status: 400 },
+   
       );
     }
 

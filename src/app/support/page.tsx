@@ -69,7 +69,7 @@ export default function SupportPage() {
         ))}
       </div>
 
-      <div className="mt-20 p-8 rounded-3xl bg-slate-900 text-white text-center">
+      <div className="mt-20 p-8 rounded-3xl bg-primary text-white text-center">
         <h2 className="text-2xl font-semibold mb-2">
           Frequently Asked Questions
         </h2>

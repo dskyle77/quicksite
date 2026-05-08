@@ -5,11 +5,7 @@ import type { TemplateProps } from "@/lib/templates";
 import { template1Content } from "./content";
 import Home from "./HomePage";
 
-export default function Template1({
-  isEditor,
-  content,
-  onUpdate,
-}: TemplateProps) {
+function Template1({ isEditor, content, onUpdate }: TemplateProps) {
   return (
     <div
       className="min-h-screen"

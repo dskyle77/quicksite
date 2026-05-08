@@ -175,12 +175,11 @@ const meta = {
 };
 
 const config = {
-  type: "template-mini",
+  type: "portfolio-1",
   theme: "ocean",
-  category: "portfolio",
 };
 
-export const templateMiniContent = {
+export const portfolio1Content = {
   meta,
   config,
   getSchema,

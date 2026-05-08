@@ -34,7 +34,7 @@ export default function CreateSitePage() {
   const [formData, setFormData] = useState({
     name: paramsName || "",
     slug: paramsSlug || "",
-    description: "", // New field
+    description: "",
     type: selectedTemplateType,
     whatsappNumber: whatsappNumber || "",
     generateWithAI: false, // New toggle
@@ -65,6 +65,9 @@ export default function CreateSitePage() {
     if (!normalizedName || !normalizedSlug) {
       return toast.error("Please add both site name and URL slug.");
     }
+    if (!formData.description && formData.generateWithAI) {
+      return toast.error("Please provide a description to use AI generation.");
+    }
 
     setLoading(true);
 
@@ -76,7 +79,7 @@ export default function CreateSitePage() {
           name: normalizedName,
           slug: normalizedSlug,
           type: formData.type,
-          description: formData.description, 
+          description: formData.description,
           generateWithAI: formData.generateWithAI,
           defaultMessage,
           whatsappNumber: formData.whatsappNumber,

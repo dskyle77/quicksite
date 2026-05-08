@@ -109,45 +109,33 @@ export function NewSiteForm({
           />
         </label>
 
-        {/* AI Toggle (always shown, but indicate if plan upgrade is needed) */}
-        <div className="flex items-center justify-between p-4 rounded-2xl bg-primary/5 border border-primary/10 opacity-100">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary rounded-lg">
-              <Sparkles size={18} className="text-white" />
+        {/* AI Toggle (shown only if can use AI) */}
+        {canUseAI && (
+          <div className="flex items-center justify-between p-4 rounded-2xl bg-primary/5 border border-primary/10">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-primary rounded-lg">
+                <Sparkles size={18} className="text-white" />
+              </div>
+              <div>
+                <p className="text-sm font-bold">Generate with AI</p>
+                <p className="text-[10px] text-slate-500">
+                  Auto-fill content based on your description
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-bold">Generate with AI</p>
-              <p className="text-[10px] text-slate-500">
-                Auto-fill content based on your description
-              </p>
-              {!canUseAI && (
-                <span className="text-xs text-yellow-600 font-semibold mt-1 inline-block">
-                  Upgrade required for AI content generation.{" "}
-                  <a
-                    href="/pricing"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline text-primary"
-                  >
-                    View plans
-                  </a>
-                </span>
-              )}
-            </div>
+            <input
+              type="checkbox"
+              className="w-5 h-5 accent-primary cursor-pointer"
+              checked={formData.generateWithAI}
+              onChange={(e) =>
+                setFormData((prev: any) => ({
+                  ...prev,
+                  generateWithAI: e.target.checked,
+                }))
+              }
+            />
           </div>
-          <input
-            type="checkbox"
-            className="w-5 h-5 accent-primary cursor-pointer"
-            checked={formData.generateWithAI}
-            disabled={!canUseAI}
-            onChange={(e) =>
-              setFormData((prev: any) => ({
-                ...prev,
-                generateWithAI: canUseAI ? e.target.checked : false,
-              }))
-            }
-          />
-        </div>
+        )}
       </div>
 
       <div className="pt-4">
