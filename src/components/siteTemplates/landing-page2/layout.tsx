@@ -30,9 +30,12 @@ export function Navbar({
 
   return (
     <header
-      className={`${!isEditor && "sticky top-0"} z-50 transition-all duration-300`}
+      className={`
+        z-50 transition-all duration-300
+        ${isEditor ? "fixed top-0 left-0 w-full" : "sticky top-0"}
+      `}
       style={{
-        background: "color-mix(in srgb, var(--qs-bg) 95%, transparent)",
+        background: "transparent",
         borderBottom: "1px solid var(--qs-border)",
         backdropFilter: "blur(12px)",
       }}

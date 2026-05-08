@@ -26,6 +26,7 @@ const getStarterContent = ({
       ctaButtonLink: getWhatsappButtonLink(),
     },
     hero: {
+      type: "background",
       badge: "🚀 Now in Public Beta",
       image1:
         "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
@@ -242,12 +243,12 @@ const getSchema = ({
   selectedTitle,
   whatsappNumber,
   defaultMessage,
-  defaultImage
+  defaultImage,
 }: {
   selectedTitle?: string;
   whatsappNumber?: string;
   defaultMessage?: string;
-  defaultImage?: string
+  defaultImage?: string;
 }) => {
   const whatsappLink = whatsappNumber
     ? {
@@ -265,6 +266,7 @@ const getSchema = ({
       ctaButtonLink: whatsappLink,
     },
     hero: {
+      type: "side | background",
       badge: "",
       image1: defaultImage,
       image1PId: "",

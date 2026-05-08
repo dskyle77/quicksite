@@ -13,7 +13,7 @@ function LandingPage2({
 }: TemplateProps) {
   return (
     <div
-      className="min-h-screen"
+      className="min-h-screen relative"
       style={{
         background: "var(--qs-bg)",
         color: "var(--qs-text)",

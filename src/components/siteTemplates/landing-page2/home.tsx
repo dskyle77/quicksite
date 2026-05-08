@@ -2,18 +2,21 @@
 import { useState } from "react";
 import { TemplateProps, TemplateComponentProps } from "@/lib/templates";
 import { Navbar, Footer } from "./layout";
-import TemplateImage from "@/components/shared/TemplateImage";
+import DynamicHero from "@/components/shared/DynamicHero";
 import CtaLink from "@/components/shared/CtaLinkModal";
 import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
-function Hero({ isEditor, content, onUpdate }: TemplateComponentProps) {
+function Hero(props: TemplateComponentProps) {
+  const { isEditor, content, onUpdate } = props;
+
   return (
-    <section className="mx-auto max-w-6xl px-4 pt-16 pb-12 md:pt-24 md:pb-20">
-      <div className="grid gap-12 md:grid-cols-2 md:items-center">
-        {/* Left: copy */}
-        <div>
+    <DynamicHero
+      {...props}
+      renderText={(heroType) => (
+        <div className={heroType === "background" ? "text-center mx-auto" : ""}>
+          {/* Badge */}
           <div
             className="mb-5 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium"
             style={{
@@ -30,8 +33,11 @@ function Hero({ isEditor, content, onUpdate }: TemplateComponentProps) {
             {content?.hero?.badge ?? "🚀 Now in Public Beta"}
           </div>
 
+          {/* Title */}
           <h2
-            className="max-w-xl text-4xl font-extrabold tracking-tight leading-[1.1] md:text-6xl"
+            className={`max-w-xl text-4xl font-extrabold tracking-tight leading-[1.1] md:text-6xl ${
+              heroType === "background" ? "mx-auto text-white" : ""
+            }`}
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
@@ -41,9 +47,12 @@ function Hero({ isEditor, content, onUpdate }: TemplateComponentProps) {
             {content?.hero?.title ?? "The Fastest Way to Launch Your Product"}
           </h2>
 
+          {/* Description */}
           <p
-            className="mt-5 max-w-lg text-base leading-7 md:text-lg"
-            style={{ color: "var(--qs-text-muted)" }}
+            className={`mt-5 max-w-lg text-base leading-7 md:text-lg ${
+              heroType === "background" ? "mx-auto text-zinc-200" : ""
+            }`}
+            style={heroType === "side" ? { color: "var(--qs-text-muted)" } : {}}
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
@@ -54,7 +63,10 @@ function Hero({ isEditor, content, onUpdate }: TemplateComponentProps) {
               "Stop wasting time on boilerplate. Get everything you need to go from idea to live product in days — not months."}
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          {/* Buttons */}
+          <div
+            className={`mt-8 flex flex-wrap gap-3 ${heroType === "background" ? "justify-center" : ""}`}
+          >
             <CtaLink
               isEditor={isEditor}
               label={content?.hero?.primaryButton ?? "Start for Free"}
@@ -82,9 +94,10 @@ function Hero({ isEditor, content, onUpdate }: TemplateComponentProps) {
             />
           </div>
 
+          {/* Trust Badge */}
           <p
-            className="mt-5 text-sm"
-            style={{ color: "var(--qs-text-muted)" }}
+            className={`mt-5 text-sm ${heroType === "background" ? "text-zinc-400" : ""}`}
+            style={heroType === "side" ? { color: "var(--qs-text-muted)" } : {}}
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
@@ -94,24 +107,8 @@ function Hero({ isEditor, content, onUpdate }: TemplateComponentProps) {
             {content?.hero?.trustBadge ?? "✓ Trusted by 500+ teams worldwide"}
           </p>
         </div>
-
-        {/* Right: image */}
-        <div className="relative">
-          <TemplateImage
-            source={content?.hero?.image1}
-            publicId={content?.hero?.image1PId}
-            isEditor={isEditor}
-            onImageChange={(url, publicId) => {
-              onUpdate("hero", {
-                ...content.hero,
-                image1: url,
-                image1PId: publicId,
-              });
-            }}
-          />
-        </div>
-      </div>
-    </section>
+      )}
+    />
   );
 }
 

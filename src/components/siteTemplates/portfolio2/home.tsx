@@ -3,134 +3,99 @@ import { TemplateProps, TemplateComponentProps } from "@/lib/templates";
 import Link from "next/link";
 import { Navbar, Footer } from "./layout";
 import TemplateImage from "@/components/shared/TemplateImage";
-import TemplateImageBackground from "@/components/shared/TemplateImageBackground";
+import DynamicHero from "@/components/shared/DynamicHero";
 import CtaLink from "@/components/shared/CtaLinkModal";
 import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
 
-function Hero({ isEditor, content, onUpdate }: TemplateComponentProps) {
-  const heroType = content?.hero?.type ?? "background"; // "side" or "background"
-
-  const textContent = (
-    <div className={heroType === "background" ? "text-center mx-auto" : ""}>
-      <div
-        className="mb-5 inline-flex rounded-full px-4 py-2 text-sm font-medium"
-        style={{
-          background: "var(--qs-bg-alt)",
-          border: "1px solid var(--qs-border)",
-          color: "var(--qs-text-muted)",
-        }}
-        contentEditable={isEditor}
-        suppressContentEditableWarning
-        onBlur={(e) =>
-          onUpdate("hero.badge", e.currentTarget.textContent?.trim())
-        }
-      >
-        {content?.hero?.badge ?? "👋 Available for Work"}
-      </div>
-
-      <h2
-        className={`max-w-xl text-4xl font-bold tracking-tight md:text-6xl ${heroType === "background" ? "mx-auto text-white" : ""}`}
-        contentEditable={isEditor}
-        suppressContentEditableWarning
-        onBlur={(e) =>
-          onUpdate("hero.title", e.currentTarget.textContent?.trim())
-        }
-      >
-        {content?.hero?.title ?? "Hi, I'm Alex — Creative Developer"}
-      </h2>
-
-      <p
-        className={`mt-6 max-w-xl text-base leading-7 md:text-lg ${heroType === "background" ? "mx-auto text-zinc-300" : ""}`}
-        style={heroType === "side" ? { color: "var(--qs-text-muted)" } : {}}
-        contentEditable={isEditor}
-        suppressContentEditableWarning
-        onBlur={(e) =>
-          onUpdate("hero.desc", e.currentTarget.textContent?.trim())
-        }
-      >
-        {content?.hero?.desc ?? "I craft beautiful digital experiences."}
-      </p>
-
-      <div
-        className={`mt-8 flex flex-wrap gap-4 ${heroType === "background" ? "justify-center" : ""}`}
-      >
-        <a
-          href="#projects"
-          className="rounded-xl px-6 py-3 font-semibold transition-transform hover:scale-[1.02] inline-block"
-          style={{
-            background: "var(--qs-primary)",
-            color: "var(--qs-primary-fg)",
-          }}
-        >
-          {content?.hero?.primaryButton ?? "View My Work"}
-        </a>
-        <CtaLink
-          isEditor={isEditor}
-          label={content?.hero?.secondaryButton ?? "Download CV"}
-          linkConfig={content?.hero?.secondaryButtonLink}
-          onLabelChange={(v) => onUpdate("hero.secondaryButton", v)}
-          onLinkChange={(cfg) => onUpdate("hero.secondaryButtonLink", cfg)}
-          className="rounded-xl px-6 py-3 font-semibold transition-transform hover:scale-[1.02] inline-block"
-          style={{
-            background: "var(--qs-bg-alt)",
-            color: "var(--qs-text)",
-            border: "1px solid var(--qs-border)",
-          }}
-        />
-      </div>
-    </div>
-  );
+function Hero(props: TemplateComponentProps) {
+  const { isEditor, content, onUpdate } = props;
 
   return (
-    <section className="relative">
-      {/* Type Toggle for Editor */}
-      {isEditor && (
-        <div className="absolute top-2 left-2 z-50">
-          <button
-            type="button"
-            onClick={() =>
-              onUpdate("hero.type", heroType === "side" ? "background" : "side")
+    <DynamicHero
+      {...props}
+      defaultType="background" // Alex template defaults to background
+      renderText={(heroType) => (
+        <div className={heroType === "background" ? "text-center mx-auto" : ""}>
+          {/* Badge */}
+          <div
+            className="mb-5 inline-flex rounded-full px-4 py-2 text-sm font-medium"
+            style={{
+              background: "var(--qs-bg-alt)",
+              border: "1px solid var(--qs-border)",
+              color: "var(--qs-text-muted)",
+            }}
+            contentEditable={isEditor}
+            suppressContentEditableWarning
+            onBlur={(e) =>
+              onUpdate("hero.badge", e.currentTarget.textContent?.trim())
             }
-            className="text-[10px] bg-zinc-800 text-zinc-400 px-2 py-1 rounded border border-zinc-700 hover:text-white"
           >
-            Layout: {heroType.toUpperCase()}
-          </button>
-        </div>
-      )}
+            {content?.hero?.badge ?? "👋 Available for Work"}
+          </div>
 
-      {heroType === "background" ? (
-        <TemplateImageBackground
-          source={content.hero.image1}
-          publicId={content?.hero?.image1PId}
-          isEditor={isEditor}
-          onImageChange={(url, pId) =>
-            onUpdate("hero", { ...content.hero, image1: url, image1PId: pId })
-          }
-        >
-          <div className="mx-auto max-w-6xl px-4 py-20">{textContent}</div>
-        </TemplateImageBackground>
-      ) : (
-        <div className="mx-auto max-w-6xl px-4 py-20 md:py-28">
-          <div className="grid gap-12 md:grid-cols-2 md:items-center">
-            {textContent}
-            <div className="relative">
-              <TemplateImage
-                source={content.hero.image1}
-                publicId={content?.hero?.image1PId}
-                isEditor={isEditor}
-                onImageChange={(url, pId) =>
-                  onUpdate("hero", {
-                    ...content.hero,
-                    image1: url,
-                    image1PId: pId,
-                  })
-                }
-              />
-            </div>
+          {/* Title */}
+          <h2
+            className={`max-w-xl text-4xl font-bold tracking-tight md:text-6xl ${
+              heroType === "background" ? "mx-auto text-white" : ""
+            }`}
+            contentEditable={isEditor}
+            suppressContentEditableWarning
+            onBlur={(e) =>
+              onUpdate("hero.title", e.currentTarget.textContent?.trim())
+            }
+          >
+            {content?.hero?.title ?? "Hi, I'm Alex — Creative Developer"}
+          </h2>
+
+          {/* Description */}
+          <p
+            className={`mt-6 max-w-xl text-base leading-7 md:text-lg ${
+              heroType === "background" ? "mx-auto text-zinc-300" : ""
+            }`}
+            style={heroType === "side" ? { color: "var(--qs-text-muted)" } : {}}
+            contentEditable={isEditor}
+            suppressContentEditableWarning
+            onBlur={(e) =>
+              onUpdate("hero.desc", e.currentTarget.textContent?.trim())
+            }
+          >
+            {content?.hero?.desc ?? "I craft beautiful digital experiences."}
+          </p>
+
+          {/* Buttons */}
+          <div
+            className={`mt-8 flex flex-wrap gap-4 ${
+              heroType === "background" ? "justify-center" : ""
+            }`}
+          >
+            <a
+              href="#projects"
+              className="rounded-xl px-6 py-3 font-semibold transition-transform hover:scale-[1.02] inline-block"
+              style={{
+                background: "var(--qs-primary)",
+                color: "var(--qs-primary-fg)",
+              }}
+            >
+              {content?.hero?.primaryButton ?? "View My Work"}
+            </a>
+
+            <CtaLink
+              isEditor={isEditor}
+              label={content?.hero?.secondaryButton ?? "Download CV"}
+              linkConfig={content?.hero?.secondaryButtonLink}
+              onLabelChange={(v) => onUpdate("hero.secondaryButton", v)}
+              onLinkChange={(cfg) => onUpdate("hero.secondaryButtonLink", cfg)}
+              className="rounded-xl px-6 py-3 font-semibold transition-transform hover:scale-[1.02] inline-block"
+              style={{
+                background: "var(--qs-bg-alt)",
+                color: "var(--qs-text)",
+                border: "1px solid var(--qs-border)",
+              }}
+            />
           </div>
         </div>
       )}
-    </section>
+    />
   );
 }
 
