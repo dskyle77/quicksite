@@ -118,10 +118,20 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Server error.";
-    const isPlanError = message.includes("Plan limit");
+
+    // Check for known plan error indicator
+    const isPlanError =
+      typeof message === "string" &&
+      (message.toLowerCase().includes("plan limit") ||
+        message.toLowerCase().includes("plan upgrade") ||
+        message.toLowerCase().includes("upgrade your plan"));
 
     return NextResponse.json(
-      { error: message },
+      {
+        error: isPlanError
+          ? "You've reached your plan limit. Please upgrade your plan to create more sites."
+          : message,
+      },
       { status: isPlanError ? 403 : 500 },
     );
   }

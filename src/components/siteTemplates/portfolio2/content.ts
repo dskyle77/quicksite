@@ -81,6 +81,32 @@ const getStarterContent = ({
     ],
     projectsHeading: "Featured Projects",
     projectsSubheading: "A selection of work I'm proud of.",
+    projects: [
+      {
+        title: "E-Commerce Platform",
+        desc: "A full-stack online store with real-time inventory, Stripe payments, and an intuitive admin dashboard.",
+        tags: ["Next.js", "Stripe", "PostgreSQL"],
+        image:
+          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+        imagePId: "",
+      },
+      {
+        title: "Task Management App",
+        desc: "A collaborative productivity app with drag-and-drop boards, real-time updates, and team workspaces.",
+        tags: ["React", "Node.js", "WebSockets"],
+        image:
+          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+        imagePId: "",
+      },
+      {
+        title: "AI Content Generator",
+        desc: "A SaaS tool that uses AI to generate blog posts, social captions, and marketing copy at scale.",
+        tags: ["OpenAI", "Next.js", "Tailwind"],
+        image:
+          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+        imagePId: "",
+      },
+    ],
     experienceHeading: "Work Experience",
     experienceSubheading:
       "My professional journey and the impact I've made along the way.",
@@ -131,36 +157,6 @@ const getStarterContent = ({
       brand: "Alex Morgan",
       copyright: `© ${new Date().getFullYear()} All rights reserved.`,
       socials: ["GitHub", "LinkedIn", "Twitter", "Dribbble"],
-    },
-
-    // Subpages — keyed by slug, each has title + body + optional image
-    pages: {
-      projects: [
-        {
-          title: "E-Commerce Platform",
-          desc: "A full-stack online store with real-time inventory, Stripe payments, and an intuitive admin dashboard.",
-          tags: ["Next.js", "Stripe", "PostgreSQL"],
-          image:
-            "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
-          imagePId: "",
-        },
-        {
-          title: "Task Management App",
-          desc: "A collaborative productivity app with drag-and-drop boards, real-time updates, and team workspaces.",
-          tags: ["React", "Node.js", "WebSockets"],
-          image:
-            "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
-          imagePId: "",
-        },
-        {
-          title: "AI Content Generator",
-          desc: "A SaaS tool that uses AI to generate blog posts, social captions, and marketing copy at scale.",
-          tags: ["OpenAI", "Next.js", "Tailwind"],
-          image:
-            "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
-          imagePId: "",
-        },
-      ],
     },
   };
 };
@@ -231,6 +227,11 @@ const getSchema = ({
     skillTags: [],
     projectsHeading: "",
     projectsSubheading: "",
+    projects: [
+      { title: "", desc: "", tags: [], image: defaultImage, imagePId: "" },
+      { title: "", desc: "", tags: [], image: defaultImage, imagePId: "" },
+      { title: "", desc: "", tags: [], image: defaultImage, imagePId: "" },
+    ],
     experienceHeading: "",
     experienceSubheading: "",
     experience: [
@@ -254,13 +255,6 @@ const getSchema = ({
       brand: selectedTitle || "",
       copyright: `© ${new Date().getFullYear()} All rights reserved.`,
       socials: ["GitHub", "LinkedIn", "Twitter"],
-    },
-    pages: {
-      projects: [
-        { title: "", desc: "", tags: [], image: defaultImage, imagePId: "" },
-        { title: "", desc: "", tags: [], image: defaultImage, imagePId: "" },
-        { title: "", desc: "", tags: [], image: defaultImage, imagePId: "" },
-      ],
     },
   };
 };

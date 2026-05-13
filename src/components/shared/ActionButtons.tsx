@@ -1,15 +1,19 @@
-import React, { ReactNode, MouseEventHandler } from "react";
+import { ReactNode, MouseEventHandler } from "react";
 import { X } from "lucide-react";
 
 type AddButtonProps = {
   children: ReactNode;
   onClick?: MouseEventHandler<HTMLButtonElement>;
+  className?: string;
 };
 
-export function AddButton({ children, onClick }: AddButtonProps) {
+export function AddButton({ children, onClick, className }: AddButtonProps) {
   return (
     <button
-      className="mt-4 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition focus:outline-none"
+      className={
+        `mt-4 rounded-lg px-4 py-2 text-sm font-semibold text-white shadow-sm transition focus:outline-none` +
+        className
+      }
       style={{ background: "var(--qs-primary)" }}
       onClick={onClick}
       type="button"

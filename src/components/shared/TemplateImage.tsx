@@ -1,6 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
 import { useRef, useState } from "react";
-import { Upload } from "lucide-react";
 import { getCurrentUser } from "@/lib/firebase";
 
 type TemplateImageProps = {
@@ -9,6 +8,7 @@ type TemplateImageProps = {
   publicId?: string;
   onImageChange?: (url: string, publicId: string) => void;
   isEditor: boolean;
+  alt?: string;
 };
 
 export default function TemplateImage({
@@ -16,14 +16,18 @@ export default function TemplateImage({
   publicId,
   isEditor,
   onImageChange,
+  alt,
 }: TemplateImageProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Incrementing this forces React to remount <img>, busting the browser cache
   const [imgKey, setImgKey] = useState(0);
+  // Local preview for the uploaded image in the editor
+  const [preview, setPreview] = useState<string | null>(null);
 
   const handleUploadClick = () => {
+    if (!isEditor || uploading) return;
     if (inputRef.current) {
       inputRef.current.value = "";
       inputRef.current.click();
@@ -33,6 +37,17 @@ export default function TemplateImage({
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Use FileReader to show preview immediately
+    if (isEditor) {
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        if (typeof event.target?.result === "string") {
+          setPreview(event.target.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
 
     setUploading(true);
     setError(null);
@@ -72,7 +87,7 @@ export default function TemplateImage({
 
       const res = await fetch("/api/imageUpload", {
         method: "POST",
-        body: formData, 
+        body: formData,
       });
 
       if (!res.ok) {
@@ -85,51 +100,85 @@ export default function TemplateImage({
 
       // Force <img> remount so the browser doesn't show the cached old image
       setImgKey((k) => k + 1);
+      setPreview(null);
       onImageChange?.(secureUrl, newPublicId);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Upload failed";
       console.error("Image upload error:", err);
       setError(message);
+      // Keep preview on failure until dismissed by new upload/success.
     } finally {
       setUploading(false);
     }
   };
+
+  // Show the preview (if exists in the editor and uploading), else show the source, else show placeholder (always clickable in editor)
+  let showImage: React.ReactNode = null;
+  if (isEditor && preview) {
+    showImage = (
+      <img
+        key={`preview-${imgKey}`}
+        alt={alt}
+        src={preview}
+        className={[
+          "object-cover w-full h-full rounded-2xl",
+          "hover:brightness-75",
+          "opacity-70 grayscale",
+        ].filter(Boolean).join(" ")}
+        loading="eager"
+        style={{ display: "block" }}
+      />
+    );
+  } else if (source) {
+    showImage = (
+      <img
+        key={imgKey}
+        alt={alt}
+        src={source}
+        className={[
+          "object-cover w-full h-full rounded-2xl",
+          isEditor ? "hover:brightness-75" : "",
+          uploading ? "opacity-50 grayscale" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        loading="eager"
+        style={{ display: "block" }}
+      />
+    );
+  } else if (isEditor) {
+    // No image source or preview, but in editor mode: show a clickable placeholder
+    showImage = (
+      <div
+        className={[
+          "flex flex-col items-center justify-center w-full h-full rounded-2xl",
+          "transition border-2 border-dashed border-(--qs-border)",
+          "hover:bg-(--qs-bg) hover:border-(--qs-primary)",
+        ].join(" ")}
+        style={{ minHeight: 80, color: "var(--qs-text-muted)" }}
+      >
+        <span className="text-sm" aria-label="Add image">
+          +
+        </span>
+        <span className="text-xs mt-1 opacity-70">Add image</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="relative flex items-center justify-center min-h-[120px] rounded-2xl overflow-hidden bg-(--qs-bg-alt)">
-      {source ? (
-        <img
-          key={imgKey}
-          alt="hero"
-          src={source}
-          className={[
-            "object-cover w-full h-full rounded-2xl",
-            isEditor ? "hover:brightness-75" : "",
-            uploading ? "opacity-50 grayscale" : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-          loading="eager"
-          style={{ display: "block" }}
-        />
-      ) : (
-        <div className="flex flex-col items-center justify-center w-full h-full min-h-[120px] bg-(--qs-bg-alt) rounded-2xl border border-dashed border-(--qs-border) p-8 text-center">
-          <Upload className="mb-2" />
-          <span className="text-sm text-(--qs-text-muted)">No image</span>
-        </div>
-      )}
+    <div
+      className="relative flex items-center justify-center min-h-[120px] rounded-2xl overflow-hidden bg-(--qs-bg-alt) cursor-pointer"
+      onClick={handleUploadClick}
+      tabIndex={isEditor ? 0 : -1}
+      style={{
+        pointerEvents: isEditor && !uploading ? "auto" : "none",
+        opacity: uploading ? 0.7 : 1,
+      }}
+    >
+      {showImage}
 
       {isEditor && (
         <>
-          <button
-            type="button"
-            title="Upload image"
-            onClick={handleUploadClick}
-            disabled={uploading}
-            className="absolute bottom-2 right-2 bg-(--qs-bg-alt) rounded-full p-2 border border-(--qs-border) hover:bg-(--qs-bg) transition cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Upload size={24} />
-          </button>
-
           <input
             ref={inputRef}
             type="file"

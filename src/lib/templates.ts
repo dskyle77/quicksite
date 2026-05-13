@@ -1,10 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// @/assets/siteTemplates/templatesRegistry.tsx
+// @/lib/templates.ts
 
 import { template1 } from "@/components/siteTemplates/landing-page1/index";
 import { landingPage2 } from "@/components/siteTemplates/landing-page2";
 import { portfolio1 } from "@/components/siteTemplates/portfolio1";
 import { portfolio2 } from "@/components/siteTemplates/portfolio2";
+import { templateBuilder } from "@/components/siteTemplates/templateBuilder"; // ← new
 
 /* -------------- TEMPLATES TYPES ---------------- */
 export interface TemplateProps {
@@ -32,6 +33,7 @@ export const templatesRegistry = [
   landingPage2,
   portfolio1,
   portfolio2,
+  templateBuilder, // ← new
 ];
 
 export const templatesCategories = Array.from(
@@ -46,4 +48,3 @@ export const getTemplateByType = (type: string) =>
   templatesRegistry.find((t) => t.config.type === type);
 
 export const isValidTemplate = (type: string) => !!getTemplateByType(type);
-

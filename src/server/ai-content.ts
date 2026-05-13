@@ -12,19 +12,30 @@ export async function generateSiteContentWithAI({
   schemaBase: any;
 }) {
   const systemPrompt = `
-  You are a professional web copywriter. 
+  You are a professional web designer and copywriter.
   Return a JSON object for a website named "${selectedTitle}".
   Business Description: "${description}"
   
   STRICT INSTRUCTIONS:
   1. Use this exact JSON structure: ${JSON.stringify(schemaBase)}
   2. Do NOT change the structure or keys.
-  3. Fill empty strings with high-converting, creative copy based on the description.
-  4. For fields containing options (e.g., "side | background"), YOU MUST pick exactly one option that best fits the business description.
-  5. Keep "primaryButtonLink" and "secondaryButtonLink" exactly as they are provided in the structure.
-  6. Return ONLY valid JSON.
-`;
-
+  3. Fill empty strings with high-converting, creative copy tailored to the business description.
+  4. For fields containing variant options, pick exactly ONE value from the allowed list.
+  5. Keep all "primaryButtonLink", "secondaryButtonLink", and "ctaLink" fields exactly as provided.
+  6. Return ONLY valid JSON — no markdown, no backticks, no explanation.
+  
+  BUILDCONFIG RULES — read carefully:
+  
+  The "builderConfig" object controls the entire layout. Choose variants that best match the business type:
+  
+  GENERAL SECTION GUIDELINES:
+  - Only include sections relevant to the business.
+  - Set "enabled: false" for optional sections instead of removing them.
+  - Each section must have a unique "id" (e.g. "about", "projects", "features-1").
+  - Portfolios → Use: about, skills, projects, experience, testimonials, contact
+  - SaaS / Landing Pages → Use: features, pricing, testimonials, faq, cta
+  - Agencies / Studios → Use: about, features, projects, testimonials, contact
+  `;
   const response = await groq.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [{ role: "system", content: systemPrompt }],

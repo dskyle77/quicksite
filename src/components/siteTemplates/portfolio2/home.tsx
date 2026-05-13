@@ -437,20 +437,17 @@ function Skills({ isEditor, content, onUpdate }: TemplateComponentProps) {
   );
 }
 
-function Projects({
-  isEditor,
-  content,
-  onUpdate,
-  slugs,
-}: TemplateComponentProps) {
-  const projects = content?.pages?.projects ?? [];
-  const projectsCount = content?.projectsCount ?? 3;
-  const toDisplay = projects.slice(0, projectsCount);
+function Projects({ isEditor, content, onUpdate }: TemplateComponentProps) {
+  const projects = content?.projects ?? [];
 
-  const slug = slugs?.slug;
+  const handleDeleteProject = (indexToDelete: number) => {
+    const newProjects = [...projects];
+    newProjects.splice(indexToDelete, 1);
+    onUpdate("projects", newProjects);
+  };
 
   return (
-    <section className="mx-auto max-w-6xl px-4 py-16" id="projects">
+    <section className="mx-auto max-w-6xl px-6 py-16">
       <div className="mb-10 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h3
@@ -458,7 +455,10 @@ function Projects({
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
-              onUpdate("projectsHeading", e.currentTarget.textContent?.trim())
+              onUpdate(
+                "projectsHeading",
+                e.currentTarget.textContent?.trim(),
+              )
             }
           >
             {content?.projectsHeading ?? "Featured Projects"}
@@ -475,148 +475,190 @@ function Projects({
               )
             }
           >
-            {content?.projectsSubheading ?? "A selection of work I'm proud of."}
+            {content?.projectsSubheading ??
+              "A selection of work I'm proud of."}
           </p>
-          {isEditor && (
-            <div className="mt-3 flex items-center gap-2">
-              <label
-                htmlFor="home-project-count"
-                className="text-xs font-medium"
-                style={{ color: "var(--qs-text-muted)" }}
-              >
-                Show
-              </label>
-              <input
-                id="home-project-count"
-                type="number"
-                min={1}
-                max={projects.length || 1}
-                value={projectsCount}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  onUpdate("projectsCount", value);
-                }}
-                onBlur={(e) => {
-                  const value = Math.max(
-                    1,
-                    Math.min(Number(e.target.value), projects.length || 1),
-                  );
-                  onUpdate("projectsCount", value);
-                }}
-                className="w-14 rounded border px-2 py-1 text-xs"
-                style={{
-                  border: "1px solid var(--qs-border)",
-                  background: "var(--qs-bg)",
-                  color: "var(--qs-text)",
-                }}
-              />
-              <span
-                className="text-xs"
-                style={{ color: "var(--qs-text-muted)" }}
-              >
-                project{projectsCount !== 1 ? "s" : ""}
-              </span>
-            </div>
-          )}
         </div>
-
-        <Link
-          href={isEditor ? `/editor/${slug}?sp=projects` : `/${slug}/projects`}
-          className="rounded-xl px-5 py-2 text-sm font-semibold transition-opacity hover:opacity-70 inline-block"
-          style={{
-            background: "var(--qs-bg-alt)",
-            color: "var(--qs-text)",
-            border: "1px solid var(--qs-border)",
-          }}
-        >
-          All projects →
-        </Link>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        {toDisplay.map((project: any, i: number) => (
+        {projects.map((project: any, i: number) => (
           <div
             key={i}
-            className="group overflow-hidden rounded-3xl transition-transform hover:-translate-y-1"
+            className="group relative overflow-hidden rounded-3xl transition-transform hover:-translate-y-1"
             style={{
               background: "var(--qs-bg-alt)",
               border: "1px solid var(--qs-border)",
             }}
           >
+            {/* Xbutton for deleting project */}
+            {isEditor && (
+              <div className="absolute top-3 right-3 z-10">
+                <Xbutton
+                  onClick={() => handleDeleteProject(i)}
+                  className="bg-white/80 hover:bg-white shadow-lg"
+                  color="red"
+                />
+              </div>
+            )}
+
             <div className="overflow-hidden">
               <TemplateImage
                 source={project.image}
                 publicId={project.imagePId}
-                isEditor={false}
+                isEditor={isEditor}
+                onImageChange={(url, publicId) => {
+                  const newProjects = [...projects];
+                  newProjects[i] = {
+                    ...newProjects[i],
+                    image: url,
+                    imagePId: publicId,
+                  };
+                  onUpdate("projects", newProjects);
+                }}
               />
             </div>
 
             <div className="p-5">
-              <h4 className="text-lg font-semibold">{project.title}</h4>
+              <h4
+                className="text-lg font-semibold"
+                contentEditable={isEditor}
+                suppressContentEditableWarning
+                onBlur={(e) => {
+                  const newProjects = [...projects];
+                  newProjects[i].title =
+                    e.currentTarget.textContent?.trim() || project.title;
+                  onUpdate("projects", newProjects);
+                }}
+              >
+                {project.title}
+              </h4>
 
               <p
                 className="mt-2 text-sm leading-6"
                 style={{ color: "var(--qs-text-muted)" }}
+                contentEditable={isEditor}
+                suppressContentEditableWarning
+                onBlur={(e) => {
+                  const newProjects = [...projects];
+                  newProjects[i].desc =
+                    e.currentTarget.textContent?.trim() || project.desc;
+                  onUpdate("projects", newProjects);
+                }}
               >
                 {project.desc}
               </p>
 
               <div className="mt-4 flex flex-wrap gap-2">
                 {project.tags.map((tag: string, j: number) => (
-                  <span
-                    key={j}
-                    className="rounded-full px-3 py-1 text-xs font-medium"
-                    style={{
-                      background: "var(--qs-bg)",
-                      border: "1px solid var(--qs-border)",
-                    }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-              {/* Preview Link Button at the right */}
-              {project.previewLink && (
-                <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                  <a
-                    href={project.previewLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-6 inline-block rounded-lg px-3 py-1 font-medium transition-colors shadow-sm hover:shadow-lg"
-                    style={{
-                      background: "var(--qs-primary)",
-                      color: "var(--qs-primary-fg)",
-                      marginTop: "1.5rem",
-                      textDecoration: "none",
-                      boxShadow: "0 3px 12px 0 rgba(0,0,0,.06)",
-                    }}
-                  >
+                  <span key={j}>
                     <span
+                      className="rounded-full px-3 py-1 text-xs font-medium"
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.5em",
+                        background: "var(--qs-bg)",
+                        border: "1px solid var(--qs-border)",
+                      }}
+                      contentEditable={isEditor}
+                      suppressContentEditableWarning
+                      onBlur={(e) => {
+                        const newProjects = [...projects];
+                        newProjects[i].tags[j] =
+                          e.currentTarget.textContent?.trim() || tag;
+                        onUpdate("projects", newProjects);
                       }}
                     >
-                      Preview
-                      <svg
-                        width="18"
-                        height="18"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        viewBox="0 0 24 24"
-                        style={{ verticalAlign: "middle" }}
-                      >
-                        <path d="M7 17L17 7M17 7H8M17 7V16" />
-                      </svg>
+                      {tag}
                     </span>
-                  </a>
+                    {isEditor && (
+                      <Xbutton
+                        onClick={() => {
+                          const newProjects = [...projects];
+                          const projTags = [...(newProjects[i].tags || [])];
+                          projTags.splice(j, 1);
+                          newProjects[i].tags = projTags;
+                          onUpdate("projects", newProjects);
+                        }}
+                      />
+                    )}
+                  </span>
+                ))}
+                {isEditor && (
+                  <AddButton
+                    onClick={() => {
+                      const newProjects = [...projects];
+                      const projTags = [...(newProjects[i].tags || [])];
+                      projTags.push("New Tag");
+                      newProjects[i].tags = projTags;
+                      onUpdate("projects", newProjects);
+                    }}
+                  >
+                    Add Tag
+                  </AddButton>
+                )}
+              </div>
+
+              {/* Preview Link Button */}
+              {project.previewLink && (
+                <a
+                  href={project.previewLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-6 inline-block rounded-lg px-4 py-2 font-medium transition-colors"
+                  style={{
+                    background: "var(--qs-primary)",
+                    color: "var(--qs-primary-fg)",
+                    marginTop: "1.5rem",
+                  }}
+                >
+                  Preview
+                </a>
+              )}
+
+              {isEditor && (
+                <div className="mt-4">
+                  <input
+                    type="text"
+                    className="w-full rounded border px-2 py-1 text-xs"
+                    style={{
+                      border: "1px solid var(--qs-border)",
+                      marginTop: "0.5rem",
+                    }}
+                    placeholder="Preview Link"
+                    value={project.previewLink || ""}
+                    onChange={(e) => {
+                      const newProjects = [...projects];
+                      newProjects[i].previewLink = e.target.value;
+                      onUpdate("projects", newProjects);
+                    }}
+                  />
+                  <span className="block text-xs text-gray-400 mt-1">
+                    (Optional) Link to live preview
+                  </span>
                 </div>
               )}
             </div>
           </div>
         ))}
+        {isEditor && (
+          <AddButton
+            onClick={() => {
+              const newProjects = [...projects];
+              const newProject = {
+                title: "New Project",
+                desc: "New Project description",
+                tags: ["tag1", "tag2", "tag3"],
+                image:
+                  "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777214672/image_wy9bs5.png",
+                imagePId: "",
+                previewLink: "",
+              };
+              newProjects.push(newProject);
+              onUpdate("projects", newProjects);
+            }}
+          >
+            Add Project
+          </AddButton>
+        )}
       </div>
     </section>
   );

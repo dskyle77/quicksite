@@ -20,21 +20,41 @@ export function TemplatePicker({
 
   const filteredTemplates = useMemo(() => {
     const cleanedSearch = search.trim().toLowerCase();
-    const result = templatesRegistry
-      .filter(({ meta, config }) => {
-        if (!cleanedSearch) return true;
-        if (config.type === selectedType) return true;
-        return (
-          meta.title.toLowerCase().includes(cleanedSearch) ||
-          meta.category.toLowerCase().includes(cleanedSearch) ||
-          meta.description.toLowerCase().includes(cleanedSearch)
-        );
-      })
-      .slice(0, 5)
-      .sort((a) =>
-        a.config.type === selectedType ? -1 : 1,
+
+    // Get the selected template explicitly
+    const selectedTemplate = templatesRegistry.find(
+      ({ config }) => config.type === selectedType,
+    );
+
+    const others = templatesRegistry.filter(({ config, meta }) => {
+      if (config.type === selectedType) return false; // skip, put at top
+      if (!cleanedSearch) return true;
+      return (
+        meta.title.toLowerCase().includes(cleanedSearch) ||
+        meta.category.toLowerCase().includes(cleanedSearch) ||
+        meta.description.toLowerCase().includes(cleanedSearch)
       );
-    return result;
+    });
+
+    if (!cleanedSearch) {
+      const list: typeof templatesRegistry = [];
+      if (selectedTemplate) list.push(selectedTemplate);
+      for (const t of others) {
+        if (list.length >= 4) break;
+        list.push(t);
+      }
+      return list;
+    }
+
+    const matching = templatesRegistry.filter(({ meta }) => {
+      return (
+        meta.title.toLowerCase().includes(cleanedSearch) ||
+        meta.category.toLowerCase().includes(cleanedSearch) ||
+        meta.description.toLowerCase().includes(cleanedSearch)
+      );
+    });
+
+    return matching.slice(0, 4);
   }, [search, selectedType]);
 
   return (
