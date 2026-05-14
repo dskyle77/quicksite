@@ -1,7 +1,15 @@
-import { uploadBuffer } from "@/lib/cloudinary";
+import { uploadBuffer } from "@/server/cloudinary";
+import { getUserFromSession } from "@/server/auth";
+
+import { serverStoreTempImage } from "@/server/firestore";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  // Guard: ensure Cloudinary env vars are set
+  const user = await getUserFromSession();
+  if (!user?.uid || !user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   if (
     !process.env.CLOUDINARY_CLOUD_NAME ||
     !process.env.CLOUDINARY_API_KEY ||
@@ -17,11 +25,20 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const file = formData.get("image") as File | null;
-    const folder = (formData.get("folder") as string | null) ?? "uploads";
+
+    const slug = formData.get("slug") as string | null;
 
     if (!file || typeof file === "string") {
       return Response.json({ error: "No file provided" }, { status: 400 });
     }
+    if (!slug || slug === "") {
+      return Response.json(
+        { error: "Site slug not provided" },
+        { status: 400 },
+      );
+    }
+
+    const folder = `quicksite/users/${user.uid}/${slug}`;
 
     // Validate file size (5 MB limit)
     const MAX_BYTES = 5 * 1024 * 1024;
@@ -42,9 +59,14 @@ export async function POST(req: Request) {
       maxBytes: MAX_BYTES,
     });
 
+    const secureUrl = result.secureUrl;
+    const publicId = result.publicId;
+
+    await serverStoreTempImage(user.uid, slug, publicId, secureUrl);
+
     return Response.json({
-      secureUrl: result.secureUrl,
-      publicId: result.publicId,
+      secureUrl,
+      publicId,
     });
   } catch (err) {
     console.error("[upload] Cloudinary upload failed:", err);

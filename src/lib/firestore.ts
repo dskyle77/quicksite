@@ -14,7 +14,7 @@ import {
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { getSiteLimit } from "@/lib/plans";
-import type { UserProfile, Site, DashboardStats } from "@/lib/types";
+import type { UserProfile, Site } from "@/lib/types";
 import type { Plan } from "@/lib/plans";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────

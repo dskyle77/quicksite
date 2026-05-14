@@ -1,6 +1,14 @@
-import { deleteImage } from "@/lib/cloudinary";
+import { deleteImage } from "@/server/cloudinary";
+import { getUserFromSession } from "@/server/auth";
+import { NextResponse } from "next/server";
+import { serverDeleteTempImage } from "@/server/firestore";
 
 export async function DELETE(req: Request) {
+  const user = await getUserFromSession();
+  if (!user?.uid || !user?.email) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   if (
     !process.env.CLOUDINARY_CLOUD_NAME ||
     !process.env.CLOUDINARY_API_KEY ||
@@ -13,13 +21,18 @@ export async function DELETE(req: Request) {
   }
 
   try {
-    const { publicId } = await req.json();
+    const { publicId, slug } = await req.json();
 
     if (!publicId || typeof publicId !== "string") {
       return Response.json({ error: "publicId is required" }, { status: 400 });
     }
+    if (!slug || typeof slug !== "string") {
+      return Response.json({ error: "slug is required" }, { status: 400 });
+    }
 
     await deleteImage(publicId);
+
+    await serverDeleteTempImage(user.uid, slug, publicId)
 
     return Response.json({ success: true });
   } catch (err) {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from "next/link";
 import { Layout, CheckCircle2, Eye } from "lucide-react";
 import { templatesRegistry } from "@/lib/templates";
@@ -18,43 +19,78 @@ export function TemplatePicker({
 }: TemplatePickerProps) {
   const [search, setSearch] = useState("");
 
-  const filteredTemplates = useMemo(() => {
+  const { filteredTemplates, templateBuilderTemplate } = useMemo(() => {
     const cleanedSearch = search.trim().toLowerCase();
 
-    // Get the selected template explicitly
-    const selectedTemplate = templatesRegistry.find(
-      ({ config }) => config.type === selectedType,
-    );
+    // Separate template-builder out from other templates
+    let builder: any = null;
+    const others: typeof templatesRegistry = [];
 
-    const others = templatesRegistry.filter(({ config, meta }) => {
-      if (config.type === selectedType) return false; // skip, put at top
-      if (!cleanedSearch) return true;
-      return (
-        meta.title.toLowerCase().includes(cleanedSearch) ||
-        meta.category.toLowerCase().includes(cleanedSearch) ||
-        meta.description.toLowerCase().includes(cleanedSearch)
-      );
-    });
+    // Optionally, identify selectedTemplate even if it's template-builder
+    let selectedTemplate: any = null;
 
-    if (!cleanedSearch) {
-      const list: typeof templatesRegistry = [];
-      if (selectedTemplate) list.push(selectedTemplate);
-      for (const t of others) {
-        if (list.length >= 4) break;
-        list.push(t);
+    for (const t of templatesRegistry) {
+      const isSelected = t.config.type === selectedType;
+      if (t.config.type === "template-builder") {
+        builder = t;
+        if (isSelected) selectedTemplate = t;
+        continue;
       }
-      return list;
+      if (isSelected) {
+        selectedTemplate = t;
+      }
+      // If searching, filter here
+      if (cleanedSearch) {
+        if (
+          t.meta?.title?.toLowerCase().includes(cleanedSearch) ||
+          t.meta?.category?.toLowerCase().includes(cleanedSearch) ||
+          t.meta?.description?.toLowerCase().includes(cleanedSearch)
+        ) {
+          others.push(t);
+        }
+      } else {
+        others.push(t);
+      }
     }
 
-    const matching = templatesRegistry.filter(({ meta }) => {
-      return (
-        meta.title.toLowerCase().includes(cleanedSearch) ||
-        meta.category.toLowerCase().includes(cleanedSearch) ||
-        meta.description.toLowerCase().includes(cleanedSearch)
-      );
-    });
+    let shownTemplates: typeof templatesRegistry = [];
 
-    return matching.slice(0, 4);
+    if (!cleanedSearch) {
+      shownTemplates = [];
+      if (selectedTemplate && selectedTemplate.config.type !== "template-builder") {
+        shownTemplates.push(selectedTemplate);
+      }
+      for (const t of others) {
+        if (
+          !shownTemplates.find((tt) => tt.config.type === t.config.type) &&
+          shownTemplates.length < 4
+        ) {
+          shownTemplates.push(t);
+        }
+      }
+    } else {
+      // On search, include "template-builder" in results only if it matches search
+      if (
+        builder &&
+        (
+          builder.meta?.title?.toLowerCase().includes(cleanedSearch) ||
+          builder.meta?.category?.toLowerCase().includes(cleanedSearch) ||
+          builder.meta?.description?.toLowerCase().includes(cleanedSearch)
+        )
+      ) {
+        // Remove template-builder from builder, push to end
+      } else {
+        builder = null;
+      }
+      // Show up to 4 results (excluding template-builder)
+      shownTemplates = others.slice(0, 4);
+    }
+
+    // Always show template-builder last, as divider, unless filtered out by search
+    return {
+      filteredTemplates: shownTemplates,
+      templateBuilderTemplate: builder,
+    };
   }, [search, selectedType]);
 
   return (
@@ -142,6 +178,67 @@ export function TemplatePicker({
             No templates found.
           </div>
         )}
+
+        {/* Divider and Template Builder at the end */}
+        {templateBuilderTemplate && (
+          <>
+            <div className="border-t my-2 border-border" />
+            <button
+              key={templateBuilderTemplate.config.type}
+              type="button"
+              className={[
+                "relative p-3 rounded-2xl border-2 transition-all text-left",
+                selectedType === "template-builder"
+                  ? "border-primary bg-primary/5"
+                  : "border-transparent bg-muted/40",
+              ].join(" ")}
+              tabIndex={0}
+              onClick={() => onTemplateChange("template-builder")}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={[
+                    "p-2 rounded-lg border shadow-sm transition-all shrink-0",
+                    selectedType === "template-builder"
+                      ? "bg-white border-primary"
+                      : "bg-slate-50 border-slate-200",
+                  ].join(" ")}
+                >
+                  <Layout
+                    size={16}
+                    className={selectedType === "template-builder" ? "text-primary" : "text-slate-400"}
+                  />
+                </div>
+                <div className="min-w-0">
+                  <h3
+                    className={[
+                      "font-bold text-sm truncate transition-colors",
+                      selectedType === "template-builder" ? "text-primary" : "text-foreground",
+                    ].join(" ")}
+                  >
+                    {templateBuilderTemplate.meta?.title ?? "Custom Builder"}
+                  </h3>
+                  <p
+                    className={[
+                      "text-[10px] line-clamp-3 transition-colors",
+                      selectedType === "template-builder" ? "text-primary/80" : "text-slate-500",
+                    ].join(" ")}
+                  >
+                    {templateBuilderTemplate.meta?.description ??
+                      "Fully dynamic template builder supporting multiple section instances."}
+                  </p>
+                </div>
+              </div>
+              {selectedType === "template-builder" && (
+                <CheckCircle2
+                  className="absolute top-2 right-2 text-primary drop-shadow"
+                  size={16}
+                />
+              )}
+            </button>
+          </>
+        )}
+
         <Link
           href={`/templates/${encodeURIComponent(selectedType)}?from=/dashboard/new&name=${encodeURIComponent(nameForPreview)}&slug=${encodeURIComponent(slugForPreview)}`}
           className="h-10 inline-flex items-center justify-center gap-2 rounded-full border bg-primary text-sm font-semibold text-primary-foreground transition"

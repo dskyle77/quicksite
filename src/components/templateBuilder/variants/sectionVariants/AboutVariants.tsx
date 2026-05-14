@@ -2,6 +2,7 @@
 
 import { SectionProps } from "../../types";
 import TemplateImage from "@/components/shared/TemplateImage";
+import Container from "@/components/shared/Container";
 
 export const AboutSection = ({
   variant,
@@ -12,9 +13,7 @@ export const AboutSection = ({
 }: SectionProps) => {
   const isEven = position % 2 === 0;
 
-  const sectionBg = isEven
-    ? "var(--qs-bg)"
-    : "var(--qs-bg-alt)";
+  const sectionBg = isEven ? "var(--qs-bg)" : "var(--qs-bg-alt)";
 
   const cardBg = isEven ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.05)";
 
@@ -27,7 +26,7 @@ export const AboutSection = ({
   if (variant === "split") {
     return (
       <section id="about" className="py-24" style={{ background: sectionBg }}>
-        <div className="max-w-6xl mx-auto px-6">
+        <Container>
           <div
             className={`grid gap-14 items-center ${
               showImage ? "md:grid-cols-2" : "max-w-3xl mx-auto text-center"
@@ -85,7 +84,7 @@ export const AboutSection = ({
                   publicId={content.image1PId}
                   isEditor={isEditor}
                   onImageChange={(url, pId) =>
-                    onUpdate("about", {
+                    onUpdate(null, {
                       ...content,
                       image1: url,
                       image1PId: pId,
@@ -95,7 +94,7 @@ export const AboutSection = ({
               </div>
             )}
           </div>
-        </div>
+        </Container>
       </section>
     );
   }
@@ -107,7 +106,7 @@ export const AboutSection = ({
   if (variant === "card-stats") {
     return (
       <section id="about" className="py-24" style={{ background: sectionBg }}>
-        <div className="max-w-6xl mx-auto px-6">
+        <Container>
           <div
             className="rounded-[36px] border p-8 md:p-14"
             style={{
@@ -128,7 +127,7 @@ export const AboutSection = ({
                     publicId={content.image1PId}
                     isEditor={isEditor}
                     onImageChange={(url, pId) =>
-                      onUpdate("content", {
+                      onUpdate(null, {
                         ...content,
                         image1: url,
                         image1PId: pId,
@@ -221,7 +220,7 @@ export const AboutSection = ({
               </div>
             </div>
           </div>
-        </div>
+        </Container>
       </section>
     );
   }
@@ -232,7 +231,7 @@ export const AboutSection = ({
 
   return (
     <section id="about" className="py-28" style={{ background: sectionBg }}>
-      <div className="max-w-4xl mx-auto px-6 text-center">
+      <Container className="text-center">
         {showImage && (
           <div
             className="mx-auto mb-12 w-72 overflow-hidden rounded-[32px] border shadow-2xl"
@@ -246,7 +245,7 @@ export const AboutSection = ({
               publicId={content.image1PId}
               isEditor={isEditor}
               onImageChange={(url, pId) =>
-                onUpdate("about", {
+                onUpdate(null, {
                   ...content,
                   image1: url,
                   image1PId: pId,
@@ -261,9 +260,7 @@ export const AboutSection = ({
           style={{ color: "var(--qs-primary)" }}
           contentEditable={isEditor}
           suppressContentEditableWarning
-          onBlur={(e) =>
-            onUpdate("label", e.currentTarget.textContent?.trim())
-          }
+          onBlur={(e) => onUpdate("label", e.currentTarget.textContent?.trim())}
         >
           {content.label || "About"}
         </p>
@@ -273,9 +270,7 @@ export const AboutSection = ({
           style={{ color: "var(--qs-text)" }}
           contentEditable={isEditor}
           suppressContentEditableWarning
-          onBlur={(e) =>
-            onUpdate("title", e.currentTarget.textContent?.trim())
-          }
+          onBlur={(e) => onUpdate("title", e.currentTarget.textContent?.trim())}
         >
           {content.title || "Tell Your Story"}
         </h2>
@@ -285,14 +280,12 @@ export const AboutSection = ({
           style={{ color: "var(--qs-text-muted)" }}
           contentEditable={isEditor}
           suppressContentEditableWarning
-          onBlur={(e) =>
-            onUpdate("desc", e.currentTarget.textContent?.trim())
-          }
+          onBlur={(e) => onUpdate("desc", e.currentTarget.textContent?.trim())}
         >
           {content.desc ||
             "Write something that builds trust and explains who you are and what you do."}
         </p>
-      </div>
+      </Container>
     </section>
   );
 };

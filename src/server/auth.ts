@@ -4,11 +4,11 @@ import { headers } from "next/headers";
 import { adminAuth, adminDb } from "./firebase-admin";
 
 export async function getUserFromSession() {
-  const authHeader =
-    (await headers()).get("authorization") ||
-    (await headers()).get("Authorization");
+  const headerStore = await headers();
 
-  if (!authHeader?.startsWith("Bearer ")) {
+  const authHeader = headerStore.get("authorization");
+
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return null;
   }
 
@@ -17,19 +17,19 @@ export async function getUserFromSession() {
   try {
     const decoded = await adminAuth.verifyIdToken(token);
 
-    // 🔥 get user profile (for plan)
     const userDoc = await adminDb.collection("users").doc(decoded.uid).get();
 
     const userData = userDoc.data();
 
     return {
       uid: decoded.uid,
-      email: decoded.email || userData?.email,
-      displayName: decoded.displayName || userData?.displayName,
-      plan: userData?.plan || "free",
+      email: decoded.email || userData?.email || null,
+      displayName: decoded.name || userData?.displayName || null,
+      plan: userData?.plan ?? "free",
+      isAdmin: userData?.isAdmin ?? false,
     };
   } catch (err) {
-    console.error("Auth error:", err);
+    console.error("[getUserFromSession] auth error:", err);
     return null;
   }
 }

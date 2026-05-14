@@ -51,7 +51,7 @@ export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
     try {
       set({ isSaving: true });
 
-      const res = await authFetch(`/api/sites/${site.id}/content`, {
+      const res = await authFetch(`/api/sites/${site.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

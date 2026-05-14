@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { TemplateComponentProps } from "@/lib/templates";
 // ─── Template Builder — Core Types ────────────────────────────────────────────
 // This file is the single source of truth for all builder configuration shapes.
 // Adding a new block type? Add its variant keys here, then register the
@@ -8,12 +9,6 @@ import React from "react";
 
 // ─── Shared Component Interface ───────────────────────────────────────────────
 
-export interface TemplateComponentProps {
-  isEditor: boolean;
-  content: Record<string, any>;
-  onUpdate: (path: string, value: any) => void;
-  slugs?: Record<string, string>;
-}
 export type SectionProps = TemplateComponentProps & {
   variant?: SectionVariantKey;
   position: number;

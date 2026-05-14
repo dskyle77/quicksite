@@ -4,8 +4,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Menu, X, Zap, User, Code } from "lucide-react";
+import { TemplateComponentProps } from "@/lib/templates";
 import {
-  TemplateComponentProps,
   VariantRegistry,
   NavbarVariantKey,
 } from "../types";
@@ -184,7 +184,7 @@ const LogoNavbar = ({
               publicId={content?.logoPId}
               alt="logo"
               onImageChange={(url, pId) =>
-                onUpdate("content", {
+                onUpdate(null, {
                   ...content,
                   logoImage: url,
                   logoPId: pId,
@@ -395,9 +395,7 @@ const CenteredNavbar = ({
           className="text-xl font-bold"
           contentEditable={isEditor}
           suppressContentEditableWarning
-          onBlur={(e) =>
-            onUpdate("title", e.currentTarget.textContent?.trim())
-          }
+          onBlur={(e) => onUpdate("title", e.currentTarget.textContent?.trim())}
         >
           {content?.title ?? "Brand"}
         </span>

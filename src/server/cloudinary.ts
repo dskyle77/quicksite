@@ -145,7 +145,32 @@ export async function deleteImage(publicId: string): Promise<void> {
     throw new Error(`Failed to delete image "${publicId}": ${result.result}`);
   }
 }
+/**
+ * Force delete folder + all contents (handles large folders better)
+ */
+export async function deleteFolderForce(folderPath: string): Promise<void> {
+  try {
+    const cleanPath = folderPath.trim().replace(/^\/+|\/+$/g, "");
 
+    // Delete all resources by prefix
+    await cloudinary.api.delete_resources_by_prefix(cleanPath, {
+      resource_type: "image",
+    });
+
+    // Also delete other resource types if needed
+    await cloudinary.api.delete_resources_by_prefix(cleanPath, {
+      resource_type: "video",
+    });
+
+    // Delete the folder
+    await cloudinary.api.delete_folder(cleanPath);
+
+    console.log(`✅ Force deleted folder: ${cleanPath}`);
+  } catch (error: any) {
+    console.error("Force delete failed:", error);
+    throw error;
+  }
+}
 /**
  * Generate a signed URL for a private image that expires after `expiresInSeconds`.
  *

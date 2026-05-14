@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { builderConfig } from "@/components/templateBuilder/configs";
+import { portfolioConfig } from "@/components/templateBuilder/configs";
 import {
   buildStarterContent,
   buildSchema,
@@ -11,25 +11,25 @@ const getStarterContent = (params: {
   whatsappNumber?: string;
   defaultMessage?: string;
   defaultImage?: string;
-}) => buildStarterContent({ config: builderConfig(), params });
+}) => buildStarterContent({ config: portfolioConfig(), params });
 
 const getSchema = (params: {
   selectedTitle?: string;
   whatsappNumber?: string;
   defaultMessage?: string;
   defaultImage?: string;
-}) => buildSchema({ config: builderConfig(), params });
+}) => buildSchema({ config: portfolioConfig(), params });
 
-export const templateBuilderContent = {
+export const portfolio3Content = {
   meta: {
-    title: "Custom",
+    title: "Portfolio 3",
     image: "/ti/builder.png",
-    category: "custom",
+    category: "portfolio-3",
     description:
       "Fully dynamic template builder supporting multiple section instances.",
   },
   config: {
-    type: "template-builder",
+    type: "portfolio-3",
     theme: "warm",
   },
   getSchema,

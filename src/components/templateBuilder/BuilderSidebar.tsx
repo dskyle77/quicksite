@@ -3,6 +3,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { X } from "lucide-react";
 import { variantOptions } from "./variantOptions";
 import {
@@ -209,9 +210,12 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                     {/* HEADER */}
                     <div className="flex items-start justify-between mb-2">
                       <div>
-                        <p className="font-medium capitalize text-xl">
+                        <Link
+                          className="font-medium capitalize text-xl"
+                          href={"#" + section.type}
+                        >
                           {section.type}
-                        </p>
+                        </Link>
                         <p className="text-[10px] text-gray-400">
                           {section.id.slice(0, 8)}
                         </p>
@@ -224,8 +228,17 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                           type="button"
                           title="Remove this section"
                         >
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 18 18">
-                            <path d="M4 4l10 10M14 4L4 14" strokeLinecap="round"/>
+                          <svg
+                            className="w-3.5 h-3.5"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            viewBox="0 0 18 18"
+                          >
+                            <path
+                              d="M4 4l10 10M14 4L4 14"
+                              strokeLinecap="round"
+                            />
                           </svg>
                           Remove
                         </button>
@@ -241,18 +254,34 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                               : "text-gray-400 bg-gray-100 hover:bg-gray-200"
                           }`}
                           type="button"
-                          title={section.enabled ? "Disable section" : "Enable section"}
+                          title={
+                            section.enabled
+                              ? "Disable section"
+                              : "Enable section"
+                          }
                         >
                           {section.enabled ? (
                             <>
-                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 18 18">
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                viewBox="0 0 18 18"
+                              >
                                 <path d="M5 9l4 4 4-8" strokeLinecap="round" />
                               </svg>
                               Disable
                             </>
                           ) : (
                             <>
-                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 18 18">
+                              <svg
+                                className="w-3.5 h-3.5"
+                                fill="none"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                viewBox="0 0 18 18"
+                              >
                                 <circle cx="9" cy="9" r="7" />
                               </svg>
                               Enable
@@ -260,7 +289,6 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                           )}
                         </button>
                       </div>
-                 
                     </div>
 
                     {/* VARIANT */}

@@ -5,7 +5,7 @@
 
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/server/auth";
-import { serverUpdateSite, serverDeleteSite } from "@/server/firestore";
+import { serverUpdateSite, serverDeleteSite, serverPromoteTempImages } from "@/server/firestore";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -18,8 +18,8 @@ export async function PATCH(req: Request, { params }: RouteContext) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
-    const { id } = await params;
-    if (!id) {
+    const { id: slug } = await params;
+    if (!slug) {
       return NextResponse.json(
         { error: "Site ID is required." },
         { status: 400 },
@@ -28,7 +28,9 @@ export async function PATCH(req: Request, { params }: RouteContext) {
 
     const body = await req.json();
 
-    await serverUpdateSite(id, user.uid, body);
+    await serverUpdateSite(slug, user.uid, body);
+
+    await serverPromoteTempImages(user.uid, slug)
 
     return NextResponse.json({ success: true });
   } catch (err) {
@@ -50,15 +52,15 @@ export async function DELETE(_req: Request, { params }: RouteContext) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
-    const { id } = await params;
-    if (!id) {
+    const { id: slug } = await params;
+    if (!slug) {
       return NextResponse.json(
         { error: "Site ID is required." },
         { status: 400 },
       );
     }
 
-    await serverDeleteSite(id, user.uid);
+    await serverDeleteSite(slug, user.uid);
 
     return NextResponse.json({ success: true });
   } catch (err) {

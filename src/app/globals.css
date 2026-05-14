@@ -1,3 +1,4 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Fira+Code:wght@400;500&family=Archivo+Black&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -112,6 +113,6 @@
     @apply bg-background text-foreground;
   }
 }
-html{
+html {
   scroll-behavior: smooth;
 }

@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/admin/cleanup-temp-images?token=6b8c1f2e9a4d7c3b1e0f9a6d8c2b7f1ab",
+      "schedule": "0 */6 * * *"
+    }
+  ]
+}

@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import {
-  TemplateComponentProps,
   VariantRegistry,
   HeroVariantKey,
 } from "../types";
+import { TemplateComponentProps } from "@/lib/templates";
+
 import TemplateImage from "@/components/shared/TemplateImage";
 import DynamicHero from "@/components/shared/DynamicHero";
 import CtaLink from "@/components/shared/CtaLinkModal";
 
+// All variants below use the `var(--qs-*)` theme as much as possible for backgrounds, text, buttons, borders, accents
+
 // ─── 1. Dynamic ───────────────────────────────────────────────────────────────
-// Delegates to DynamicHero which switches between "background" and "side" based
-// on content.type. Best for templates that let users choose at runtime.
 
 const DynamicVariant = (props: TemplateComponentProps) => {
   const { isEditor, content, onUpdate } = props;
@@ -20,7 +21,13 @@ const DynamicVariant = (props: TemplateComponentProps) => {
       {...props}
       defaultType={content?.type ?? "background"}
       renderText={(heroType) => (
-        <div className={heroType === "background" ? "text-center mx-auto" : ""}>
+        <div
+          className={
+            heroType === "background"
+              ? "text-center mx-auto"
+              : ""
+          }
+        >
           {/* Badge */}
           <div
             className="mb-5 inline-flex rounded-full px-4 py-2 text-sm font-medium"
@@ -40,8 +47,13 @@ const DynamicVariant = (props: TemplateComponentProps) => {
 
           <h2
             className={`max-w-xl text-4xl font-bold tracking-tight md:text-6xl ${
-              heroType === "background" ? "mx-auto text-white" : ""
+              heroType === "background" ? "mx-auto" : ""
             }`}
+            style={{
+              color: heroType === "background"
+                ? "var(--qs-bg-contrast, var(--qs-primary-fg, white))"
+                : "var(--qs-text, #222)",
+            }}
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
@@ -53,9 +65,13 @@ const DynamicVariant = (props: TemplateComponentProps) => {
 
           <p
             className={`mt-6 max-w-xl text-base leading-7 md:text-lg ${
-              heroType === "background" ? "mx-auto text-zinc-300" : ""
+              heroType === "background" ? "mx-auto" : ""
             }`}
-            style={heroType === "side" ? { color: "var(--qs-text-muted)" } : {}}
+            style={
+              heroType === "background"
+                ? { color: "var(--qs-text-muted, #d1d5db)" }
+                : { color: "var(--qs-text-muted, #555)" }
+            }
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
@@ -105,14 +121,16 @@ const DynamicVariant = (props: TemplateComponentProps) => {
 };
 
 // ─── 2. Split ─────────────────────────────────────────────────────────────────
-// Explicit 50/50 layout — text left, image right.
 
 const SplitVariant = ({
   isEditor,
   content,
   onUpdate,
 }: TemplateComponentProps) => (
-  <section className="mx-auto max-w-7xl px-6 py-20 md:py-32">
+  <section
+    className="mx-auto max-w-7xl px-6 py-20 md:py-32"
+    style={{ background: "var(--qs-bg, white)" }}
+  >
     <div className="grid gap-16 md:grid-cols-2 md:items-center">
       <div>
         <span
@@ -126,6 +144,9 @@ const SplitVariant = ({
         </span>
         <h1
           className="text-5xl font-bold leading-tight md:text-7xl"
+          style={{
+            color: "var(--qs-text, #18181b)"
+          }}
           contentEditable={isEditor}
           suppressContentEditableWarning
           onBlur={(e) => onUpdate("title", e.currentTarget.textContent?.trim())}
@@ -162,6 +183,7 @@ const SplitVariant = ({
               style={{
                 border: "2px solid var(--qs-border)",
                 color: "var(--qs-text)",
+                background: "var(--qs-bg-alt, transparent)",
               }}
               onLabelChange={(v) => onUpdate("secondaryButton", v)}
               linkConfig={content?.secondaryButtonLink}
@@ -179,7 +201,7 @@ const SplitVariant = ({
           publicId={content?.image1PId}
           isEditor={isEditor}
           onImageChange={(url, pId) =>
-            onUpdate("content", { ...content, image1: url, image1PId: pId })
+            onUpdate(null, { ...content, image1: url, image1PId: pId })
           }
         />
       </div>
@@ -188,14 +210,16 @@ const SplitVariant = ({
 );
 
 // ─── 3. Minimalist ────────────────────────────────────────────────────────────
-// Large bold typography, dot-grid background, no image. Great for high-end creatives.
 
 const MinimalistVariant = ({
   isEditor,
   content,
   onUpdate,
 }: TemplateComponentProps) => (
-  <section className="relative flex min-h-[80vh] flex-col items-center justify-center px-6 text-center">
+  <section
+    className="relative flex min-h-[80vh] flex-col items-center justify-center px-6 text-center"
+    style={{ background: "var(--qs-bg, #fff)" }}
+  >
     <div
       className="absolute inset-0 -z-10 opacity-20"
       style={{
@@ -206,6 +230,7 @@ const MinimalistVariant = ({
     />
     <h1
       className="text-3xl font-black uppercase italic tracking-tighter md:text-6xl"
+      style={{ color: "var(--qs-text, #111)" }}
       contentEditable={isEditor}
       suppressContentEditableWarning
       onBlur={(e) => onUpdate("title", e.currentTarget.textContent?.trim())}
@@ -227,7 +252,7 @@ const MinimalistVariant = ({
           isEditor={isEditor}
           label={content?.primaryButton}
           className="border-b-2 pb-1 text-xl font-bold transition-all flex items-center gap-2"
-          style={{ borderColor: "var(--qs-primary)" }}
+          style={{ borderColor: "var(--qs-primary)", color: "var(--qs-primary)", background: "transparent" }}
           onLabelChange={(v) => onUpdate("primaryButton", v)}
           linkConfig={content?.primaryButtonLink}
           onLinkChange={(cfg) => onUpdate("primaryButtonLink", cfg)}
@@ -244,13 +269,17 @@ const CenteredVariant = ({
   content,
   onUpdate,
 }: TemplateComponentProps) => (
-  <section className="relative flex min-h-[75vh] flex-col items-center justify-center px-6 text-center py-24">
+  <section
+    className="relative flex min-h-[75vh] flex-col items-center justify-center px-6 text-center py-24"
+    style={{ background: "var(--qs-bg, #fff)" }}
+  >
     {content?.badge && (
       <div
         className="mb-6 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium"
         style={{
           background: "var(--qs-bg-alt)",
           border: "1px solid var(--qs-border)",
+          color: "var(--qs-text-muted)"
         }}
         contentEditable={isEditor}
         suppressContentEditableWarning
@@ -261,6 +290,7 @@ const CenteredVariant = ({
     )}
     <h1
       className="max-w-4xl text-5xl font-bold tracking-tight md:text-7xl"
+      style={{ color: "var(--qs-text, #18181b)" }}
       contentEditable={isEditor}
       suppressContentEditableWarning
       onBlur={(e) => onUpdate("title", e.currentTarget.textContent?.trim())}
@@ -300,6 +330,7 @@ const CenteredVariant = ({
           style={{
             color: "var(--qs-text)",
             border: "1px solid var(--qs-border)",
+            background: "var(--qs-bg-alt, transparent)",
           }}
         />
       )}

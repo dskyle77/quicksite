@@ -7,7 +7,7 @@ import type { AdminUser, PlanType } from "./adminTypes";
 import { PLAN_COLORS, STATUS_COLORS } from "./adminTypes";
 import { cn } from "@/lib/utils";
 
-const VALID_PLANS: PlanType[] = ["free", "basic", "growth", "pro"];
+const VALID_PLANS: PlanType[] = ["free", "growth", "pro"];
 
 export default function UsersScreen({
   users: initial,

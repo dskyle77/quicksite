@@ -2,6 +2,7 @@
 
 import { SectionProps } from "../../types";
 import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
+import Container from "@/components/shared/Container";
 
 type FeatureItem = {
   title: string;
@@ -47,10 +48,9 @@ export const FeaturesSection = ({
     return (
       <section
         id="features"
-        className="py-24"
         style={{ background: sectionBg }}
       >
-        <div className="max-w-5xl mx-auto px-4">
+        <Container className="py-24">
           <h2
             className="text-4xl md:text-5xl font-black text-center mb-5"
             style={{ color: "var(--qs-text)" }}
@@ -136,7 +136,7 @@ export const FeaturesSection = ({
               <AddButton onClick={handleAdd}>Add Feature</AddButton>
             </div>
           )}
-        </div>
+        </Container>
       </section>
     );
   }
@@ -149,10 +149,9 @@ export const FeaturesSection = ({
     return (
       <section
         id="features"
-        className="py-24"
         style={{ background: sectionBg }}
       >
-        <div className="max-w-6xl mx-auto px-4">
+        <Container className="py-24">
           <h2
             className="text-4xl md:text-5xl font-black text-center mb-5"
             style={{ color: "var(--qs-text)" }}
@@ -235,7 +234,7 @@ export const FeaturesSection = ({
               <AddButton onClick={handleAdd}>Add Feature</AddButton>
             </div>
           )}
-        </div>
+        </Container>
       </section>
     );
   }
@@ -245,8 +244,8 @@ export const FeaturesSection = ({
   // ─────────────────────────────────────────────
 
   return (
-    <section id="features" className="py-28" style={{ background: sectionBg }}>
-      <div className="max-w-7xl mx-auto px-4">
+    <section id="features" style={{ background: sectionBg }}>
+      <Container className="py-24">
         <h2
           className="text-5xl md:text-6xl font-black text-center mb-5"
           style={{ color: "var(--qs-text)" }}
@@ -340,7 +339,7 @@ export const FeaturesSection = ({
             <AddButton onClick={handleAdd}>Add Feature</AddButton>
           </div>
         )}
-      </div>
+      </Container>
     </section>
   );
 };

@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { useRef, useState } from "react";
 import { Upload } from "lucide-react";
-import { getCurrentUser } from "@/lib/firebase";
+import authFetch from "@/lib/authFetch";
+import { useSiteEditorStore } from "@/store/useSiteEditorStore";
 
 type TemplateImageBackgroundProps = {
   source?: string;
@@ -21,29 +22,49 @@ export default function TemplateImageBackground({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
 
+  // Use site slug for auth fetch, like TemplateImage
+  const site = useSiteEditorStore((state) => state.site);
+  const slug = site?.slug || "";
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
     try {
-      const user = await getCurrentUser();
-      const folder = user?.uid;
-
+      // ── 1. Delete the old image (using slug) ───────────────────────────────
       if (publicId) {
-        await fetch("/api/imageDelete", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ publicId }),
-        });
+        try {
+          const deleteRes = await authFetch("/api/imageDelete", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ publicId, slug }),
+          });
+          if (!deleteRes.ok) {
+            console.warn("Old image deletion failed — continuing with upload");
+          }
+        } catch (err) {
+          console.warn("Delete request failed — continuing with upload:", err);
+        }
       }
 
+      // ── 2. Upload the new image (with slug and optional folder) ────────────
       const formData = new FormData();
       formData.append("image", file);
-      if (folder) formData.append("folder", folder);
+      formData.append("slug", slug);
 
-      const res = await fetch("/api/imageUpload", { method: "POST", body: formData });
+      const res = await authFetch("/api/imageUpload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const { error: msg } = await res.json().catch(() => ({}));
+        throw new Error(msg ?? `Upload failed with status ${res.status}`);
+      }
+
       const { secureUrl, publicId: newId } = await res.json();
-      
+      if (!secureUrl) throw new Error("No URL returned from upload API");
+
       onImageChange?.(secureUrl, newId);
     } catch (err) {
       console.error(err);
@@ -71,11 +92,21 @@ export default function TemplateImageBackground({
           <button
             onClick={() => inputRef.current?.click()}
             className="flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-lg border border-white/20 transition cursor-pointer"
+            disabled={uploading}
           >
             <Upload size={18} />
-            <span className="text-sm">{uploading ? "Uploading..." : "Change Background"}</span>
+            <span className="text-sm">
+              {uploading ? "Uploading..." : "Change Background"}
+            </span>
           </button>
-          <input ref={inputRef} type="file" className="hidden" onChange={handleFileChange} accept="image/*" />
+          <input
+            ref={inputRef}
+            type="file"
+            className="hidden"
+            onChange={handleFileChange}
+            accept="image/*"
+            disabled={uploading}
+          />
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { variantOptions } from "./variantOptions";
 import {
   SchemaParams,
   NavbarContent,
@@ -422,138 +423,79 @@ export const schemaMap: Record<string, any> = {
   footer: footerSchema,
 };
 
-/* builderConfig.ts or contentBlocks.ts */
+// New helper: buildStarterContent
+export const buildStarterContent = ({
+  config,
+  params,
+}: {
+  config: any;
+  params: {
+    selectedTitle?: string;
+    whatsappNumber?: string;
+    defaultMessage?: string;
+    defaultImage?: string;
+  };
+}) => {
+  const content: any = {
+    builderConfig: config,
+    navbar: starterMap.navbar(params),
+    hero: starterMap.hero(params),
+    footer: starterMap.footer(params),
+  };
 
-export const builderConfigSchema = () => ({
-  _note:
-    "AI: For each property, use ONLY valid options. See documentation. For sections, include only relevant ones (about, skills, projects, experience, testimonials, contact, faq, pricing, cta, features, team, gallery). Set 'enabled: false' for optional sections to hide them without removing. Each section must have a unique 'id'. Do NOT add or remove keys.",
-  navbar: "classic",
-  hero: "dynamic",
-  footer: "classic",
-  sections: [
-    {
-      id: "",
-      type: "",
-      variant: "",
-      enabled: true,
-    },
-  ],
-});
+  config.sections.forEach((sec: any) => {
+    const starterFn = starterMap[sec.type];
+    if (starterFn) {
+      const contentKey = `${sec.id}${sec.type}`;
+      content[contentKey] = starterFn(params);
+    }
+  });
 
-// export const builderConfigStarter = () => ({
-//   navbar: "classic",
-//   hero: "dynamic",
-//   footer: "classic",
-//   sections: [
-//     {
-//       id: "init-about",
-//       type: "about",
-//       variant: "split",
-//       enabled: true,
-//     },
-//     {
-//       id: "init-skills",
-//       type: "skills",
-//       variant: "grid",
-//       enabled: true,
-//     },
-//     {
-//       id: "init-projects",
-//       type: "projects",
-//       variant: "card-grid",
-//       enabled: true,
-//     },
-//     {
-//       id: "init-experience",
-//       type: "experience",
-//       variant: "timeline",
-//       enabled: true,
-//     },
-//     {
-//       id: "init-contact",
-//       type: "contact",
-//       variant: "default",
-//       enabled: true,
-//     },
-//   ],
-// });
-export const builderConfigStarter = () => ({
-  navbar: "classic",
-  hero: "dynamic",
-  footer: "classic",
-  sections: [
-    {
-      id: "init-about",
-      type: "about",
-      variant: "split",
-      enabled: true,
+  return content;
+};
+
+// New helper: buildSchema
+export const buildSchema = ({
+  config,
+  params,
+}: {
+  config: any;
+  params: {
+    selectedTitle?: string;
+    whatsappNumber?: string;
+    defaultMessage?: string;
+    defaultImage?: string;
+  };
+}) => {
+  const schema: any = {
+    builderConfig: {
+      _note: `AI: Use valid variant keys from ${JSON.stringify(
+        variantOptions,
+      )} for navbar, hero, footer and sections.`,
+      navbar: "classic | glass | centered",
+      hero: "dynamic | split | minimalist | centered",
+      footer: "classic | centered | minimal | columns",
+      sections: config.sections.map((sec: any) => ({
+        id: sec.id,
+        type: sec.type,
+        variant: "Pick a valid variant",
+        enabled: true,
+      })),
     },
-    {
-      id: "init-skills",
-      type: "skills",
-      variant: "grid",
-      enabled: true,
-    },
-    {
-      id: "init-projects",
-      type: "projects",
-      variant: "card-grid",
-      enabled: true,
-    },
-    {
-      id: "init-experience",
-      type: "experience",
-      variant: "timeline",
-      enabled: true,
-    },
-    {
-      id: "init-testimonials",
-      type: "testimonials",
-      variant: "grid",
-      enabled: true,
-    },
-    {
-      id: "init-contact",
-      type: "contact",
-      variant: "default",
-      enabled: true,
-    },
-    {
-      id: "init-features",
-      type: "features",
-      variant: "grid",
-      enabled: true,
-    },
-    {
-      id: "init-pricing",
-      type: "pricing",
-      variant: "table",
-      enabled: true,
-    },
-    {
-      id: "init-faq",
-      type: "faq",
-      variant: "accordion",
-      enabled: true,
-    },
-    {
-      id: "init-cta",
-      type: "cta",
-      variant: "simple",
-      enabled: true,
-    },
-    // Add optional sections as templates (disabled by default)
-    // {
-    //   id: "init-team",
-    //   type: "team",
-    //   variant: "card",
-    //   enabled: false,
-    // },
-    // {
-    //   id: "init-gallery",
-    //   type: "gallery",
-    //   variant: "masonry",
-    //   enabled: false,
-    // },
-  ],
-});
+    navbar: schemaMap.navbar(params),
+    hero: schemaMap.hero(params),
+    footer: schemaMap.footer(params),
+  };
+
+  // Inject scoped schemas for AI to fill
+  config.sections.forEach((sec: any) => {
+    const schemaFn = schemaMap[sec.type];
+    if (schemaFn) {
+      const contentKey = `${sec.id}${sec.type}`;
+      schema[contentKey] = schemaFn(params);
+    }
+  });
+
+  return schema;
+};
+

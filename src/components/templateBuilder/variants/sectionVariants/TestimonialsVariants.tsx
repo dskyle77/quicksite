@@ -2,7 +2,7 @@
 
 import { SectionProps } from "../../types";
 import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
-
+import Container from "@/components/shared/Container";
 type Testimonial = {
   quote: string;
   name: string;
@@ -47,12 +47,8 @@ export const TestimonialsSection = ({
 
   if (variant === "grid") {
     return (
-      <section
-        className="py-24"
-        style={{ background: sectionBg }}
-        id="testimonials"
-      >
-        <div className="max-w-6xl mx-auto px-4">
+      <section style={{ background: sectionBg }} id="testimonials">
+        <Container className="py-24">
           <div className="text-center mb-14">
             <h2
               className="text-4xl md:text-5xl font-black mb-5"
@@ -73,10 +69,7 @@ export const TestimonialsSection = ({
                 contentEditable={isEditor}
                 suppressContentEditableWarning
                 onBlur={(e) =>
-                  onUpdate(
-                    "subheading",
-                    e.currentTarget.textContent?.trim(),
-                  )
+                  onUpdate("subheading", e.currentTarget.textContent?.trim())
                 }
               >
                 {content?.subheading}
@@ -175,7 +168,7 @@ export const TestimonialsSection = ({
               <AddButton onClick={handleAdd}>Add Testimonial</AddButton>
             </div>
           )}
-        </div>
+        </Container>
       </section>
     );
   }
@@ -187,11 +180,11 @@ export const TestimonialsSection = ({
   if (variant === "carousel") {
     return (
       <section
-        className="py-24 overflow-hidden"
+        className="overflow-hidden"
         style={{ background: sectionBg }}
         id="testimonials"
       >
-        <div className="max-w-7xl mx-auto px-4">
+        <Container className="py-24">
           <div className="text-center mb-14">
             <h2
               className="text-4xl md:text-5xl font-black mb-5"
@@ -303,7 +296,7 @@ export const TestimonialsSection = ({
               <AddButton onClick={handleAdd}>Add Testimonial</AddButton>
             </div>
           )}
-        </div>
+        </Container>
         <style jsx>{`
           /* Custom, extra-thin scrollbar for the carousel */
           .custom-scrollbar {
@@ -336,12 +329,8 @@ export const TestimonialsSection = ({
   // Minimal Variant: "List" style but with Card Appearance
 
   return (
-    <section
-      className="py-24 md:py-32"
-      style={{ background: sectionBg }}
-      id="testimonials"
-    >
-      <div className="max-w-3xl mx-auto px-4">
+    <section style={{ background: sectionBg }} id="testimonials">
+      <Container className="py-24 md:py-32">
         <div className="text-center mb-12">
           <h2
             className="text-3xl md:text-5xl font-bold mb-4 tracking-tight"
@@ -448,7 +437,7 @@ export const TestimonialsSection = ({
             <AddButton onClick={handleAdd}>Add Testimonial</AddButton>
           </div>
         )}
-      </div>
+      </Container>
     </section>
   );
 };

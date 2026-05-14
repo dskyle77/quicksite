@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 import { useRef, useState } from "react";
-import { getCurrentUser } from "@/lib/firebase";
+import authFetch from "@/lib/authFetch";
+
+import { useSiteEditorStore } from "@/store/useSiteEditorStore";
 
 type TemplateImageProps = {
   source?: string;
@@ -18,6 +20,9 @@ export default function TemplateImage({
   onImageChange,
   alt,
 }: TemplateImageProps) {
+  const site = useSiteEditorStore((state) => state.site);
+  const slug = site?.slug || "";
+
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -53,24 +58,13 @@ export default function TemplateImage({
     setError(null);
 
     try {
-      let folder: string | undefined;
-      try {
-        const user = await getCurrentUser();
-        folder = user?.uid;
-      } catch (err) {
-        console.warn(
-          "Could not get Firebase user — uploading without folder:",
-          err,
-        );
-      }
-
       // ── 1. Delete the old image ────────────────────────────────────────────
       if (publicId) {
         try {
-          const deleteRes = await fetch("/api/imageDelete", {
+          const deleteRes = await authFetch("/api/imageDelete", {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ publicId }),
+            body: JSON.stringify({ publicId, slug }),
           });
           if (!deleteRes.ok) {
             console.warn("Old image deletion failed — continuing with upload");
@@ -83,9 +77,9 @@ export default function TemplateImage({
       // ── 2. Upload the new image ────────────────────────────────────────────
       const formData = new FormData();
       formData.append("image", file);
-      if (folder) formData.append("folder", folder);
+      formData.append("slug", slug);
 
-      const res = await fetch("/api/imageUpload", {
+      const res = await authFetch("/api/imageUpload", {
         method: "POST",
         body: formData,
       });
@@ -98,7 +92,6 @@ export default function TemplateImage({
       const { secureUrl, publicId: newPublicId } = await res.json();
       if (!secureUrl) throw new Error("No URL returned from upload API");
 
-      // Force <img> remount so the browser doesn't show the cached old image
       setImgKey((k) => k + 1);
       setPreview(null);
       onImageChange?.(secureUrl, newPublicId);
@@ -106,13 +99,11 @@ export default function TemplateImage({
       const message = err instanceof Error ? err.message : "Upload failed";
       console.error("Image upload error:", err);
       setError(message);
-      // Keep preview on failure until dismissed by new upload/success.
     } finally {
       setUploading(false);
     }
   };
 
-  // Show the preview (if exists in the editor and uploading), else show the source, else show placeholder (always clickable in editor)
   let showImage: React.ReactNode = null;
   if (isEditor && preview) {
     showImage = (
@@ -124,7 +115,9 @@ export default function TemplateImage({
           "object-cover w-full h-full rounded-2xl",
           "hover:brightness-75",
           "opacity-70 grayscale",
-        ].filter(Boolean).join(" ")}
+        ]
+          .filter(Boolean)
+          .join(" ")}
         loading="eager"
         style={{ display: "block" }}
       />

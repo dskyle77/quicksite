@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+
+import { createPortal } from "react-dom";
 import { useSiteDisplayStore } from "@/store/useSiteDisplayStore";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -13,11 +15,17 @@ export type LinkConfig = {
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-export function buildHref(config?: LinkConfig): string {
+export function buildHref(
+  config?: LinkConfig,
+  messageOverride?: string,
+): string {
   if (!config) return "#";
   if (config.type === "whatsapp") {
     const phone = (config.phone ?? "").replace(/\D/g, "");
-    const msg = encodeURIComponent(config.message ?? "");
+    const msg =
+      typeof messageOverride === "string"
+        ? encodeURIComponent(messageOverride)
+        : encodeURIComponent(config.message ?? "");
     return phone ? `https://wa.me/${phone}${msg ? `?text=${msg}` : ""}` : "#";
   }
   return config.url || "#";
@@ -29,63 +37,85 @@ interface LinkConfigMenuProps {
   value?: LinkConfig;
   onChange: (cfg: LinkConfig) => void;
   onClose: () => void;
+  messageOverride?: string;
 }
 
-function LinkConfigMenu({ value, onChange, onClose }: LinkConfigMenuProps) {
+function LinkConfigMenu({
+  value,
+  onChange,
+  onClose,
+  messageOverride,
+}: LinkConfigMenuProps) {
   const [tab, setTab] = useState<"whatsapp" | "url">(value?.type ?? "whatsapp");
   const [phone, setPhone] = useState(value?.phone ?? "");
   const [message, setMessage] = useState(value?.message ?? "");
   const [url, setUrl] = useState(value?.url ?? "");
+
   const ref = useRef<HTMLDivElement>(null);
 
+  // WhatsApp branding
+  const WA_GREEN = "#25D366";
+  const WA_TEAL = "#075E54";
+  const WA_LIGHT_GREEN = "#DCF8C6";
+
+  // Close on outside click (cleaner + safer)
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        onClose();
+      }
     };
+
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, [onClose]);
 
   const handleSave = () => {
-    onChange(
-      tab === "whatsapp"
-        ? { type: "whatsapp", phone, message }
-        : { type: "url", url },
-    );
+    if (tab === "whatsapp") {
+      onChange({
+        type: "whatsapp",
+        phone,
+        message: messageOverride ?? message,
+      });
+    } else {
+      onChange({
+        type: "url",
+        url,
+      });
+    }
+
     onClose();
   };
 
-  // WhatsApp Branding Colors
-  const WA_GREEN = "#25D366";
-  const WA_TEAL = "#075E54";
-  const WA_LIGHT_GREEN = "#DCF8C6";
+  // Prevent SSR crash
+  if (typeof window === "undefined") return null;
 
-  // Render as a true popup modal with overlay centred in the screen
-  return (
-    <div className="fixed inset-0 flex items-center justify-center z-9999">
+  return createPortal(
+    <div className="fixed inset-0 z-99999 flex items-center justify-center">
       {/* Overlay */}
       <div
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
         onClick={onClose}
-        aria-label="Close popup"
-        tabIndex={-1}
       />
 
+      {/* Modal */}
       <div
         ref={ref}
-        className="relative w-[22rem] max-w-[95vw] rounded-3xl shadow-2xl p-5 transition-all animate-in fade-in zoom-in duration-200"
-        style={{
-          background: "var(--qs-bg)",
-          border: `1px solid ${tab === "whatsapp" ? WA_GREEN : "var(--qs-border)"}`,
-        }}
-        onMouseDown={e => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
+        onMouseDown={(e) => e.stopPropagation()}
+        className="relative w-88 max-w-[95vw] rounded-3xl shadow-2xl p-5 animate-in fade-in zoom-in duration-200"
+        style={{
+          background: "#fff",
+          border: `1px solid ${
+            tab === "whatsapp" ? "#25D366" : "#e5e7eb"
+          }`,
+        }}
       >
         {/* Tabs */}
         <div
           className="mb-4 flex rounded-xl p-1 text-sm font-medium"
-          style={{ background: "var(--qs-bg-alt)" }}
+          style={{ background: "#f9fafb" }}
         >
           {(["whatsapp", "url"] as const).map((t) => {
             const isActive = tab === t;
@@ -94,16 +124,16 @@ function LinkConfigMenu({ value, onChange, onClose }: LinkConfigMenuProps) {
             return (
               <button
                 key={t}
-                className="flex-1 rounded-lg py-1.5 capitalize transition-all"
-                style={
-                  isActive
-                    ? {
-                        background: isWhatsAppTab ? WA_TEAL : "var(--qs-primary)",
-                        color: "#FFFFFF",
-                      }
-                    : { color: "var(--qs-text-muted)" }
-                }
                 onClick={() => setTab(t)}
+                className="flex-1 rounded-lg py-1.5 capitalize"
+                style={{
+                  background: isActive
+                    ? isWhatsAppTab
+                      ? "#075E54"
+                      : "#0051ff"
+                    : "transparent",
+                  color: isActive ? "#fff" : "#6B7280",
+                }}
               >
                 {isWhatsAppTab ? "📱 WhatsApp" : "🔗 Custom URL"}
               </button>
@@ -111,95 +141,107 @@ function LinkConfigMenu({ value, onChange, onClose }: LinkConfigMenuProps) {
           })}
         </div>
 
+        {/* CONTENT */}
         {tab === "whatsapp" ? (
           <div className="flex flex-col gap-3">
             <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-[#075E54]">
+              <label className="mb-1 block text-[10px] font-bold uppercase text-[#075E54]">
                 WhatsApp Number
               </label>
+
               <input
                 type="tel"
-                placeholder="e.g. 2348012345678"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full rounded-xl px-3 py-2 text-sm outline-none border transition-focus"
+                placeholder="2348012345678"
+                className="w-full rounded-xl px-3 py-2 text-sm border outline-none"
                 style={{
-                  background: WA_LIGHT_GREEN,
-                  borderColor: WA_GREEN,
+                  background: "#DCF8C6",
+                  borderColor: "#25D366",
                   color: "#128C7E",
                 }}
               />
             </div>
+
             <div>
-              <label className="mb-1 block text-[10px] font-bold uppercase tracking-wider text-[#075E54]">
+              <label className="mb-1 block text-[10px] font-bold uppercase text-[#075E54]">
                 Pre-filled Message
               </label>
+
               <textarea
-                placeholder="Hi, I'd like to get started…"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
                 rows={3}
-                className="w-full resize-none rounded-xl px-3 py-2 text-sm outline-none border"
+                value={messageOverride ?? message}
+                onChange={
+                  messageOverride
+                    ? undefined
+                    : (e) => setMessage(e.target.value)
+                }
+                readOnly={messageOverride !== undefined}
+                className="w-full resize-none rounded-xl px-3 py-2 text-sm border outline-none"
                 style={{
-                  background: "#FFFFFF",
-                  borderColor: WA_GREEN,
+                  background: "#fff",
+                  borderColor: "#25D366",
                   color: "#444",
                 }}
               />
+
+              {messageOverride && (
+                <p className="mt-1 text-[10px] text-gray-500 italic">
+                  Message is locked by system
+                </p>
+              )}
             </div>
           </div>
         ) : (
           <div>
-            <label
-              className="mb-1 block text-xs font-semibold"
-              style={{ color: "var(--qs-text-muted)" }}
-            >
+            <label className="mb-1 block text-xs font-semibold text-[#6B7280]">
               URL
             </label>
+
             <input
               type="url"
-              placeholder="https://example.com"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              className="w-full rounded-xl px-3 py-2 text-sm outline-none"
+              placeholder="https://example.com"
+              className="w-full rounded-xl px-3 py-2 text-sm border outline-none"
               style={{
-                background: "var(--qs-bg-alt)",
-                border: "1px solid var(--qs-border)",
-                color: "var(--qs-text)",
+                background: "#f9fafb",
+                border: "1px solid #e5e7eb",
+                color: "#121212",
               }}
             />
           </div>
         )}
 
+        {/* ACTIONS */}
         <div className="mt-4 flex gap-2">
           <button
-            className="flex-1 rounded-xl py-2 text-sm font-bold transition-all active:scale-95"
-            style={{
-              background: tab === "whatsapp" ? WA_GREEN : "var(--qs-primary)",
-              color: tab === "whatsapp" ? "#fff" : "var(--qs-primary-fg)",
-              boxShadow:
-                tab === "whatsapp" ? "0 2px 8px rgba(37, 211, 102, 0.3)" : "none",
-            }}
             onClick={handleSave}
+            className="flex-1 rounded-xl py-2 text-sm font-bold active:scale-95"
+            style={{
+              background: tab === "whatsapp" ? "#25D366" : "#0051ff",
+              color: "#fff",
+              boxShadow:
+                tab === "whatsapp"
+                  ? "0 2px 8px rgba(37, 211, 102, 0.3)"
+                  : "none",
+            }}
           >
             {tab === "whatsapp" ? "Set WhatsApp Link" : "Save URL"}
           </button>
+
           <button
-            className="rounded-xl px-4 py-2 text-sm font-semibold hover:bg-black/5"
-            style={{
-              background: "transparent",
-              color: "var(--qs-text-muted)",
-            }}
             onClick={onClose}
+            className="rounded-xl px-4 py-2 text-sm text-[#6B7280]"
           >
             Cancel
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
-
 // ─── CtaLink (default export) ─────────────────────────────────────────────────
 
 export interface CtaLinkProps {
@@ -210,6 +252,7 @@ export interface CtaLinkProps {
   onLinkChange: (cfg: LinkConfig) => void;
   className?: string;
   style?: React.CSSProperties;
+  messageOverride?: string;
 }
 
 export default function CtaLink({
@@ -220,12 +263,13 @@ export default function CtaLink({
   onLinkChange,
   className,
   style,
+  messageOverride,
 }: CtaLinkProps) {
   const { slug } = useSiteDisplayStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const wrapRef = useRef<HTMLSpanElement>(null);
 
-  const href = buildHref(linkConfig);
+  const href = buildHref(linkConfig, messageOverride);
 
   const handleClick = () => {
     if (linkConfig?.type !== "whatsapp") return;
@@ -307,6 +351,7 @@ export default function CtaLink({
           value={linkConfig}
           onChange={onLinkChange}
           onClose={() => setMenuOpen(false)}
+          messageOverride={messageOverride}
         />
       )}
     </span>

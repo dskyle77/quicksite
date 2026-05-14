@@ -1,5 +1,7 @@
 import { SectionProps } from "../../types";
 import CtaLink from "@/components/shared/CtaLinkModal";
+import { useState } from "react";
+import Container from "@/components/shared/Container";
 
 export const ContactSection = ({
   variant,
@@ -10,11 +12,15 @@ export const ContactSection = ({
 }: SectionProps) => {
   const isEven = position % 2 === 0;
 
-  const sectionBg = isEven
-    ? "linear-gradient(135deg, var(--qs-bg) 0%, var(--qs-bg-alt) 100%)"
-    : "linear-gradient(135deg, var(--qs-bg-alt) 0%, var(--qs-bg) 100%)";
+  const sectionBg = isEven ? "var(--qs-bg)" : "var(--qs-bg-alt)";
 
   const cardBg = isEven ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.05)";
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
 
   // ─────────────────────────────────────────────
   // SPLIT VARIANT
@@ -22,8 +28,8 @@ export const ContactSection = ({
 
   if (variant === "split") {
     return (
-      <section id="contact" className="py-24" style={{ background: sectionBg }}>
-        <div className="max-w-6xl mx-auto px-4">
+      <section id="contact" style={{ background: sectionBg }}>
+        <Container className="py-24">
           <div
             className="grid md:grid-cols-2 gap-12 items-center rounded-[36px] border p-8 md:p-14"
             style={{
@@ -101,7 +107,7 @@ export const ContactSection = ({
               )}
             </div>
           </div>
-        </div>
+        </Container>
       </section>
     );
   }
@@ -112,8 +118,8 @@ export const ContactSection = ({
 
   if (variant === "minimal") {
     return (
-      <section id="contact" className="py-24" style={{ background: sectionBg }}>
-        <div className="max-w-3xl mx-auto px-4 text-center">
+      <section id="contact" style={{ background: sectionBg }}>
+        <Container className="py-24 text-center">
           <div
             className="rounded-[36px] border p-8 md:p-14"
             style={{
@@ -171,19 +177,32 @@ export const ContactSection = ({
               />
             </div>
           </div>
-        </div>
+        </Container>
       </section>
     );
   }
 
   // ─────────────────────────────────────────────
-  // DEFAULT VARIANT
-  // ─────────────────────────────────────────────
-  // ─────────────────────────────────────────────
   // FORM VARIANT
   // ─────────────────────────────────────────────
 
   if (variant === "form") {
+    // State for form fields to construct the message override
+
+    // Helper to handle input/textarea events
+    const handleInput = (key: keyof typeof formData, value: string) => {
+      setFormData((prev) => ({ ...prev, [key]: value }));
+    };
+
+    // Build the message to pass to the CtaLink as messageOverride
+    const messageOverride = [
+      formData.name && `Name: ${formData.name}`,
+      formData.email && `Email: ${formData.email}`,
+      formData.message && `Message: ${formData.message}`,
+    ]
+      .filter(Boolean)
+      .join("\n");
+
     return (
       <section id="contact" className="py-24" style={{ background: sectionBg }}>
         <div className="max-w-6xl mx-auto px-4">
@@ -314,6 +333,8 @@ export const ContactSection = ({
                       border: "1px solid var(--qs-border)",
                       color: "var(--qs-text)",
                     }}
+                    value={formData.name}
+                    onChange={(e) => handleInput("name", e.target.value)}
                   />
                 </div>
 
@@ -334,6 +355,8 @@ export const ContactSection = ({
                       border: "1px solid var(--qs-border)",
                       color: "var(--qs-text)",
                     }}
+                    value={formData.email}
+                    onChange={(e) => handleInput("email", e.target.value)}
                   />
                 </div>
 
@@ -354,6 +377,8 @@ export const ContactSection = ({
                       border: "1px solid var(--qs-border)",
                       color: "var(--qs-text)",
                     }}
+                    value={formData.message}
+                    onChange={(e) => handleInput("message", e.target.value)}
                   />
                 </div>
 
@@ -371,6 +396,7 @@ export const ContactSection = ({
                       background: "var(--qs-primary)",
                       color: "var(--qs-primary-fg)",
                     }}
+                    messageOverride={messageOverride}
                   />
                 </div>
               </div>
@@ -380,84 +406,54 @@ export const ContactSection = ({
       </section>
     );
   }
+
   return (
-    <section id="contact" className="py-28" style={{ background: sectionBg }}>
-      <div className="max-w-6xl mx-auto px-4">
+    <section id="contact" style={{ background: sectionBg }}>
+      <Container className="py-14">
         <div
-          className="relative overflow-hidden rounded-[40px] px-6 py-14 md:px-14 md:py-20 text-center"
+          className="rounded-2xl shadow-lg border border-(--qs-border) px-5 py-8 md:px-10 md:py-12 bg-(--qs-bg-alt) flex flex-col gap-4 items-start"
           style={{
-            background:
-              "linear-gradient(135deg, var(--qs-primary) 0%, color-mix(in srgb, var(--qs-primary) 70%, black) 100%)",
-            color: "var(--qs-primary-fg)",
+            background: "var(--qs-bg-alt)",
+            color: "var(--qs-text)",
           }}
         >
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 right-0 h-64 w-64 rounded-full bg-white blur-3xl" />
+          <div className="text-2xl mb-1 select-none" aria-hidden>
+            🚀
           </div>
-
-          <div className="relative z-10">
-            <div className="text-5xl md:text-6xl mb-6">✦</div>
-
-            <h2
-              className="text-4xl md:text-6xl font-black tracking-tight leading-tight"
-              contentEditable={isEditor}
-              suppressContentEditableWarning
-              onBlur={(e) =>
-                onUpdate("content.title", e.currentTarget.textContent?.trim())
-              }
-            >
-              {content.title ?? "Let's Build Something Great"}
-            </h2>
-
-            <p
-              className="mx-auto mt-6 max-w-2xl text-lg md:text-xl leading-relaxed opacity-90"
-              contentEditable={isEditor}
-              suppressContentEditableWarning
-              onBlur={(e) =>
-                onUpdate("content.desc", e.currentTarget.textContent?.trim())
-              }
-            >
-              {content.desc ??
-                "Ready to start your next project? Reach out and let's make it happen."}
-            </p>
-
-            <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <CtaLink
-                isEditor={isEditor}
-                label={content.primaryButton ?? "Send a Message"}
-                linkConfig={content.primaryButtonLink}
-                onLabelChange={(v) => onUpdate("content.primaryButton", v)}
-                onLinkChange={(cfg) =>
-                  onUpdate("content.primaryButtonLink", cfg)
-                }
-                className="rounded-2xl px-8 py-5 font-bold text-center transition-all duration-300 hover:scale-[1.03]"
-                style={{
-                  background: "#fff",
-                  color: "#000",
-                }}
-              />
-
-              {content.secondaryButton && (
-                <CtaLink
-                  isEditor={isEditor}
-                  label={content.secondaryButton}
-                  linkConfig={content.secondaryButtonLink}
-                  onLabelChange={(v) => onUpdate("content.secondaryButton", v)}
-                  onLinkChange={(cfg) =>
-                    onUpdate("content.secondaryButtonLink", cfg)
-                  }
-                  className="rounded-2xl px-8 py-5 font-bold text-center transition-all duration-300 hover:scale-[1.03]"
-                  style={{
-                    background: "transparent",
-                    color: "var(--qs-primary-fg)",
-                    border: "1px solid rgba(255,255,255,0.25)",
-                  }}
-                />
-              )}
-            </div>
+          <h2
+            className="text-2xl md:text-4xl font-extrabold tracking-tight mb-2"
+            style={{ color: "var(--qs-primary)" }}
+            contentEditable={isEditor}
+            suppressContentEditableWarning
+            onBlur={(e) =>
+              onUpdate("content.title", e.currentTarget.textContent?.trim())
+            }
+          >
+            {content.title ?? "Let's Build Something Great"}
+          </h2>
+          <p
+            className="mt-0 text-base md:text-lg leading-relaxed mb-5 text-(--qs-text-muted) max-w-xl"
+            contentEditable={isEditor}
+            suppressContentEditableWarning
+            onBlur={(e) =>
+              onUpdate("content.desc", e.currentTarget.textContent?.trim())
+            }
+          >
+            {content.desc ??
+              "Ready to start your next project? Reach out and let's make it happen."}
+          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-3 w-full mt-1">
+            <CtaLink
+              isEditor={isEditor}
+              label={content.primaryButton ?? "Send a Message"}
+              linkConfig={content.primaryButtonLink}
+              onLabelChange={(v) => onUpdate("content.primaryButton", v)}
+              onLinkChange={(cfg) => onUpdate("content.primaryButtonLink", cfg)}
+              className="rounded-lg px-6 py-3 font-bold text-center w-full sm:w-auto transition-all duration-200 hover:-translate-y-1 bg-(--qs-primary) text-(--qs-primary-fg)"
+            />
           </div>
         </div>
-      </div>
+      </Container>
     </section>
   );
 };

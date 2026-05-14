@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { SectionProps } from "../../types";
+import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
+import Container from "@/components/shared/Container";
 
 export const FaqSection = ({
   content,
@@ -12,12 +14,30 @@ export const FaqSection = ({
   const isEven = position % 2 === 0;
   const sectionBg = isEven ? "var(--qs-bg)" : "var(--qs-bg-alt)";
 
+  // Handler to delete FAQ item
+  const handleDelete = (idx: number) => {
+    const next = [...list];
+    next.splice(idx, 1);
+    onUpdate("items", next);
+  };
+
+  // Handler to add new FAQ
+  const handleAdd = () => {
+    onUpdate("items", [
+      ...list,
+      {
+        question: "New Question",
+        answer: "Type your answer here.",
+      },
+    ]);
+  };
+
   if (variant === "accordion") {
     return (
-      <section className="py-16" style={{ background: sectionBg }}>
-        <div className="max-w-3xl mx-auto px-4">
+      <section style={{ background: sectionBg }}>
+        <Container className="py-20">
           <h2
-            className="text-3xl font-bold mb-6 text-center"
+            className="text-4xl md:text-5xl font-black mb-10 text-center tracking-tight"
             style={{ color: "var(--qs-text)" }}
             contentEditable={isEditor}
             suppressContentEditableWarning
@@ -27,57 +47,73 @@ export const FaqSection = ({
           >
             {content?.heading ?? "Frequently Asked Questions"}
           </h2>
-          <div className="space-y-4">
+          <div className="space-y-3">
             {list.map(
               (item: { question: string; answer: string }, i: number) => (
                 <div
                   key={i}
-                  className="border-b"
-                  style={{ borderColor: "var(--qs-border)" }}
+                  className="relative border rounded-3xl bg-(--qs-card) overflow-hidden transition-all hover:-translate-y-1 hover:shadow-2xl"
+                  style={{
+                    border: "1px solid var(--qs-border)",
+                    backdropFilter: "blur(8px)",
+                  }}
                 >
-                  <div
-                    className="font-medium text-base py-2"
-                    style={{ color: "var(--qs-text)" }}
-                    contentEditable={isEditor}
-                    suppressContentEditableWarning
-                    onBlur={(e) =>
-                      onUpdate(
-                        `items.${i}.question`,
-                        e.currentTarget.textContent?.trim(),
-                      )
-                    }
-                  >
-                    {item.question}
-                  </div>
-                  <div
-                    className="text-sm pb-3"
-                    style={{ color: "var(--qs-text-muted)" }}
-                    contentEditable={isEditor}
-                    suppressContentEditableWarning
-                    onBlur={(e) =>
-                      onUpdate(
-                        `items.${i}.answer`,
-                        e.currentTarget.textContent?.trim(),
-                      )
-                    }
-                  >
-                    {item.answer}
+                  {isEditor && (
+                    <div className="absolute top-4 right-4 z-20">
+                      <Xbutton onClick={() => handleDelete(i)} color="red" />
+                    </div>
+                  )}
+                  <div className="p-7">
+                    <div
+                      className="font-bold text-lg mb-2"
+                      style={{ color: "var(--qs-text)" }}
+                      contentEditable={isEditor}
+                      suppressContentEditableWarning
+                      onBlur={(e) =>
+                        onUpdate(
+                          `items.${i}.question`,
+                          e.currentTarget.textContent?.trim(),
+                        )
+                      }
+                    >
+                      {item.question}
+                    </div>
+                    <div
+                      className="text-base leading-relaxed"
+                      style={{ color: "var(--qs-text-muted)" }}
+                      contentEditable={isEditor}
+                      suppressContentEditableWarning
+                      onBlur={(e) =>
+                        onUpdate(
+                          `items.${i}.answer`,
+                          e.currentTarget.textContent?.trim(),
+                        )
+                      }
+                    >
+                      {item.answer}
+                    </div>
                   </div>
                 </div>
               ),
             )}
           </div>
-        </div>
+          {isEditor && (
+            <div className="mt-8 flex justify-center">
+              <AddButton onClick={handleAdd}>Add FAQ</AddButton>
+            </div>
+          )}
+        </Container>
       </section>
     );
   }
+
   if (variant === "numbered") {
     // Numbered list FAQ
     return (
-      <section className="py-16" style={{ background: sectionBg }}>
-        <div className="max-w-3xl mx-auto px-4">
+      <section style={{ background: sectionBg }}>
+        <Container className="py-20">
           <h2
-            className="text-2xl font-bold mb-8 text-center"
+            className="text-3xl md:text-4xl font-black mb-10 text-center tracking-tight"
             style={{ color: "var(--qs-text)" }}
             contentEditable={isEditor}
             suppressContentEditableWarning
@@ -87,12 +123,17 @@ export const FaqSection = ({
           >
             {content?.heading ?? "FAQs"}
           </h2>
-          <ol className="list-decimal pl-6 space-y-6">
+          <ol className="list-decimal pl-8 space-y-10">
             {list.map(
               (item: { question: string; answer: string }, i: number) => (
-                <li key={i}>
+                <li key={i} className="relative">
+                  {isEditor && (
+                    <div className="absolute top-1 right-0 z-10">
+                      <Xbutton onClick={() => handleDelete(i)} color="red" />
+                    </div>
+                  )}
                   <div
-                    className="font-semibold text-base"
+                    className="font-bold text-lg mb-2"
                     style={{ color: "var(--qs-text)" }}
                     contentEditable={isEditor}
                     suppressContentEditableWarning
@@ -106,7 +147,7 @@ export const FaqSection = ({
                     {item.question}
                   </div>
                   <div
-                    className="text-sm"
+                    className="text-base leading-relaxed pb-1"
                     style={{ color: "var(--qs-text-muted)" }}
                     contentEditable={isEditor}
                     suppressContentEditableWarning
@@ -123,16 +164,22 @@ export const FaqSection = ({
               ),
             )}
           </ol>
-        </div>
+          {isEditor && (
+            <div className="mt-8 flex justify-center">
+              <AddButton onClick={handleAdd}>Add FAQ</AddButton>
+            </div>
+          )}
+        </Container>
       </section>
     );
   }
+
   // Default (grid) FAQ
   return (
-    <section className="py-16" style={{ background: sectionBg }}>
-      <div className="max-w-4xl mx-auto px-4">
+    <section style={{ background: sectionBg }}>
+      <Container className="py-20">
         <h2
-          className="text-3xl font-bold mb-8 text-center"
+          className="text-4xl md:text-5xl font-black mb-12 text-center tracking-tight"
           style={{ color: "var(--qs-text)" }}
           contentEditable={isEditor}
           suppressContentEditableWarning
@@ -142,18 +189,23 @@ export const FaqSection = ({
         >
           {content?.heading ?? "FAQ"}
         </h2>
-        <div className="grid gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {list.map((item: { question: string; answer: string }, i: number) => (
             <div
               key={i}
-              className="rounded-md border px-6 py-4 backdrop-blur-sm"
+              className="relative group rounded-3xl border p-7 transition-all hover:-translate-y-1 hover:shadow-2xl bg-(--qs-card)"
               style={{
                 border: "1px solid var(--qs-border)",
-                background: "rgba(255,255,255,0.03)",
+                backdropFilter: "blur(10px)",
               }}
             >
+              {isEditor && (
+                <div className="absolute top-4 right-4 z-10">
+                  <Xbutton onClick={() => handleDelete(i)} color="red" />
+                </div>
+              )}
               <div
-                className="font-semibold mb-2"
+                className="font-bold text-lg mb-2"
                 style={{ color: "var(--qs-text)" }}
                 contentEditable={isEditor}
                 suppressContentEditableWarning
@@ -167,7 +219,7 @@ export const FaqSection = ({
                 {item.question}
               </div>
               <div
-                className="text-sm"
+                className="text-base leading-relaxed"
                 style={{ color: "var(--qs-text-muted)" }}
                 contentEditable={isEditor}
                 suppressContentEditableWarning
@@ -183,7 +235,12 @@ export const FaqSection = ({
             </div>
           ))}
         </div>
-      </div>
+        {isEditor && (
+          <div className="mt-10 flex justify-center">
+            <AddButton onClick={handleAdd}>Add FAQ</AddButton>
+          </div>
+        )}
+      </Container>
     </section>
   );
 };

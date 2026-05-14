@@ -4,6 +4,7 @@
 import { SectionProps } from "../../types";
 import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
 import CtaLink from "@/components/shared/CtaLinkModal";
+import Container from "@/components/shared/Container";
 
 type PricingPlan = {
   name: string;
@@ -27,8 +28,11 @@ export const PricingSection = ({
   const isEven = position % 2 === 0;
 
   const sectionBg = isEven ? "var(--qs-bg)" : "var(--qs-bg-alt)";
-
   const cardBg = isEven ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.05)";
+
+  // ─────────────────────────────────────────────
+  // HANDLERS
+  // ─────────────────────────────────────────────
 
   const handleAdd = () => {
     onUpdate("plans", [
@@ -49,7 +53,6 @@ export const PricingSection = ({
     onUpdate("plans", next);
   };
 
-  // add a feature to a plan at index i
   const handleAddFeature = (planIdx: number) => {
     const nextPlans = [...plans];
     const plan = { ...nextPlans[planIdx] };
@@ -59,7 +62,6 @@ export const PricingSection = ({
     onUpdate("plans", nextPlans);
   };
 
-  // delete a feature at (planIdx, featureIdx)
   const handleDeleteFeature = (planIdx: number, featureIdx: number) => {
     const nextPlans = [...plans];
     const plan = { ...nextPlans[planIdx] };
@@ -69,12 +71,11 @@ export const PricingSection = ({
     onUpdate("plans", nextPlans);
   };
 
-  // Set the given plan (by index) as the only featured/most-popular plan
   const handleSetFeatured = (planIdx: number) => {
     const nextPlans = plans.map((plan, i) =>
       i === planIdx
         ? { ...plan, featured: true }
-        : { ...plan, featured: false }
+        : { ...plan, featured: false },
     );
     onUpdate("plans", nextPlans);
   };
@@ -90,9 +91,7 @@ export const PricingSection = ({
         style={{ color: "var(--qs-text)" }}
         contentEditable={isEditor}
         suppressContentEditableWarning
-        onBlur={(e) =>
-          onUpdate("heading", e.currentTarget.textContent?.trim())
-        }
+        onBlur={(e) => onUpdate("heading", e.currentTarget.textContent?.trim())}
       >
         {content.heading ?? "Pricing Plans"}
       </h2>
@@ -111,22 +110,22 @@ export const PricingSection = ({
     </div>
   );
 
+
+
   // ─────────────────────────────────────────────
-  // HIGHLIGHT VARIANT
+  // HIGHLIGHT TOP VARIANT
   // ─────────────────────────────────────────────
 
   if (variant === "highlight-top") {
-    // Find if any plan is explicitly featured
     const anyFeatured = plans.some((plan) => plan.featured);
 
     return (
       <section className="py-24" style={{ background: sectionBg }} id="pricing">
-        <div className="max-w-6xl mx-auto px-4">
+        <Container>
           <Header />
 
           <div className="grid gap-8 md:grid-cols-3">
             {plans.map((plan, i) => {
-              // Use explicit featured field if any present, otherwise default to 2nd plan
               const featured = anyFeatured ? !!plan.featured : i === 1;
 
               return (
@@ -143,13 +142,13 @@ export const PricingSection = ({
                       : "1px solid var(--qs-border)",
                   }}
                 >
+                  {/* Editor Controls */}
                   {isEditor && (
                     <div className="absolute top-4 right-4 z-20 flex gap-1">
                       <Xbutton onClick={() => handleDelete(i)} color="red" />
                       <button
                         type="button"
-                        className={`ml-2 px-2 py-1 text-xs rounded font-bold border-2`}
-                   
+                        className="ml-2 px-2 py-1 text-xs rounded font-bold border-2"
                         style={{ marginTop: -2, marginLeft: 8 }}
                         title="Mark as Most Popular"
                         onClick={() => handleSetFeatured(i)}
@@ -210,9 +209,11 @@ export const PricingSection = ({
 
                   <ul className="mt-8 space-y-3">
                     {(plan.features || []).map((feature, j) => (
-                      <li key={j} className="flex items-start gap-3 text-sm group">
+                      <li
+                        key={j}
+                        className="flex items-start gap-3 text-sm group"
+                      >
                         <span>✓</span>
-
                         <span
                           contentEditable={isEditor}
                           suppressContentEditableWarning
@@ -231,22 +232,19 @@ export const PricingSection = ({
                             className="ml-2 text-red-600 opacity-70 hover:opacity-100"
                             style={{ marginTop: -2 }}
                             onClick={() => handleDeleteFeature(i, j)}
-                            title="Delete feature"
                           >
-                            <svg width={16} height={16} viewBox="0 0 16 16">
-                              <path d="M3.5 4.5l9 9m0-9l-9 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            </svg>
+                            ✕
                           </button>
                         )}
                       </li>
                     ))}
+
                     {isEditor && (
                       <li>
                         <button
                           type="button"
                           className="text-xs px-2 py-1 rounded bg-white/10 border border-dashed border-white/30 hover:bg-white/20 hover:border-white/50"
                           onClick={() => handleAddFeature(i)}
-                          style={{marginTop: "4px"}}
                         >
                           + Add feature
                         </button>
@@ -259,9 +257,7 @@ export const PricingSection = ({
                       isEditor={isEditor}
                       label={plan.cta ?? "Choose Plan"}
                       linkConfig={plan.ctaLink}
-                      onLabelChange={(v) =>
-                        onUpdate(`plans.${i}.cta`, v)
-                      }
+                      onLabelChange={(v) => onUpdate(`plans.${i}.cta`, v)}
                       onLinkChange={(cfg) =>
                         onUpdate(`plans.${i}.ctaLink`, cfg)
                       }
@@ -282,7 +278,7 @@ export const PricingSection = ({
               <AddButton onClick={handleAdd}>Add Pricing Plan</AddButton>
             </div>
           )}
-        </div>
+        </Container>
       </section>
     );
   }
@@ -292,17 +288,17 @@ export const PricingSection = ({
   // ─────────────────────────────────────────────
 
   if (variant === "compact") {
-    // Find if any plan is explicitly featured
     const anyFeatured = plans.some((plan) => plan.featured);
 
     return (
       <section className="py-20" style={{ background: sectionBg }} id="pricing">
-        <div className="max-w-6xl mx-auto px-4">
+        <Container>
           <Header />
 
           <div className="grid gap-5 md:grid-cols-3">
             {plans.map((plan, i) => {
               const featured = anyFeatured ? !!plan.featured : i === 1;
+
               return (
                 <div
                   key={i}
@@ -314,6 +310,7 @@ export const PricingSection = ({
                     border: "1px solid var(--qs-border)",
                   }}
                 >
+                  {/* Editor Controls */}
                   {isEditor && (
                     <div className="absolute top-4 right-4 flex gap-1">
                       <Xbutton onClick={() => handleDelete(i)} color="red" />
@@ -324,8 +321,6 @@ export const PricingSection = ({
                             ? "bg-white/40 text-black/90 border border-white/60"
                             : "bg-white/20 text-white border border-white/20 hover:bg-white/30 hover:border-white/60"
                         }`}
-                        style={{ marginTop: -2, marginLeft: 8 }}
-                        title="Mark as Most Popular"
                         onClick={() => handleSetFeatured(i)}
                         disabled={featured}
                       >
@@ -394,24 +389,20 @@ export const PricingSection = ({
                           <button
                             type="button"
                             className="ml-2 text-red-600 opacity-70 hover:opacity-100"
-                            style={{ marginTop: -2 }}
                             onClick={() => handleDeleteFeature(i, j)}
-                            title="Delete feature"
                           >
-                            <svg width={16} height={16} viewBox="0 0 16 16">
-                              <path d="M3.5 4.5l9 9m0-9l-9 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                            </svg>
+                            ✕
                           </button>
                         )}
                       </li>
                     ))}
+
                     {isEditor && (
                       <li>
                         <button
                           type="button"
                           className="text-xs px-2 py-1 rounded bg-white/10 border border-dashed border-white/30 hover:bg-white/20 hover:border-white/50"
                           onClick={() => handleAddFeature(i)}
-                          style={{marginTop: "4px"}}
                         >
                           + Add feature
                         </button>
@@ -445,7 +436,7 @@ export const PricingSection = ({
               <AddButton onClick={handleAdd}>Add Pricing Plan</AddButton>
             </div>
           )}
-        </div>
+        </Container>
       </section>
     );
   }
@@ -456,7 +447,7 @@ export const PricingSection = ({
 
   return (
     <section className="py-24" style={{ background: sectionBg }} id="pricing">
-      <div className="max-w-7xl mx-auto px-4">
+      <Container>
         <Header />
 
         <div className="grid gap-8 md:grid-cols-3">
@@ -469,32 +460,6 @@ export const PricingSection = ({
                 border: "1px solid var(--qs-border)",
               }}
             >
-              {isEditor && (
-                <div className="absolute top-4 right-4 flex gap-1">
-                  <Xbutton onClick={() => handleDelete(i)} color="red" />
-                  <button
-                    type="button"
-                    className={`ml-2 px-2 py-1 text-xs rounded font-bold ${
-                      plan.featured
-                        ? "bg-white/40 text-black/90 border border-white/60"
-                        : "bg-white/20 text-white border border-white/20 hover:bg-white/30 hover:border-white/60"
-                    }`}
-                    style={{ marginTop: -2, marginLeft: 8 }}
-                    title="Mark as Most Popular"
-                    onClick={() => handleSetFeatured(i)}
-                    disabled={plan.featured}
-                  >
-                    {plan.featured ? "Most Popular" : "Set Most Popular"}
-                  </button>
-                </div>
-              )}
-
-              {plan.featured && (
-                <div className="mb-5 inline-flex rounded-full bg-white/20 px-4 py-1 text-xs font-bold uppercase tracking-wider">
-                  Most Popular
-                </div>
-              )}
-
               <h3
                 className="text-2xl font-black"
                 style={{ color: "var(--qs-text)" }}
@@ -564,24 +529,20 @@ export const PricingSection = ({
                       <button
                         type="button"
                         className="ml-2 text-red-600 opacity-70 hover:opacity-100"
-                        style={{ marginTop: -2 }}
                         onClick={() => handleDeleteFeature(i, j)}
-                        title="Delete feature"
                       >
-                        <svg width={16} height={16} viewBox="0 0 16 16">
-                          <path d="M3.5 4.5l9 9m0-9l-9 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                        </svg>
+                        ✕
                       </button>
                     )}
                   </li>
                 ))}
+
                 {isEditor && (
                   <li>
                     <button
                       type="button"
                       className="text-xs px-2 py-1 rounded bg-white/10 border border-dashed border-white/30 hover:bg-white/20 hover:border-white/50"
                       onClick={() => handleAddFeature(i)}
-                      style={{marginTop: "4px"}}
                     >
                       + Add feature
                     </button>
@@ -595,9 +556,7 @@ export const PricingSection = ({
                   label={plan.cta ?? "Choose Plan"}
                   linkConfig={plan.ctaLink}
                   onLabelChange={(v) => onUpdate(`plans.${i}.cta`, v)}
-                  onLinkChange={(cfg) =>
-                    onUpdate(`plans.${i}.ctaLink`, cfg)
-                  }
+                  onLinkChange={(cfg) => onUpdate(`plans.${i}.ctaLink`, cfg)}
                   className="w-full rounded-2xl px-6 py-4 text-center font-bold"
                   style={{
                     background: "var(--qs-primary)",
@@ -614,7 +573,7 @@ export const PricingSection = ({
             <AddButton onClick={handleAdd}>Add Pricing Plan</AddButton>
           </div>
         )}
-      </div>
+      </Container>
     </section>
   );
 };

@@ -49,35 +49,6 @@ function calcStats(sites: Site[], siteLimit: number): DashboardStats {
   };
 }
 
-async function deleteCloudinaryImages(content: Record<string, unknown>) {
-  const ids: string[] = [];
-
-  function walk(obj: unknown) {
-    if (!obj || typeof obj !== "object") return;
-    for (const [key, value] of Object.entries(obj as Record<string, unknown>)) {
-      if (key.endsWith("PId") && typeof value === "string" && value) {
-        ids.push(value);
-      } else {
-        walk(value);
-      }
-    }
-  }
-
-  walk(content);
-
-  if (ids.length === 0) return;
-
-  await Promise.allSettled(
-    ids.map((publicId) =>
-      fetch("/api/imageDelete", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ publicId }),
-      }),
-    ),
-  );
-}
-
 async function apiFetch(
   url: string,
   method: string,
@@ -148,18 +119,11 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
 
   // ── Remove site ─────────────────────────────────────────────────────────────
 
-  removeSite: async (siteId, token) => {
-    const site = get().sites.find((s) => s.id === siteId);
-
-    // Delete Cloudinary images first (best-effort)
-    if (site?.content) {
-      await deleteCloudinaryImages(site.content as Record<string, unknown>);
-    }
-
-    await apiFetch(`/api/sites/${siteId}`, "DELETE", token);
+  removeSite: async (slug, token) => {
+    await apiFetch(`/api/sites/${slug}`, "DELETE", token);
 
     set((state) => {
-      const sites = state.sites.filter((s) => s.id !== siteId);
+      const sites = state.sites.filter((s) => s.id !== slug);
       return {
         sites,
         stats: calcStats(sites, state.siteLimit),

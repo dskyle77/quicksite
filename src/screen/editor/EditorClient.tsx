@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { ReactNode } from "react";
 import { Loader2, Save, ArrowLeft, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/useAuth";

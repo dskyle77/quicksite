@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // @/lib/templates.ts
 
-import { template1 } from "@/components/siteTemplates/landing-page1/index";
-import { landingPage2 } from "@/components/siteTemplates/landing-page2";
-import { portfolio1 } from "@/components/siteTemplates/portfolio1";
-import { portfolio2 } from "@/components/siteTemplates/portfolio2";
 import { templateBuilder } from "@/components/siteTemplates/templateBuilder"; // ← new
+import { portfolio3 } from "@/components/siteTemplates/portfolio3"; // ← new
 
 /* -------------- TEMPLATES TYPES ---------------- */
 export interface TemplateProps {
@@ -19,7 +16,7 @@ export interface TemplateProps {
 export interface TemplateComponentProps {
   isEditor: boolean;
   content: AnyObject;
-  onUpdate: (path: string, value: any) => void;
+  onUpdate: (path: string | null, value: any) => void;
   slugs?: Record<string, string>;
 }
 /* ---------------- TYPES ---------------- */
@@ -29,11 +26,8 @@ type AnyObject = Record<string, any>;
 /* ---------------- REGISTRY ---------------- */
 
 export const templatesRegistry = [
-  template1,
-  landingPage2,
-  portfolio1,
-  portfolio2,
-  templateBuilder, // ← new
+  portfolio3,
+  templateBuilder,
 ];
 
 export const templatesCategories = Array.from(

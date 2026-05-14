@@ -4,6 +4,7 @@
 import { SectionProps } from "../../types";
 import TemplateImage from "@/components/shared/TemplateImage";
 import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
+import Container from "@/components/shared/Container";
 
 type ProjectItem = {
   title: string;
@@ -28,9 +29,7 @@ export const ProjectsSection = ({
 
   const isEven = position % 2 === 0;
 
-  const sectionBg = isEven
-    ? "linear-gradient(135deg, var(--qs-bg) 0%, var(--qs-bg-alt) 100%)"
-    : "linear-gradient(135deg, var(--qs-bg-alt) 0%, var(--qs-bg) 100%)";
+  const sectionBg = isEven ? "var(--qs-bg)" : "var(--qs-bg-alt)";
 
   const cardBg = isEven ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.05)";
 
@@ -59,14 +58,12 @@ export const ProjectsSection = ({
     ]);
   };
 
-  const updateProject = (idx: number, key: keyof ProjectItem, value: any) => {
+  const updateProject = (idx: number, changes: Partial<ProjectItem>) => {
     const next = [...items];
-
     next[idx] = {
       ...next[idx],
-      [key]: value,
+      ...changes,
     };
-
     updateProjects(next);
   };
 
@@ -77,25 +74,22 @@ export const ProjectsSection = ({
         style={{ color: "var(--qs-text)" }}
         contentEditable={isEditor}
         suppressContentEditableWarning
-        onBlur={(e) =>
-          onUpdate("heading", e.currentTarget.textContent?.trim())
-        }
+        onBlur={(e) => onUpdate("heading", e.currentTarget.textContent?.trim())}
       >
         {heading ?? "Projects"}
       </h2>
 
-        <p
-          className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed"
-          style={{ color: "var(--qs-text-muted)" }}
-          contentEditable={isEditor}
-          suppressContentEditableWarning
-          onBlur={(e) =>
-            onUpdate("subheading", e.currentTarget.textContent?.trim())
-          }
-        >
-          {subheading ?? "Add a short subheading here"}
-     
-        </p>
+      <p
+        className="mx-auto mt-5 max-w-2xl text-lg leading-relaxed"
+        style={{ color: "var(--qs-text-muted)" }}
+        contentEditable={isEditor}
+        suppressContentEditableWarning
+        onBlur={(e) =>
+          onUpdate("subheading", e.currentTarget.textContent?.trim())
+        }
+      >
+        {subheading ?? "Add a short subheading here"}
+      </p>
     </div>
   );
 
@@ -105,12 +99,8 @@ export const ProjectsSection = ({
 
   if (variant === "list") {
     return (
-      <section
-        className="py-24"
-        style={{ background: sectionBg }}
-        id="projects"
-      >
-        <div className="mx-auto max-w-6xl px-4">
+      <section style={{ background: sectionBg }} id="projects">
+        <Container className="py-24">
           <SectionHeader />
 
           <div className="space-y-14">
@@ -135,8 +125,8 @@ export const ProjectsSection = ({
                     publicId={proj.imagePId}
                     isEditor={isEditor}
                     onImageChange={(url, pId) => {
-                      updateProject(i, "image", url);
-                      updateProject(i, "imagePId", pId);
+                      // Update both image and imagePId at once
+                      updateProject(i, { image: url, imagePId: pId });
                     }}
                   />
                 </div>
@@ -148,11 +138,9 @@ export const ProjectsSection = ({
                     contentEditable={isEditor}
                     suppressContentEditableWarning
                     onBlur={(e) =>
-                      updateProject(
-                        i,
-                        "title",
-                        e.currentTarget.textContent?.trim(),
-                      )
+                      updateProject(i, {
+                        title: e.currentTarget.textContent?.trim(),
+                      })
                     }
                   >
                     {proj.title}
@@ -164,11 +152,9 @@ export const ProjectsSection = ({
                     contentEditable={isEditor}
                     suppressContentEditableWarning
                     onBlur={(e) =>
-                      updateProject(
-                        i,
-                        "desc",
-                        e.currentTarget.textContent?.trim(),
-                      )
+                      updateProject(i, {
+                        desc: e.currentTarget.textContent?.trim(),
+                      })
                     }
                   >
                     {proj.desc}
@@ -192,7 +178,7 @@ export const ProjectsSection = ({
                               const next = [...(proj.tags || [])];
                               next[j] =
                                 e.currentTarget.textContent?.trim() ?? tag;
-                              updateProject(i, "tags", next);
+                              updateProject(i, { tags: next });
                             }}
                           >
                             {tag}
@@ -202,7 +188,7 @@ export const ProjectsSection = ({
                               onClick={() => {
                                 const next = [...(proj.tags || [])];
                                 next.splice(j, 1);
-                                updateProject(i, "tags", next);
+                                updateProject(i, { tags: next });
                               }}
                               color="red"
                             />
@@ -213,10 +199,9 @@ export const ProjectsSection = ({
                       {isEditor && (
                         <AddButton
                           onClick={() => {
-                            updateProject(i, "tags", [
-                              ...(proj.tags || []),
-                              "New Tag",
-                            ]);
+                            updateProject(i, {
+                              tags: [...(proj.tags || []), "New Tag"],
+                            });
                           }}
                         >
                           + Tag
@@ -229,10 +214,9 @@ export const ProjectsSection = ({
                     <div className="mt-6 flex flex-wrap gap-3">
                       <AddButton
                         onClick={() => {
-                          updateProject(i, "tags", [
-                            ...(proj.tags || []),
-                            "New Tag",
-                          ]);
+                          updateProject(i, {
+                            tags: [...(proj.tags || []), "New Tag"],
+                          });
                         }}
                       >
                         + Tag
@@ -249,7 +233,7 @@ export const ProjectsSection = ({
               <AddButton onClick={handleAdd}>Add Project</AddButton>
             </div>
           )}
-        </div>
+        </Container>
       </section>
     );
   }
@@ -260,12 +244,8 @@ export const ProjectsSection = ({
 
   if (variant === "card-grid") {
     return (
-      <section
-        className="py-24"
-        style={{ background: sectionBg }}
-        id="projects"
-      >
-        <div className="mx-auto max-w-7xl px-4">
+      <section style={{ background: sectionBg }} id="projects">
+        <Container className="py-24">
           <SectionHeader />
 
           <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
@@ -290,8 +270,8 @@ export const ProjectsSection = ({
                     publicId={proj.imagePId}
                     isEditor={isEditor}
                     onImageChange={(url, pId) => {
-                      updateProject(i, "image", url);
-                      updateProject(i, "imagePId", pId);
+                      // Update both image and imagePId at once
+                      updateProject(i, { image: url, imagePId: pId });
                     }}
                   />
                 </div>
@@ -303,11 +283,9 @@ export const ProjectsSection = ({
                     contentEditable={isEditor}
                     suppressContentEditableWarning
                     onBlur={(e) =>
-                      updateProject(
-                        i,
-                        "title",
-                        e.currentTarget.textContent?.trim(),
-                      )
+                      updateProject(i, {
+                        title: e.currentTarget.textContent?.trim(),
+                      })
                     }
                   >
                     {proj.title}
@@ -319,11 +297,9 @@ export const ProjectsSection = ({
                     contentEditable={isEditor}
                     suppressContentEditableWarning
                     onBlur={(e) =>
-                      updateProject(
-                        i,
-                        "desc",
-                        e.currentTarget.textContent?.trim(),
-                      )
+                      updateProject(i, {
+                        desc: e.currentTarget.textContent?.trim(),
+                      })
                     }
                   >
                     {proj.desc}
@@ -344,11 +320,9 @@ export const ProjectsSection = ({
                             suppressContentEditableWarning
                             onBlur={(e) => {
                               const next = [...(proj.tags || [])];
-
                               next[j] =
                                 e.currentTarget.textContent?.trim() ?? tag;
-
-                              updateProject(i, "tags", next);
+                              updateProject(i, { tags: next });
                             }}
                           >
                             {tag}
@@ -358,10 +332,8 @@ export const ProjectsSection = ({
                             <Xbutton
                               onClick={() => {
                                 const next = [...(proj.tags || [])];
-
                                 next.splice(j, 1);
-
-                                updateProject(i, "tags", next);
+                                updateProject(i, { tags: next });
                               }}
                               color="red"
                             />
@@ -372,10 +344,9 @@ export const ProjectsSection = ({
                       {isEditor && (
                         <AddButton
                           onClick={() => {
-                            updateProject(i, "tags", [
-                              ...(proj.tags || []),
-                              "New Tag",
-                            ]);
+                            updateProject(i, {
+                              tags: [...(proj.tags || []), "New Tag"],
+                            });
                           }}
                         >
                           + Tag
@@ -393,7 +364,7 @@ export const ProjectsSection = ({
               <AddButton onClick={handleAdd}>Add Project</AddButton>
             </div>
           )}
-        </div>
+        </Container>
       </section>
     );
   }
@@ -403,15 +374,15 @@ export const ProjectsSection = ({
   // ─────────────────────────────────────────────
 
   return (
-    <section className="py-24" style={{ background: sectionBg }} id="projects">
-      <div className="mx-auto max-w-7xl px-4">
+    <section style={{ background: sectionBg }} id="projects">
+      <Container className="py-24">
         <SectionHeader />
 
-        <div className="columns-1 gap-8 space-y-8 md:columns-2 xl:columns-3">
+        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
           {items.map((proj, i) => (
             <div
               key={i}
-              className="relative mb-8 break-inside-avoid overflow-hidden rounded-[32px] border"
+              className="relative flex flex-col overflow-hidden rounded-[32px] border transition-shadow hover:shadow-xl"
               style={{
                 background: cardBg,
                 border: "1px solid var(--qs-border)",
@@ -423,48 +394,100 @@ export const ProjectsSection = ({
                 </div>
               )}
 
-              <TemplateImage
-                source={proj.image}
-                publicId={proj.imagePId}
-                isEditor={isEditor}
-                onImageChange={(url, pId) => {
-                  updateProject(i, "image", url);
-                  updateProject(i, "imagePId", pId);
-                }}
-              />
+              <div className="h-52 w-full overflow-hidden">
+                <TemplateImage
+                  source={proj.image}
+                  publicId={proj.imagePId}
+                  isEditor={isEditor}
+                  onImageChange={(url, pId) => {
+                    // Update both image and imagePId at once
+                    updateProject(i, { image: url, imagePId: pId });
+                  }}
+                />
+              </div>
 
-              <div className="p-6">
-                <h3
-                  className="text-2xl font-bold"
-                  style={{ color: "var(--qs-text)" }}
-                  contentEditable={isEditor}
-                  suppressContentEditableWarning
-                  onBlur={(e) =>
-                    updateProject(
-                      i,
-                      "title",
-                      e.currentTarget.textContent?.trim(),
-                    )
-                  }
-                >
-                  {proj.title}
-                </h3>
+              <div className="flex flex-1 flex-col justify-between p-6">
+                <div>
+                  <h3
+                    className="text-xl font-extrabold"
+                    style={{ color: "var(--qs-text)" }}
+                    contentEditable={isEditor}
+                    suppressContentEditableWarning
+                    onBlur={(e) =>
+                      updateProject(i, {
+                        title: e.currentTarget.textContent?.trim(),
+                      })
+                    }
+                  >
+                    {proj.title}
+                  </h3>
 
-                <p
-                  className="mt-4 text-sm leading-7"
-                  style={{ color: "var(--qs-text-muted)" }}
-                  contentEditable={isEditor}
-                  suppressContentEditableWarning
-                  onBlur={(e) =>
-                    updateProject(
-                      i,
-                      "desc",
-                      e.currentTarget.textContent?.trim(),
-                    )
-                  }
-                >
-                  {proj.desc}
-                </p>
+                  <p
+                    className="mt-2 text-sm leading-6"
+                    style={{ color: "var(--qs-text-muted)" }}
+                    contentEditable={isEditor}
+                    suppressContentEditableWarning
+                    onBlur={(e) =>
+                      updateProject(i, {
+                        desc: e.currentTarget.textContent?.trim(),
+                      })
+                    }
+                  >
+                    {proj.desc}
+                  </p>
+
+                  {!!proj.tags?.length && (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {proj.tags.map((tag, j) => (
+                        <span
+                          key={j}
+                          className="inline-block rounded-full bg-[var(--qs-primary)] px-3 py-1 text-xs font-semibold text-white"
+                          style={{
+                            background: "var(--qs-primary)",
+                            color: "var(--qs-primary-fg)",
+                          }}
+                          contentEditable={isEditor}
+                          suppressContentEditableWarning
+                          onBlur={(e) => {
+                            const editedTag = e.currentTarget.textContent?.trim() ?? "";
+                            const nextTags = [...(proj.tags || [])];
+                            nextTags[j] = editedTag;
+                            updateProject(i, { tags: nextTags });
+                          }}
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {isEditor && (
+                        <AddButton
+                          onClick={() => {
+                            updateProject(i, {
+                              tags: [...(proj.tags || []), "New Tag"],
+                            });
+                          }}
+                          className="px-2 py-1 text-xs"
+                        >
+                          + Tag
+                        </AddButton>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {proj.previewLink && (
+                  <a
+                    href={proj.previewLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-5 inline-block rounded-md bg-[var(--qs-secondary)] px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-[var(--qs-primary)]"
+                    style={{
+                      background: "var(--qs-secondary)",
+                      color: "var(--qs-secondary-fg)",
+                    }}
+                  >
+                    View Project
+                  </a>
+                )}
               </div>
             </div>
           ))}
@@ -475,7 +498,7 @@ export const ProjectsSection = ({
             <AddButton onClick={handleAdd}>Add Project</AddButton>
           </div>
         )}
-      </div>
+      </Container>
     </section>
   );
 };

@@ -3,10 +3,11 @@
 // Register new footer variants here. Key must match FooterVariantKey in types.ts.
 
 import {
-  TemplateComponentProps,
   VariantRegistry,
   FooterVariantKey,
 } from "../types";
+import { TemplateComponentProps } from "@/lib/templates";
+
 import Branding from "@/components/shared/Branding";
 
 // ─── 1. Classic ───────────────────────────────────────────────────────────────

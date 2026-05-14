@@ -10,13 +10,12 @@ export async function PATCH(
   if (!caller?.uid)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const callerDoc = await adminDb.collection("users").doc(caller.uid).get();
-  if (!callerDoc.data()?.isAdmin) {
+  if (!caller.isAdmin)
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-  }
 
   const { plan } = await req.json();
-  const validPlans = ["free", "basic", "growth", "pro"];
+
+  const validPlans = ["free", "growth", "pro"];
   if (!validPlans.includes(plan)) {
     return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
   }

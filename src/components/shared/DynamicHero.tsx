@@ -13,7 +13,7 @@ export default function DynamicHero({
   renderText,
   defaultType = "side",
 }: DynamicHeroProps) {
-  const heroType = content?.hero?.type ?? defaultType;
+  const heroType = content?.type ?? defaultType;
 
   return (
     <section className="relative">
@@ -23,7 +23,7 @@ export default function DynamicHero({
           <button
             type="button"
             onClick={() =>
-              onUpdate("hero.type", heroType === "side" ? "background" : "side")
+              onUpdate("type", heroType === "side" ? "background" : "side")
             }
             className="text-[10px] bg-zinc-900/80 backdrop-blur text-zinc-300 px-3 py-1.5 rounded-full border border-zinc-700 hover:text-white"
           >
@@ -34,11 +34,11 @@ export default function DynamicHero({
 
       {heroType === "background" ? (
         <TemplateImageBackground
-          source={content?.hero?.image1}
-          publicId={content?.hero?.image1PId}
+          source={content?.image1}
+          publicId={content?.image1PId}
           isEditor={isEditor}
           onImageChange={(url, pId) =>
-            onUpdate("hero", { ...content.hero, image1: url, image1PId: pId })
+            onUpdate(null, { ...content, image1: url, image1PId: pId })
           }
         >
           <div className="mx-auto max-w-6xl px-4 py-24">
@@ -51,12 +51,12 @@ export default function DynamicHero({
             {renderText("side")}
             <div className="relative">
               <TemplateImage
-                source={content?.hero?.image1}
-                publicId={content?.hero?.image1PId}
+                source={content?.image1}
+                publicId={content?.image1PId}
                 isEditor={isEditor}
                 onImageChange={(url, pId) =>
-                  onUpdate("hero", {
-                    ...content.hero,
+                  onUpdate(null, {
+                    ...content,
                     image1: url,
                     image1PId: pId,
                   })

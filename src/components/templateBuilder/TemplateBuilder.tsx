@@ -1,11 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
-import {
-  TemplateComponentProps,
-  BuilderConfig,
-  SectionVariantKey,
-} from "./types";
-import { BuilderSidebar } from "./BuilderSidebar"; // Import the sidebar we created
+import { TemplateComponentProps } from "@/lib/templates";
+import { BuilderConfig, SectionVariantKey } from "./types";
+import { BuilderSidebar } from "./BuilderSidebar";
 
 // Variant Registries
 import { NavbarVariants } from "./variants/NavbarVariants";
@@ -18,37 +15,60 @@ export default function TemplateBuilder({
   content,
   onUpdate,
   slugs,
-}: TemplateComponentProps) {
-  const builderConfig = content.builderConfig;
-  const [config, setConfig] = useState<BuilderConfig>(builderConfig);
+  customize,
+}: Omit<TemplateComponentProps, "onUpdate"> & {
+  onUpdate: (path: string, value: any) => void;
+  customize: boolean;
+}) {
+  // The config constant always points to the up-to-date config object.
+  const config: BuilderConfig = content.builderConfig || {};
 
+  // Only create sidebar and react state if customize is true.
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  // If not customizing, config is static. Otherwise we allow interactive update.
+  const [internalConfig, setInternalConfig] = useState<BuilderConfig>(config);
+
+  // Pick the config source: if customize, use state, else use just config from props.
+  const effectiveConfig = customize ? internalConfig : config;
 
   const onClose = () => {
     setSidebarOpen(false);
   };
+
   const handleConfigChange = (newConfig: BuilderConfig) => {
-    setConfig(newConfig);
+    setInternalConfig(newConfig);
     onUpdate("builderConfig", newConfig);
   };
 
-  const Navbar = NavbarVariants[config.navbar] ?? NavbarVariants["classic"];
-  const Hero = HeroVariants[config.hero] ?? HeroVariants["dynamic"];
-  const Footer = FooterVariants[config.footer] ?? FooterVariants["classic"];
+  // -- Handle Updates: Provides sectioned update paths to subcomponents --
+  const makeHandleUpdates = (sectionPrefix: string) => {
+    return (path: string | null, val: any) => {
+      if (!path) {
+        onUpdate(sectionPrefix, val);
+      } else {
+        onUpdate(`${sectionPrefix}.${path}`, val);
+      }
+    };
+  };
 
-  const enabledSections = config.sections.filter((s) => s.enabled);
+  const Navbar = NavbarVariants[effectiveConfig.navbar] ?? NavbarVariants["classic"];
+  const Hero = HeroVariants[effectiveConfig.hero] ?? HeroVariants["dynamic"];
+  const Footer = FooterVariants[effectiveConfig.footer] ?? FooterVariants["classic"];
+
+  const enabledSections = (effectiveConfig.sections || []).filter((s) => s.enabled);
 
   return (
     <div
       className="flex"
       style={{
-        height: "calc(100vh - 4rem)", 
+        height: "calc(100vh - 4rem)",
       }}
     >
-      {isEditor && sidebarOpen && (
+      {customize && isEditor && sidebarOpen && (
         <aside className="w-80 h-full overflow-y-auto overflow-x-hidden border-r">
           <BuilderSidebar
-            config={config}
+            config={internalConfig}
             onChange={handleConfigChange}
             open={sidebarOpen}
             onClose={onClose}
@@ -57,13 +77,13 @@ export default function TemplateBuilder({
       )}
 
       <div
-        className={`flex-1 ${isEditor ? "bg-gray-100 p-2" : ""}`}
+        className={`flex-1 ${customize && isEditor ? "bg-gray-100 p-2" : ""}`}
         style={{
           height: "100%",
           overflowY: "auto",
         }}
       >
-        {isEditor && !sidebarOpen && (
+        {customize && isEditor && !sidebarOpen && (
           <button
             className="fixed top-18 left-4 z-100 bg-white border rounded-full shadow-md px-4 py-2 text-xs font-semibold flex items-center gap-2 hover:bg-gray-50 transition"
             style={{
@@ -93,19 +113,23 @@ export default function TemplateBuilder({
         )}
 
         <div
-          className={`${isEditor ? "max-w-7xl mx-auto shadow-2xl bg-white min-h-full" : ""}`}
+          className={`${
+            customize && isEditor
+              ? "max-w-7xl mx-auto shadow-2xl bg-white min-h-full"
+              : ""
+          }`}
         >
           <Navbar
             isEditor={isEditor}
             content={content.navbar || {}}
-            onUpdate={(path, val) => onUpdate(`navbar.${path}`, val)}
+            onUpdate={makeHandleUpdates("navbar")}
             slugs={slugs}
           />
 
           <Hero
             isEditor={isEditor}
             content={content.hero || {}}
-            onUpdate={(path, val) => onUpdate(`hero.${path}`, val)}
+            onUpdate={makeHandleUpdates("hero")}
             slugs={slugs}
           />
 
@@ -124,11 +148,9 @@ export default function TemplateBuilder({
                   variant={sec.variant as SectionVariantKey}
                   isEditor={isEditor}
                   content={sectionContent}
-                  onUpdate={(path, val) =>
-                    onUpdate(`${contentKey}.${path}`, val)
-                  }
+                  onUpdate={makeHandleUpdates(contentKey)}
                   slugs={slugs}
-                  position={i}
+                  position={i + 1}
                 />
               );
             })}
@@ -137,7 +159,7 @@ export default function TemplateBuilder({
           <Footer
             isEditor={isEditor}
             content={content.footer || {}}
-            onUpdate={(path, val) => onUpdate(`footer.${path}`, val)}
+            onUpdate={makeHandleUpdates("footer")}
             slugs={slugs}
           />
         </div>

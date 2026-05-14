@@ -3,9 +3,9 @@
 
 import type { TemplateProps } from "@/lib/templates";
 import TemplateBuilder from "@/components/templateBuilder/TemplateBuilder";
-import { templateBuilderContent } from "./content";
+import { portfolio3Content } from "./content";
 
-function TemplateBuilderTemplate({
+function Template({
   isEditor,
   content,
   onUpdate,
@@ -29,7 +29,7 @@ function TemplateBuilderTemplate({
         content={content}
         onUpdate={handleUpdate}
         slugs={slugs}
-        customize={true}
+        customize={false}
       />
     </div>
   );
@@ -37,7 +37,7 @@ function TemplateBuilderTemplate({
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 
-export const templateBuilder = {
-  ...templateBuilderContent,
-  template: TemplateBuilderTemplate,
+export const portfolio3 = {
+  ...portfolio3Content,
+  template: Template,
 };
