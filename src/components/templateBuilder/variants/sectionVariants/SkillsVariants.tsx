@@ -9,6 +9,8 @@ export const SkillsSection = ({
   content,
   onUpdate,
   position,
+  anchorName,
+  path
 }: SectionProps) => {
   // Use even/odd position to set section background
   const isEven = position % 2 === 0;
@@ -20,7 +22,7 @@ export const SkillsSection = ({
   // ── Variant: "grid" ──
   if (variant === "grid") {
     return (
-      <section id="skills" style={{ background: sectionBg }}>
+      <section id={anchorName} style={{ background: sectionBg }}>
         <Container className="py-16">
           <div className="mb-12 text-center">
             <h3
@@ -146,7 +148,7 @@ export const SkillsSection = ({
   if (variant === "tags") {
     return (
       <section
-        id="skills"
+        id={anchorName}
         style={{ background: sectionBg }}
         className="relative"
       >
@@ -154,7 +156,7 @@ export const SkillsSection = ({
           {/* Header */}
           <div className="mb-12 text-center max-w-2xl mx-auto">
             <h3
-              className="text-3xl md:text-4xl font-bold tracking-tight"
+              className="text-3xl @md:text-4xl font-bold tracking-tight"
               contentEditable={isEditor}
               suppressContentEditableWarning
               onBlur={(e) =>
@@ -165,7 +167,7 @@ export const SkillsSection = ({
             </h3>
 
             <p
-              className="mt-3 text-sm md:text-base opacity-70 leading-relaxed"
+              className="mt-3 text-sm @md:text-base opacity-70 leading-relaxed"
               style={{ color: "var(--qs-text-muted)" }}
               contentEditable={isEditor}
               suppressContentEditableWarning
@@ -178,7 +180,7 @@ export const SkillsSection = ({
           </div>
 
           {/* Tags */}
-          <div className="flex flex-wrap justify-center gap-3 md:gap-4">
+          <div className="flex flex-wrap justify-center gap-3 @md:gap-4">
             {tags.map((tag: string, i: number) => (
               <div key={i} className="group relative">
                 <span
@@ -241,12 +243,12 @@ export const SkillsSection = ({
 
   // ── Variant: "icons-list" ──
   return (
-    <section id="skills" style={{ background: sectionBg }}>
+    <section id={anchorName} style={{ background: sectionBg }}>
       <Container className="py-20">
         {/* Header */}
         <div className="mb-14 text-center max-w-2xl mx-auto">
           <h3
-            className="text-3xl md:text-4xl font-bold tracking-tight"
+            className="text-3xl @md:text-4xl font-bold tracking-tight"
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
@@ -271,11 +273,11 @@ export const SkillsSection = ({
         </div>
 
         {/* Grid */}
-        <div className="grid md:grid-cols-2 gap-6 md:gap-8">
+        <div className="grid @md:grid-cols-2 gap-6 @md:gap-8">
           {items.map((skill: any, i: number) => (
             <div
               key={i}
-              className="group relative rounded-2xl border p-5 md:p-6
+              className="group relative rounded-2xl border p-5 @md:p-6
             transition-all duration-200 hover:shadow-lg hover:-translate-y-1"
               style={{
                 background: "var(--qs-card-bg)",
@@ -322,7 +324,7 @@ export const SkillsSection = ({
                 {/* Content */}
                 <div className="flex-1">
                   <div
-                    className="text-lg md:text-xl font-semibold"
+                    className="text-lg @md:text-xl font-semibold"
                     contentEditable={isEditor}
                     suppressContentEditableWarning
                     onBlur={(e) => {

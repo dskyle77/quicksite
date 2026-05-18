@@ -73,6 +73,44 @@ export async function uploadImage(
   return mapResponse(response);
 }
 
+export async function uploadSiteImages(
+  slug: string,
+  uid: string,
+  images: Record<string, File>,
+): Promise<Record<string, string>> {
+  if (!images || typeof images !== "object") return {};
+
+  const folderBase = `quicksite/users/${uid}/${slug}/images`;
+  const MAX_BYTES = 5 * 1024 * 1024;
+  const allowedFormats = ["jpg", "jpeg", "png", "webp"];
+
+  const results: Record<string, string> = {};
+
+  await Promise.all(
+    Object.entries(images).map(async ([path, file]) => {
+      if (!file) return;
+
+      // Convert File → Buffer
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+
+      const publicId = `${folderBase}/${path}`;
+
+      const uploadResult = await uploadBuffer(buffer, {
+        folder: folderBase,
+        publicId,
+        tags: ["quicksite", uid, slug, path],
+        allowedFormats,
+        maxBytes: MAX_BYTES,
+        overwrite: true,
+      });
+
+      results[path] = uploadResult.secureUrl;
+    }),
+  );
+
+  return results;
+}
 /**
  * Upload an image from a Base64-encoded data URI.
  *

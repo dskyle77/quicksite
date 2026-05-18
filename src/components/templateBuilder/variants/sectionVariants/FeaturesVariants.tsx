@@ -15,6 +15,8 @@ export const FeaturesSection = ({
   onUpdate,
   variant,
   position,
+  anchorName,
+  path
 }: SectionProps) => {
   const items: FeatureItem[] = content?.items ?? [];
 
@@ -47,12 +49,12 @@ export const FeaturesSection = ({
   if (variant === "list") {
     return (
       <section
-        id="features"
+        id={anchorName}
         style={{ background: sectionBg }}
       >
         <Container className="py-24">
           <h2
-            className="text-4xl md:text-5xl font-black text-center mb-5"
+            className="text-4xl @md:text-5xl font-black text-center mb-5"
             style={{ color: "var(--qs-text)" }}
             contentEditable={isEditor}
             suppressContentEditableWarning
@@ -148,12 +150,12 @@ export const FeaturesSection = ({
   if (variant === "icons") {
     return (
       <section
-        id="features"
+        id={anchorName}
         style={{ background: sectionBg }}
       >
         <Container className="py-24">
           <h2
-            className="text-4xl md:text-5xl font-black text-center mb-5"
+            className="text-4xl @md:text-5xl font-black text-center mb-5"
             style={{ color: "var(--qs-text)" }}
             contentEditable={isEditor}
             suppressContentEditableWarning
@@ -181,7 +183,7 @@ export const FeaturesSection = ({
             </p>
           )}
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 @md:grid-cols-4 gap-6">
             {items.map((feature, i) => (
               <div
                 key={i}
@@ -244,10 +246,10 @@ export const FeaturesSection = ({
   // ─────────────────────────────────────────────
 
   return (
-    <section id="features" style={{ background: sectionBg }}>
+    <section id={anchorName} style={{ background: sectionBg }}>
       <Container className="py-24">
         <h2
-          className="text-5xl md:text-6xl font-black text-center mb-5"
+          className="text-5xl @md:text-6xl font-black text-center mb-5"
           style={{ color: "var(--qs-text)" }}
           contentEditable={isEditor}
           suppressContentEditableWarning
@@ -275,7 +277,7 @@ export const FeaturesSection = ({
           </p>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 @md:grid-cols-2 @xl:grid-cols-3 gap-8">
           {items.map((item, i) => (
             <div
               key={i}

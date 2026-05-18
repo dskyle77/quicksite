@@ -9,6 +9,8 @@ export const FaqSection = ({
   onUpdate,
   variant,
   position,
+  anchorName,
+  path
 }: SectionProps) => {
   const list = content?.items || [];
   const isEven = position % 2 === 0;
@@ -34,10 +36,10 @@ export const FaqSection = ({
 
   if (variant === "accordion") {
     return (
-      <section style={{ background: sectionBg }}>
+      <section id={anchorName} style={{ background: sectionBg }}>
         <Container className="py-20">
           <h2
-            className="text-4xl md:text-5xl font-black mb-10 text-center tracking-tight"
+            className="text-4xl @md:text-5xl font-black mb-10 text-center tracking-tight"
             style={{ color: "var(--qs-text)" }}
             contentEditable={isEditor}
             suppressContentEditableWarning
@@ -110,10 +112,10 @@ export const FaqSection = ({
   if (variant === "numbered") {
     // Numbered list FAQ
     return (
-      <section style={{ background: sectionBg }}>
+      <section id={anchorName} style={{ background: sectionBg }}>
         <Container className="py-20">
           <h2
-            className="text-3xl md:text-4xl font-black mb-10 text-center tracking-tight"
+            className="text-3xl @md:text-4xl font-black mb-10 text-center tracking-tight"
             style={{ color: "var(--qs-text)" }}
             contentEditable={isEditor}
             suppressContentEditableWarning
@@ -176,10 +178,10 @@ export const FaqSection = ({
 
   // Default (grid) FAQ
   return (
-    <section style={{ background: sectionBg }}>
+    <section id={anchorName} style={{ background: sectionBg }}>
       <Container className="py-20">
         <h2
-          className="text-4xl md:text-5xl font-black mb-12 text-center tracking-tight"
+          className="text-4xl @md:text-5xl font-black mb-12 text-center tracking-tight"
           style={{ color: "var(--qs-text)" }}
           contentEditable={isEditor}
           suppressContentEditableWarning
@@ -189,7 +191,7 @@ export const FaqSection = ({
         >
           {content?.heading ?? "FAQ"}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 @md:grid-cols-2 gap-8">
           {list.map((item: { question: string; answer: string }, i: number) => (
             <div
               key={i}

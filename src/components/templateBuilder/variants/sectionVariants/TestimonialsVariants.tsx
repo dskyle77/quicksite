@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { SectionProps } from "../../types";
 import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
 import Container from "@/components/shared/Container";
@@ -15,6 +13,8 @@ export const TestimonialsSection = ({
   content,
   onUpdate,
   position,
+  anchorName,
+  path
 }: SectionProps) => {
   const items: Testimonial[] = content?.items ?? [];
 
@@ -47,11 +47,11 @@ export const TestimonialsSection = ({
 
   if (variant === "grid") {
     return (
-      <section style={{ background: sectionBg }} id="testimonials">
+      <section style={{ background: sectionBg }} id={anchorName}>
         <Container className="py-24">
           <div className="text-center mb-14">
             <h2
-              className="text-4xl md:text-5xl font-black mb-5"
+              className="text-4xl @md:text-5xl font-black mb-5"
               style={{ color: "var(--qs-text)" }}
               contentEditable={isEditor}
               suppressContentEditableWarning
@@ -77,7 +77,7 @@ export const TestimonialsSection = ({
             )}
           </div>
 
-          <div className="grid gap-7 md:grid-cols-2">
+          <div className="grid gap-7 @md:grid-cols-2">
             {items.map((item, i) => (
               <div
                 key={i}
@@ -182,12 +182,12 @@ export const TestimonialsSection = ({
       <section
         className="overflow-hidden"
         style={{ background: sectionBg }}
-        id="testimonials"
+        id={anchorName}
       >
         <Container className="py-24">
           <div className="text-center mb-14">
             <h2
-              className="text-4xl md:text-5xl font-black mb-5"
+              className="text-4xl @md:text-5xl font-black mb-5"
               style={{ color: "var(--qs-text)" }}
               contentEditable={isEditor}
               suppressContentEditableWarning
@@ -213,7 +213,7 @@ export const TestimonialsSection = ({
             {items.map((item, i) => (
               <div
                 key={i}
-                className="relative min-w-[340px] md:min-w-[420px] snap-center rounded-[32px] border p-8 transition-all duration-300"
+                className="relative min-w-[340px] @md:min-w-[420px] snap-center rounded-[32px] border p-8 transition-all duration-300"
                 style={{
                   background: cardBg,
                   border: "1px solid var(--qs-border)",
@@ -329,11 +329,11 @@ export const TestimonialsSection = ({
   // Minimal Variant: "List" style but with Card Appearance
 
   return (
-    <section style={{ background: sectionBg }} id="testimonials">
-      <Container className="py-24 md:py-32">
+    <section style={{ background: sectionBg }} id={anchorName}>
+      <Container className="py-24 @md:py-32">
         <div className="text-center mb-12">
           <h2
-            className="text-3xl md:text-5xl font-bold mb-4 tracking-tight"
+            className="text-3xl @md:text-5xl font-bold mb-4 tracking-tight"
             style={{ color: "var(--qs-primary)" }}
             contentEditable={isEditor}
             suppressContentEditableWarning
@@ -353,7 +353,7 @@ export const TestimonialsSection = ({
           {items.map((item, i) => (
             <div
               key={i}
-              className="relative rounded-2xl shadow-md px-5 py-6 flex flex-col md:flex-row items-center gap-3 border border-solid background-(--qs-card-bg)"
+              className="relative rounded-2xl shadow-md px-5 py-6 flex flex-col @md:flex-row items-center gap-3 border border-solid background-(--qs-card-bg)"
               style={{
                 borderColor: "var(--qs-border, #e5e7eb)",
               }}
@@ -364,8 +364,8 @@ export const TestimonialsSection = ({
                 </div>
               )}
 
-              <div className="w-full flex flex-col md:flex-row items-center md:items-start gap-4">
-                <div className="shrink-0 text-4xl md:mr-5 mb-2 md:mb-0 text-center md:text-left">
+              <div className="w-full flex flex-col @md:flex-row items-center @md:items-start gap-4">
+                <div className="shrink-0 text-4xl @md:mr-5 mb-2 @md:mb-0 text-center @md:text-left">
                   <span
                     role="img"
                     aria-label="testimonial emoji"
@@ -375,9 +375,9 @@ export const TestimonialsSection = ({
                   </span>
                 </div>
 
-                <div className="flex-1 flex flex-col items-center md:items-start">
+                <div className="flex-1 flex flex-col items-center @md:items-start">
                   <p
-                    className="text-lg md:text-xl italic leading-relaxed text-center md:text-left"
+                    className="text-lg @md:text-xl italic leading-relaxed text-center @md:text-left"
                     style={{ color: "var(--qs-text)" }}
                     contentEditable={isEditor}
                     suppressContentEditableWarning
@@ -391,9 +391,9 @@ export const TestimonialsSection = ({
                     “{item.quote}”
                   </p>
 
-                  <div className="mt-6 flex flex-col items-center md:items-start">
+                  <div className="mt-6 flex flex-col items-center @md:items-start">
                     <div
-                      className="font-semibold text-base md:text-lg"
+                      className="font-semibold text-base @md:text-lg"
                       style={{ color: "var(--qs-primary)" }}
                       contentEditable={isEditor}
                       suppressContentEditableWarning
@@ -420,7 +420,7 @@ export const TestimonialsSection = ({
                     >
                       {item.role}
                     </div>
-                    <div className="mt-2 text-yellow-400 text-base md:text-lg">
+                    <div className="mt-2 text-yellow-400 text-base @md:text-lg">
                       <span aria-label="Rated 5 Stars" title="Rated 5 Stars">
                         ★★★★★
                       </span>

@@ -1,16 +1,17 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-
 import { createPortal } from "react-dom";
 import { useSiteDisplayStore } from "@/store/useSiteDisplayStore";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type LinkConfig = {
-  type: "whatsapp" | "url";
+  type: "whatsapp" | "url" | "anchor";
   phone?: string;
   message?: string;
   url?: string;
+  anchorId?: string;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -27,6 +28,9 @@ export function buildHref(
         ? encodeURIComponent(messageOverride)
         : encodeURIComponent(config.message ?? "");
     return phone ? `https://wa.me/${phone}${msg ? `?text=${msg}` : ""}` : "#";
+  }
+  if (config.type === "anchor") {
+    return config.anchorId ? `#${config.anchorId}` : "#";
   }
   return config.url || "#";
 }
@@ -46,17 +50,13 @@ function LinkConfigMenu({
   onClose,
   messageOverride,
 }: LinkConfigMenuProps) {
-  const [tab, setTab] = useState<"whatsapp" | "url">(value?.type ?? "whatsapp");
+  const [tab, setTab] = useState<"whatsapp" | "url" | "anchor">(value?.type ?? "whatsapp");
   const [phone, setPhone] = useState(value?.phone ?? "");
   const [message, setMessage] = useState(value?.message ?? "");
   const [url, setUrl] = useState(value?.url ?? "");
+  const [anchorId, setAnchorId] = useState(value?.anchorId ?? "");
 
   const ref = useRef<HTMLDivElement>(null);
-
-  // WhatsApp branding
-  const WA_GREEN = "#25D366";
-  const WA_TEAL = "#075E54";
-  const WA_LIGHT_GREEN = "#DCF8C6";
 
   // Close on outside click (cleaner + safer)
   useEffect(() => {
@@ -77,13 +77,17 @@ function LinkConfigMenu({
         phone,
         message: messageOverride ?? message,
       });
+    } else if (tab === "anchor") {
+      onChange({
+        type: "anchor",
+        anchorId,
+      });
     } else {
       onChange({
         type: "url",
         url,
       });
     }
-
     onClose();
   };
 
@@ -104,38 +108,53 @@ function LinkConfigMenu({
         role="dialog"
         aria-modal="true"
         onMouseDown={(e) => e.stopPropagation()}
-        className="relative w-88 max-w-[95vw] rounded-3xl shadow-2xl p-5 animate-in fade-in zoom-in duration-200"
+        className="relative w-90 max-w-[95vw] rounded-3xl shadow-2xl p-5 animate-in fade-in zoom-in duration-200"
         style={{
           background: "#fff",
-          border: `1px solid ${
-            tab === "whatsapp" ? "#25D366" : "#e5e7eb"
-          }`,
+          border:
+            tab === "whatsapp"
+              ? "1px solid #25D366"
+              : tab === "anchor"
+              ? "1px solid #ffa500"
+              : "1px solid #e5e7eb",
         }}
       >
         {/* Tabs */}
         <div
-          className="mb-4 flex rounded-xl p-1 text-sm font-medium"
+          className="mb-4 flex rounded-xl p-1 text-sm font-medium gap-4"
           style={{ background: "#f9fafb" }}
         >
-          {(["whatsapp", "url"] as const).map((t) => {
+          {(["whatsapp", "url", "anchor"] as const).map((t) => {
             const isActive = tab === t;
             const isWhatsAppTab = t === "whatsapp";
+            const isAnchorTab = t === "anchor";
+
+            let label;
+            if (isWhatsAppTab) {
+              label = "WhatsApp";
+            } else if (isAnchorTab) {
+              label = "Section";
+            } else {
+              label = "Custom URL";
+            }
 
             return (
               <button
                 key={t}
                 onClick={() => setTab(t)}
-                className="flex-1 rounded-lg py-1.5 capitalize"
+                className="flex-1 rounded-lg py-1 capitalize flex items-center justify-center gap-1"
                 style={{
                   background: isActive
                     ? isWhatsAppTab
                       ? "#075E54"
+                      : isAnchorTab
+                      ? "#ffa500"
                       : "#0051ff"
                     : "transparent",
                   color: isActive ? "#fff" : "#6B7280",
                 }}
               >
-                {isWhatsAppTab ? "📱 WhatsApp" : "🔗 Custom URL"}
+                 <span>{label}</span>
               </button>
             );
           })}
@@ -192,6 +211,27 @@ function LinkConfigMenu({
               )}
             </div>
           </div>
+        ) : tab === "anchor" ? (
+          <div>
+            <label className="mb-1 block text-xs font-semibold text-[#FFA500]">
+              Section ID
+            </label>
+            <input
+              type="text"
+              value={anchorId}
+              onChange={(e) => setAnchorId(e.target.value.replace(/^#/, ""))}
+              placeholder="section-id"
+              className="w-full rounded-xl px-3 py-2 text-sm border outline-none"
+              style={{
+                background: "#fffbe8",
+                border: "1px solid #ffa500",
+                color: "#ff8c00",
+              }}
+            />
+            <p className="mt-1 text-[10px] text-gray-500 italic">
+              This will link to a section on this page (e.g., <code>#about</code>).
+            </p>
+          </div>
         ) : (
           <div>
             <label className="mb-1 block text-xs font-semibold text-[#6B7280]">
@@ -219,15 +259,26 @@ function LinkConfigMenu({
             onClick={handleSave}
             className="flex-1 rounded-xl py-2 text-sm font-bold active:scale-95"
             style={{
-              background: tab === "whatsapp" ? "#25D366" : "#0051ff",
+              background:
+                tab === "whatsapp"
+                  ? "#25D366"
+                  : tab === "anchor"
+                  ? "#ffa500"
+                  : "#0051ff",
               color: "#fff",
               boxShadow:
                 tab === "whatsapp"
                   ? "0 2px 8px rgba(37, 211, 102, 0.3)"
+                  : tab === "anchor"
+                  ? "0 2px 8px rgba(255, 165, 0, 0.2)"
                   : "none",
             }}
           >
-            {tab === "whatsapp" ? "Set WhatsApp Link" : "Save URL"}
+            {tab === "whatsapp"
+              ? "Set WhatsApp Link"
+              : tab === "anchor"
+              ? "Set Section Link"
+              : "Save URL"}
           </button>
 
           <button
@@ -242,9 +293,10 @@ function LinkConfigMenu({
     document.body,
   );
 }
+
 // ─── CtaLink (default export) ─────────────────────────────────────────────────
 
-export interface CtaLinkProps {
+export interface EditableLinkButtonProps {
   isEditor: boolean;
   label: string;
   linkConfig?: LinkConfig;
@@ -253,9 +305,10 @@ export interface CtaLinkProps {
   className?: string;
   style?: React.CSSProperties;
   messageOverride?: string;
+  noPreview?: boolean;
 }
 
-export default function CtaLink({
+export default function EditableLinkButton({
   isEditor,
   label,
   linkConfig,
@@ -264,7 +317,8 @@ export default function CtaLink({
   className,
   style,
   messageOverride,
-}: CtaLinkProps) {
+  noPreview,
+}: EditableLinkButtonProps) {
   const { slug } = useSiteDisplayStore();
   const [menuOpen, setMenuOpen] = useState(false);
   const wrapRef = useRef<HTMLSpanElement>(null);
@@ -282,11 +336,13 @@ export default function CtaLink({
   };
 
   if (!isEditor) {
+    // For anchor links, do not add target="_blank"
+    const isAnchor = linkConfig?.type === "anchor";
     return (
       <a
         href={href}
-        target="_blank"
-        rel="noopener noreferrer"
+        target={isAnchor ? undefined : "_blank"}
+        rel={isAnchor ? undefined : "noopener noreferrer"}
         className={className}
         style={style}
         onClick={handleClick}
@@ -315,10 +371,18 @@ export default function CtaLink({
           className="ml-1 flex h-6 w-6 items-center justify-center rounded-full text-xs transition-transform hover:scale-110"
           style={{
             background:
-              linkConfig?.type === "whatsapp" ? "#25D366" : "var(--qs-bg-alt)",
+              linkConfig?.type === "whatsapp"
+                ? "#25D366"
+                : linkConfig?.type === "anchor"
+                ? "#ffa500"
+                : "var(--qs-bg-alt)",
             border: "1px solid var(--qs-border)",
             color:
-              linkConfig?.type === "whatsapp" ? "#fff" : "var(--qs-text-muted)",
+              linkConfig?.type === "whatsapp"
+                ? "#fff"
+                : linkConfig?.type === "anchor"
+                ? "#fff"
+                : "var(--qs-text-muted)",
             flexShrink: 0,
           }}
           onClick={(e) => {
@@ -326,23 +390,31 @@ export default function CtaLink({
             setMenuOpen((v) => !v);
           }}
         >
-          {linkConfig?.type === "whatsapp" ? "📱" : "🔗"}
+          {linkConfig?.type === "whatsapp"
+            ? "📱"
+            : linkConfig?.type === "anchor"
+            ? "🔗"
+            : "🔗"}
         </button>
       </span>
 
-      {linkConfig && (
+      {linkConfig && !noPreview && (
         <span
           className="truncate max-w-[160px] text-[10px] font-medium absolute -bottom-3"
           style={{
             color:
               linkConfig.type === "whatsapp"
                 ? "#128C7E"
+                : linkConfig.type === "anchor"
+                ? "#ffa500"
                 : "var(--qs-text-muted)",
           }}
         >
           {linkConfig.type === "whatsapp"
             ? `wa.me/${linkConfig.phone ?? ""}`
-            : (linkConfig.url ?? "")}
+            : linkConfig.type === "anchor"
+            ? `#${linkConfig.anchorId ?? ""}`
+            : linkConfig.url ?? ""}
         </span>
       )}
 

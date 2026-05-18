@@ -16,6 +16,8 @@ export const ExperienceSection = ({
   content,
   onUpdate,
   position,
+  anchorName,
+  path
 }: SectionProps) => {
   // Determine if this section is in an even or odd position
   const isEven = position % 2 === 0;
@@ -38,14 +40,14 @@ export const ExperienceSection = ({
   if (variant === "timeline") {
     return (
       <section
-        id="experience"
+        id={anchorName}
         style={{ background: sectionBg }} // Set section background
       >
-        <Container className="py-10 sm:py-16">
-          <div className="mb-8 sm:mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <Container className="py-10 @sm:py-16">
+          <div className="mb-8 @sm:mb-10 flex flex-col @sm:flex-row @sm:items-center @sm:justify-between gap-2">
             <div>
               <h3
-                className="text-2xl sm:text-3xl font-bold"
+                className="text-2xl @sm:text-3xl font-bold"
                 contentEditable={isEditor}
                 suppressContentEditableWarning
                 onBlur={(e) =>
@@ -68,7 +70,7 @@ export const ExperienceSection = ({
             </div>
             {isEditor && (
               <AddButton
-                className="mt-2 sm:mt-0 ml-0 sm:ml-2"
+                className="mt-2 @sm:mt-0 ml-0 @sm:ml-2"
                 aria-label="Add experience"
                 onClick={handleAdd}
               >
@@ -77,13 +79,13 @@ export const ExperienceSection = ({
             )}
           </div>
           <div
-            className="relative pl-4 sm:pl-8 border-l-2"
+            className="relative pl-4 @sm:pl-8 border-l-2"
             style={{ borderColor: "var(--qs-border)" }}
           >
             {items.map((item, i) => (
               <div
                 key={i}
-                className="relative mb-8 sm:mb-10 group"
+                className="relative mb-8 @sm:mb-10 group"
                 style={{
                   background: i % 2 === 0 ? itemBg : sectionBg,
                   borderRadius: "0.5rem",
@@ -92,7 +94,7 @@ export const ExperienceSection = ({
                 }}
               >
                 <div
-                  className="absolute -left-6 sm:-left-[2.65rem] top-1 w-4 h-4 sm:w-5 sm:h-5 rounded-full border-2"
+                  className="absolute -left-6 @sm:-left-[2.65rem] top-1 w-4 h-4 @sm:w-5 @sm:h-5 rounded-full border-2"
                   style={{
                     background: "var(--qs-primary)",
                     borderColor: sectionBg,
@@ -106,7 +108,7 @@ export const ExperienceSection = ({
                   />
                 )}
                 <p
-                  className="text-[11px] sm:text-xs font-bold uppercase tracking-widest mb-1"
+                  className="text-[11px] @sm:text-xs font-bold uppercase tracking-widest mb-1"
                   style={{ color: "var(--qs-primary)" }}
                   contentEditable={isEditor}
                   suppressContentEditableWarning
@@ -120,7 +122,7 @@ export const ExperienceSection = ({
                   {item.period}
                 </p>
                 <h4
-                  className="text-base sm:text-lg font-bold"
+                  className="text-base @sm:text-lg font-bold"
                   contentEditable={isEditor}
                   suppressContentEditableWarning
                   onBlur={(e) => {
@@ -133,7 +135,7 @@ export const ExperienceSection = ({
                   {item.role}
                 </h4>
                 <p
-                  className="text-xs sm:text-sm font-medium"
+                  className="text-xs @sm:text-sm font-medium"
                   style={{ color: "var(--qs-text-muted)" }}
                   contentEditable={isEditor}
                   suppressContentEditableWarning
@@ -147,7 +149,7 @@ export const ExperienceSection = ({
                   {item.company}
                 </p>
                 <p
-                  className="mt-2 text-xs sm:text-sm leading-relaxed"
+                  className="mt-2 text-xs @sm:text-sm leading-relaxed"
                   style={{ color: "var(--qs-text-muted)" }}
                   contentEditable={isEditor}
                   suppressContentEditableWarning
@@ -171,12 +173,12 @@ export const ExperienceSection = ({
   // ── Variant: "card-stack" ──
   if (variant === "card-stack") {
     return (
-      <section id="experience" style={{ background: sectionBg }}>
-        <Container className="py-10 sm:py-16">
-          <div className="mb-8 sm:mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+      <section id={anchorName} style={{ background: sectionBg }}>
+        <Container className="py-10 @sm:py-16">
+          <div className="mb-8 @sm:mb-10 flex flex-col @sm:flex-row @sm:items-center @sm:justify-between gap-2">
             <div>
               <h3
-                className="text-2xl sm:text-3xl font-bold"
+                className="text-2xl @sm:text-3xl font-bold"
                 contentEditable={isEditor}
                 suppressContentEditableWarning
                 onBlur={(e) =>
@@ -199,7 +201,7 @@ export const ExperienceSection = ({
             </div>
             {isEditor && (
               <AddButton
-                className="mt-2 sm:mt-0 ml-0 sm:ml-2"
+                className="mt-2 @sm:mt-0 ml-0 @sm:ml-2"
                 aria-label="Add experience"
                 onClick={handleAdd}
               >
@@ -211,7 +213,7 @@ export const ExperienceSection = ({
             {items.map((item, i) => (
               <div
                 key={i}
-                className="rounded-xl sm:rounded-2xl p-4 sm:p-6 relative group"
+                className="rounded-xl @sm:rounded-2xl p-4 @sm:p-6 relative group"
                 style={{
                   background: i % 2 === 0 ? itemBg : sectionBg,
                   border: "1px solid var(--qs-border)",
@@ -224,9 +226,9 @@ export const ExperienceSection = ({
                     onClick={() => handleRemove(i)}
                   />
                 )}
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between mb-3">
+                <div className="flex flex-col gap-1 @sm:flex-row @sm:items-center @sm:justify-between mb-3">
                   <h4
-                    className="text-base sm:text-lg font-bold"
+                    className="text-base @sm:text-lg font-bold"
                     contentEditable={isEditor}
                     suppressContentEditableWarning
                     onBlur={(e) => {
@@ -239,7 +241,7 @@ export const ExperienceSection = ({
                     {item.role}
                   </h4>
                   <span
-                    className="text-[11px] sm:text-xs font-mono px-2 sm:px-3 py-[6px] sm:py-1 rounded-full mt-1 sm:mt-0"
+                    className="text-[11px] @sm:text-xs font-mono px-2 @sm:px-3 py-[6px] @sm:py-1 rounded-full mt-1 @sm:mt-0"
                     style={{
                       background: i % 2 === 0 ? sectionBg : itemBg,
                       border: "1px solid var(--qs-border)",
@@ -257,7 +259,7 @@ export const ExperienceSection = ({
                   </span>
                 </div>
                 <p
-                  className="text-xs sm:text-sm font-medium mb-2"
+                  className="text-xs @sm:text-sm font-medium mb-2"
                   style={{ color: "var(--qs-primary)" }}
                   contentEditable={isEditor}
                   suppressContentEditableWarning
@@ -271,7 +273,7 @@ export const ExperienceSection = ({
                   {item.company}
                 </p>
                 <p
-                  className="text-xs sm:text-sm leading-relaxed"
+                  className="text-xs @sm:text-sm leading-relaxed"
                   style={{ color: "var(--qs-text-muted)" }}
                   contentEditable={isEditor}
                   suppressContentEditableWarning
@@ -294,11 +296,11 @@ export const ExperienceSection = ({
 
   // ── Variant: "compact-list" ── (Mobile Friendly)
   return (
-    <section id="experience" style={{ background: sectionBg }}>
-      <Container className="py-10 sm:py-16">
-        <div className="mb-8 sm:mb-10 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+    <section id={anchorName} style={{ background: sectionBg }}>
+      <Container className="py-10 @sm:py-16">
+        <div className="mb-8 @sm:mb-10 flex flex-col @sm:flex-row @sm:items-center @sm:justify-between gap-2">
           <h3
-            className="text-2xl sm:text-3xl font-bold"
+            className="text-2xl @sm:text-3xl font-bold"
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
@@ -309,7 +311,7 @@ export const ExperienceSection = ({
           </h3>
           {isEditor && (
             <AddButton
-              className="mt-2 sm:mt-0 ml-0 sm:ml-2"
+              className="mt-2 @sm:mt-0 ml-0 @sm:ml-2"
               aria-label="Add experience"
               onClick={handleAdd}
             >
@@ -317,11 +319,11 @@ export const ExperienceSection = ({
             </AddButton>
           )}
         </div>
-        <div className="space-y-6 sm:space-y-8">
+        <div className="space-y-6 @sm:space-y-8">
           {items.map((item, i) => (
             <div
               key={i}
-              className="relative group flex flex-col sm:flex-row gap-3 sm:gap-8 sm:items-start p-3 sm:p-5 bg-opacity-70 rounded-lg border border-solid sm:border-0 shadow-sm hover:shadow transition-all"
+              className="relative group flex flex-col @sm:flex-row gap-3 @sm:gap-8 @sm:items-start p-3 @sm:p-5 bg-opacity-70 rounded-lg border border-solid @sm:border-0 shadow-sm hover:shadow transition-all"
               style={{
          
                 borderColor: "var(--qs-border)",
@@ -335,9 +337,9 @@ export const ExperienceSection = ({
                   onClick={() => handleRemove(i)}
                 />
               )}
-              <div className="w-full sm:w-48 shrink-0 flex items-center sm:block mb-1 sm:mb-0">
+              <div className="w-full @sm:w-48 shrink-0 flex items-center @sm:block mb-1 @sm:mb-0">
                 <span
-                  className="inline-block text-[11px] sm:text-xs font-mono px-3 sm:px-4 py-1 sm:py-2 rounded-full"
+                  className="inline-block text-[11px] @sm:text-xs font-mono px-3 @sm:px-4 py-1 @sm:py-2 rounded-full"
                   style={{
                     background: i % 2 === 0 ? sectionBg : itemBg,
                     border: "1px solid var(--qs-border)",
@@ -356,7 +358,7 @@ export const ExperienceSection = ({
               </div>
               <div className="flex-1">
                 <h4
-                  className="text-base sm:text-xl font-bold"
+                  className="text-base @sm:text-xl font-bold"
                   contentEditable={isEditor}
                   suppressContentEditableWarning
                   onBlur={(e) => {
@@ -369,7 +371,7 @@ export const ExperienceSection = ({
                   {item.role}
                 </h4>
                 <p
-                  className="text-xs sm:text-sm font-medium"
+                  className="text-xs @sm:text-sm font-medium"
                   style={{ color: "var(--qs-primary)" }}
                   contentEditable={isEditor}
                   suppressContentEditableWarning
@@ -383,7 +385,7 @@ export const ExperienceSection = ({
                   {item.company}
                 </p>
                 <p
-                  className="mt-2 sm:mt-3 text-xs sm:text-sm"
+                  className="mt-2 @sm:mt-3 text-xs @sm:text-sm"
                   style={{ color: "var(--qs-text-muted)" }}
                   contentEditable={isEditor}
                   suppressContentEditableWarning

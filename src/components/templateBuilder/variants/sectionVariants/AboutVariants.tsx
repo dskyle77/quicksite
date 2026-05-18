@@ -10,6 +10,8 @@ export const AboutSection = ({
   content,
   onUpdate,
   position,
+  anchorName,
+  path,
 }: SectionProps) => {
   const isEven = position % 2 === 0;
 
@@ -25,11 +27,15 @@ export const AboutSection = ({
 
   if (variant === "split") {
     return (
-      <section id="about" className="py-24" style={{ background: sectionBg }}>
+      <section
+        id={anchorName}
+        className="py-24"
+        style={{ background: sectionBg }}
+      >
         <Container>
           <div
             className={`grid gap-14 items-center ${
-              showImage ? "md:grid-cols-2" : "max-w-3xl mx-auto text-center"
+              showImage ? "@md:grid-cols-2" : "max-w-3xl mx-auto text-center"
             }`}
           >
             <div>
@@ -46,7 +52,7 @@ export const AboutSection = ({
               </p>
 
               <h2
-                className="text-4xl md:text-6xl font-black tracking-tight leading-tight"
+                className="text-4xl @md:text-6xl font-black tracking-tight leading-tight"
                 style={{ color: "var(--qs-text)" }}
                 contentEditable={isEditor}
                 suppressContentEditableWarning
@@ -81,15 +87,8 @@ export const AboutSection = ({
               >
                 <TemplateImage
                   source={content.image1}
-                  publicId={content.image1PId}
                   isEditor={isEditor}
-                  onImageChange={(url, pId) =>
-                    onUpdate(null, {
-                      ...content,
-                      image1: url,
-                      image1PId: pId,
-                    })
-                  }
+                  path={path + ".image1"}
                 />
               </div>
             )}
@@ -105,10 +104,14 @@ export const AboutSection = ({
 
   if (variant === "card-stats") {
     return (
-      <section id="about" className="py-24" style={{ background: sectionBg }}>
+      <section
+        id={anchorName}
+        className="py-24"
+        style={{ background: sectionBg }}
+      >
         <Container>
           <div
-            className="rounded-[36px] border p-8 md:p-14"
+            className="rounded-[36px] border p-8 @md:p-14"
             style={{
               background: cardBg,
               border: "1px solid var(--qs-border)",
@@ -117,22 +120,15 @@ export const AboutSection = ({
           >
             <div
               className={`grid gap-14 items-center ${
-                showImage ? "md:grid-cols-2" : "max-w-4xl mx-auto"
+                showImage ? "@md:grid-cols-2" : "max-w-4xl mx-auto"
               }`}
             >
               {showImage && (
                 <div className="overflow-hidden rounded-[28px] border border-(--qs-border)">
                   <TemplateImage
                     source={content.image1}
-                    publicId={content.image1PId}
+                    path={path + ".image1"}
                     isEditor={isEditor}
-                    onImageChange={(url, pId) =>
-                      onUpdate(null, {
-                        ...content,
-                        image1: url,
-                        image1PId: pId,
-                      })
-                    }
                   />
                 </div>
               )}
@@ -151,7 +147,7 @@ export const AboutSection = ({
                 </p>
 
                 <h2
-                  className="text-4xl md:text-5xl font-black tracking-tight mb-6"
+                  className="text-4xl @md:text-5xl font-black tracking-tight mb-6"
                   style={{ color: "var(--qs-text)" }}
                   contentEditable={isEditor}
                   suppressContentEditableWarning
@@ -186,7 +182,7 @@ export const AboutSection = ({
                       }}
                     >
                       <div
-                        className="text-3xl md:text-4xl font-black mb-2"
+                        className="text-3xl @md:text-4xl font-black mb-2"
                         style={{ color: "var(--qs-primary)" }}
                         contentEditable={isEditor}
                         suppressContentEditableWarning
@@ -230,7 +226,11 @@ export const AboutSection = ({
   // ─────────────────────────────────────────────
 
   return (
-    <section id="about" className="py-28" style={{ background: sectionBg }}>
+    <section
+      id={anchorName}
+      className="py-28"
+      style={{ background: sectionBg }}
+    >
       <Container className="text-center">
         {showImage && (
           <div
@@ -242,15 +242,8 @@ export const AboutSection = ({
           >
             <TemplateImage
               source={content.image1}
-              publicId={content.image1PId}
+              path={path + ".image1"}
               isEditor={isEditor}
-              onImageChange={(url, pId) =>
-                onUpdate(null, {
-                  ...content,
-                  image1: url,
-                  image1PId: pId,
-                })
-              }
             />
           </div>
         )}
@@ -266,7 +259,7 @@ export const AboutSection = ({
         </p>
 
         <h2
-          className="text-5xl md:text-6xl font-black tracking-tight mb-7"
+          className="text-5xl @md:text-6xl font-black tracking-tight mb-7"
           style={{ color: "var(--qs-text)" }}
           contentEditable={isEditor}
           suppressContentEditableWarning

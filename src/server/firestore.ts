@@ -1,14 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/server/firestore.ts
 
-import { Timestamp } from "firebase-admin/firestore";
 import { adminDb } from "./firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { getSiteLimit } from "@/lib/plans";
 import type { Site } from "@/lib/types";
 import type { Plan } from "@/lib/plans";
 
-import { deleteFolderForce, deleteImage } from "./cloudinary";
+import { deleteFolderForce } from "./cloudinary";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -144,6 +143,7 @@ export async function serverUpdateSite(
       updatedAt: FieldValue.serverTimestamp(),
     });
 }
+
 /**
  * Update Custom Domain (Field Update Only)
  */
@@ -191,15 +191,7 @@ export async function serverDeleteSite(
   const siteRef = adminDb.collection("sites").doc(slug);
   const userRef = adminDb.collection("users").doc(uid);
 
-  // Delete images collection (subcollection of site)
-  const imagesColRef = siteRef.collection("images");
-  const imagesSnap = await imagesColRef.get();
   const batch = adminDb.batch();
-
-  // Delete all docs in images collection
-  imagesSnap.forEach((doc) => {
-    batch.delete(doc.ref);
-  });
 
   // Delete the site doc itself
   batch.delete(siteRef);
@@ -222,125 +214,4 @@ export async function serverDeleteSite(
     // Log but don't throw to avoid breaking DB deletion for Cloudinary errors
     console.error(`Failed to force delete Cloudinary folder: ${folderPath}`, e);
   }
-}
-
-export async function serverStoreTempImage(
-  uid: string,
-  slug: string,
-  publicId: string,
-  url: string,
-): Promise<void> {
-  await assertSiteOwner(slug, uid);
-
-  await adminDb.collection("images").add({
-    siteSlug: slug,
-    uid,
-    publicId,
-    url,
-    status: "temp",
-    createdAt: FieldValue.serverTimestamp(),
-    updatedAt: FieldValue.serverTimestamp(),
-  });
-}
-
-export async function serverPromoteTempImages(
-  uid: string,
-  slug: string,
-): Promise<void> {
-  await assertSiteOwner(slug, uid);
-
-  const snap = await adminDb
-    .collection("images")
-    .where("siteSlug", "==", slug)
-    .where("status", "==", "temp")
-    .get();
-
-  if (snap.empty) return;
-
-  const batch = adminDb.batch();
-
-  snap.docs.forEach((doc) => {
-    batch.update(doc.ref, {
-      status: "used",
-      updatedAt: FieldValue.serverTimestamp(),
-    });
-  });
-
-  await batch.commit();
-}
-
-export async function serverDeleteTempImage(
-  uid: string,
-  slug: string,
-  publicId: string,
-): Promise<void> {
-  await assertSiteOwner(slug, uid);
-
-  const snap = await adminDb
-    .collection("images")
-    .where("siteSlug", "==", slug)
-    .where("publicId", "==", publicId)
-    .limit(1)
-    .get();
-
-  if (snap.empty) return;
-
-  const doc = snap.docs[0];
-  const data = doc.data();
-
-  try {
-    if (data?.publicId) {
-      await deleteImage(data.publicId);
-    }
-  } catch (err) {
-    console.error("[deleteTempImage] Cloudinary failed:", err);
-    return;
-  }
-
-  await doc.ref.delete();
-}
-
-export async function serverDeleteAllOldTempImages(): Promise<void> {
-  const cutoff = Timestamp.fromMillis(Date.now() - 48 * 60 * 60 * 1000);
-
-  const snap = await adminDb
-    .collection("images")
-    .where("status", "==", "temp")
-    .where("createdAt", "<", cutoff)
-    .get();
-
-  if (snap.empty) return;
-
-  const docs = snap.docs;
-
-  // 1. delete Cloudinary in parallel (safe + fast)
-  await Promise.allSettled(
-    docs.map(async (doc) => {
-      const data = doc.data();
-      if (!data?.publicId) return;
-
-      await deleteImage(data.publicId);
-    }),
-  );
-
-  // 2. Firestore deletes in batches (500 limit safe)
-  const chunks = chunkArray(docs, 400);
-
-  for (const chunk of chunks) {
-    const batch = adminDb.batch();
-
-    chunk.forEach((doc) => batch.delete(doc.ref));
-
-    await batch.commit();
-  }
-}
-
-function chunkArray<T>(arr: T[], size: number): T[][] {
-  const result: T[][] = [];
-
-  for (let i = 0; i < arr.length; i += size) {
-    result.push(arr.slice(i, i + size));
-  }
-
-  return result;
 }

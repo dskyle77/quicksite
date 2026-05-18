@@ -16,7 +16,7 @@ export default function EditorLayout({ children }: EditorLayoutProps) {
 
   const router = useRouter();
 
-  const { fetchSite } = useSiteEditorStore();
+  const { fetchSite, reset } = useSiteEditorStore();
   const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
@@ -34,7 +34,12 @@ export default function EditorLayout({ children }: EditorLayoutProps) {
       console.error("Fetch Error:", err);
       toast.error("Failed to load site data.");
     });
-  }, [user, slug, fetchSite]);
+
+    return () => {
+      reset();
+    };
+
+  }, [user, slug, reset, fetchSite]);
 
   return <>{children}</>;
 }

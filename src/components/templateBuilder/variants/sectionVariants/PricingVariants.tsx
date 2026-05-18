@@ -3,7 +3,7 @@
 
 import { SectionProps } from "../../types";
 import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
-import CtaLink from "@/components/shared/CtaLinkModal";
+import EditableLinkButton from "@/components/shared/EditableLink";
 import Container from "@/components/shared/Container";
 
 type PricingPlan = {
@@ -22,6 +22,8 @@ export const PricingSection = ({
   onUpdate,
   variant,
   position,
+  anchorName,
+  path
 }: SectionProps) => {
   const plans: PricingPlan[] = content?.plans || [];
 
@@ -87,7 +89,7 @@ export const PricingSection = ({
   const Header = () => (
     <div className="text-center mb-14">
       <h2
-        className="text-4xl md:text-5xl font-black tracking-tight"
+        className="text-4xl @md:text-5xl font-black tracking-tight"
         style={{ color: "var(--qs-text)" }}
         contentEditable={isEditor}
         suppressContentEditableWarning
@@ -110,8 +112,6 @@ export const PricingSection = ({
     </div>
   );
 
-
-
   // ─────────────────────────────────────────────
   // HIGHLIGHT TOP VARIANT
   // ─────────────────────────────────────────────
@@ -120,11 +120,15 @@ export const PricingSection = ({
     const anyFeatured = plans.some((plan) => plan.featured);
 
     return (
-      <section className="py-24" style={{ background: sectionBg }} id="pricing">
+      <section
+        className="py-24"
+        style={{ background: sectionBg }}
+        id={anchorName}
+      >
         <Container>
           <Header />
 
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid gap-8 @md:grid-cols-3">
             {plans.map((plan, i) => {
               const featured = anyFeatured ? !!plan.featured : i === 1;
 
@@ -253,7 +257,7 @@ export const PricingSection = ({
                   </ul>
 
                   <div className="mt-10">
-                    <CtaLink
+                    <EditableLinkButton
                       isEditor={isEditor}
                       label={plan.cta ?? "Choose Plan"}
                       linkConfig={plan.ctaLink}
@@ -291,11 +295,15 @@ export const PricingSection = ({
     const anyFeatured = plans.some((plan) => plan.featured);
 
     return (
-      <section className="py-20" style={{ background: sectionBg }} id="pricing">
+      <section
+        className="py-20"
+        style={{ background: sectionBg }}
+        id={anchorName}
+      >
         <Container>
           <Header />
 
-          <div className="grid gap-5 md:grid-cols-3">
+          <div className="grid gap-5 @md:grid-cols-3">
             {plans.map((plan, i) => {
               const featured = anyFeatured ? !!plan.featured : i === 1;
 
@@ -411,7 +419,7 @@ export const PricingSection = ({
                   </ul>
 
                   <div className="mt-8">
-                    <CtaLink
+                    <EditableLinkButton
                       isEditor={isEditor}
                       label={plan.cta ?? "Choose"}
                       linkConfig={plan.ctaLink}
@@ -446,11 +454,15 @@ export const PricingSection = ({
   // ─────────────────────────────────────────────
 
   return (
-    <section className="py-24" style={{ background: sectionBg }} id="pricing">
+    <section
+      className="py-24"
+      style={{ background: sectionBg }}
+      id={anchorName}
+    >
       <Container>
         <Header />
 
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 @md:grid-cols-3">
           {plans.map((plan, i) => (
             <div
               key={i}
@@ -551,7 +563,7 @@ export const PricingSection = ({
               </ul>
 
               <div className="mt-10">
-                <CtaLink
+                <EditableLinkButton
                   isEditor={isEditor}
                   label={plan.cta ?? "Choose Plan"}
                   linkConfig={plan.ctaLink}

@@ -1,5 +1,5 @@
 import { SectionProps } from "../../types";
-import CtaLink from "@/components/shared/CtaLinkModal";
+import EditableLinkButton from "@/components/shared/EditableLink";
 import { useState } from "react";
 import Container from "@/components/shared/Container";
 
@@ -9,6 +9,8 @@ export const ContactSection = ({
   content,
   onUpdate,
   position,
+  anchorName,
+  path
 }: SectionProps) => {
   const isEven = position % 2 === 0;
 
@@ -28,10 +30,10 @@ export const ContactSection = ({
 
   if (variant === "split") {
     return (
-      <section id="contact" style={{ background: sectionBg }}>
+      <section id={anchorName} style={{ background: sectionBg }}>
         <Container className="py-24">
           <div
-            className="grid md:grid-cols-2 gap-12 items-center rounded-[36px] border p-8 md:p-14"
+            className="grid @md:grid-cols-2 gap-12 items-center rounded-[36px] border p-8 @md:p-14"
             style={{
               background: cardBg,
               border: "1px solid var(--qs-border)",
@@ -47,7 +49,7 @@ export const ContactSection = ({
               </p>
 
               <h2
-                className="text-4xl md:text-6xl font-black tracking-tight leading-tight"
+                className="text-4xl @md:text-6xl font-black tracking-tight leading-tight"
                 style={{ color: "var(--qs-text)" }}
                 contentEditable={isEditor}
                 suppressContentEditableWarning
@@ -73,7 +75,7 @@ export const ContactSection = ({
             </div>
 
             <div className="flex flex-col gap-4">
-              <CtaLink
+              <EditableLinkButton
                 isEditor={isEditor}
                 label={content.primaryButton ?? "Send a Message"}
                 linkConfig={content.primaryButtonLink}
@@ -89,7 +91,7 @@ export const ContactSection = ({
               />
 
               {content.secondaryButton && (
-                <CtaLink
+                <EditableLinkButton
                   isEditor={isEditor}
                   label={content.secondaryButton}
                   linkConfig={content.secondaryButtonLink}
@@ -118,10 +120,10 @@ export const ContactSection = ({
 
   if (variant === "minimal") {
     return (
-      <section id="contact" style={{ background: sectionBg }}>
+      <section id={anchorName} style={{ background: sectionBg }}>
         <Container className="py-24 text-center">
           <div
-            className="rounded-[36px] border p-8 md:p-14"
+            className="rounded-[36px] border p-8 @md:p-14"
             style={{
               background: cardBg,
               border: "1px solid var(--qs-border)",
@@ -136,7 +138,7 @@ export const ContactSection = ({
             </div>
 
             <h2
-              className="text-4xl md:text-5xl font-black tracking-tight"
+              className="text-4xl @md:text-5xl font-black tracking-tight"
               style={{ color: "var(--qs-text)" }}
               contentEditable={isEditor}
               suppressContentEditableWarning
@@ -161,7 +163,7 @@ export const ContactSection = ({
             </p>
 
             <div className="mt-10">
-              <CtaLink
+              <EditableLinkButton
                 isEditor={isEditor}
                 label={content.primaryButton ?? "Send Message"}
                 linkConfig={content.primaryButtonLink}
@@ -204,10 +206,10 @@ export const ContactSection = ({
       .join("\n");
 
     return (
-      <section id="contact" className="py-24" style={{ background: sectionBg }}>
+      <section id={anchorName} className="py-24" style={{ background: sectionBg }}>
         <div className="max-w-6xl mx-auto px-4">
           <div
-            className="grid lg:grid-cols-2 gap-10 rounded-[36px] border overflow-hidden"
+            className="grid @lg:grid-cols-2 gap-10 rounded-[36px] border overflow-hidden"
             style={{
               background: cardBg,
               border: "1px solid var(--qs-border)",
@@ -215,7 +217,7 @@ export const ContactSection = ({
             }}
           >
             {/* Left */}
-            <div className="p-8 md:p-14">
+            <div className="p-8 @md:p-14">
               <p
                 className="uppercase tracking-[0.25em] text-xs font-bold mb-5"
                 style={{ color: "var(--qs-primary)" }}
@@ -224,7 +226,7 @@ export const ContactSection = ({
               </p>
 
               <h2
-                className="text-4xl md:text-5xl font-black tracking-tight leading-tight"
+                className="text-4xl @md:text-5xl font-black tracking-tight leading-tight"
                 style={{ color: "var(--qs-text)" }}
                 contentEditable={isEditor}
                 suppressContentEditableWarning
@@ -309,7 +311,7 @@ export const ContactSection = ({
 
             {/* Right */}
             <div
-              className="p-8 md:p-14 border-l"
+              className="p-8 @md:p-14 border-l"
               style={{
                 borderColor: "var(--qs-border)",
                 background: "rgba(255,255,255,0.02)",
@@ -383,7 +385,7 @@ export const ContactSection = ({
                 </div>
 
                 <div className="pt-2">
-                  <CtaLink
+                  <EditableLinkButton
                     isEditor={isEditor}
                     label={content.primaryButton ?? "Send Message"}
                     linkConfig={content.primaryButtonLink}
@@ -408,10 +410,10 @@ export const ContactSection = ({
   }
 
   return (
-    <section id="contact" style={{ background: sectionBg }}>
+    <section id={anchorName} style={{ background: sectionBg }}>
       <Container className="py-14">
         <div
-          className="rounded-2xl shadow-lg border border-(--qs-border) px-5 py-8 md:px-10 md:py-12 bg-(--qs-bg-alt) flex flex-col gap-4 items-start"
+          className="rounded-2xl shadow-lg border border-(--qs-border) px-5 py-8 @md:px-10 @md:py-12 bg-(--qs-bg-alt) flex flex-col gap-4 items-start"
           style={{
             background: "var(--qs-bg-alt)",
             color: "var(--qs-text)",
@@ -421,7 +423,7 @@ export const ContactSection = ({
             🚀
           </div>
           <h2
-            className="text-2xl md:text-4xl font-extrabold tracking-tight mb-2"
+            className="text-2xl @md:text-4xl font-extrabold tracking-tight mb-2"
             style={{ color: "var(--qs-primary)" }}
             contentEditable={isEditor}
             suppressContentEditableWarning
@@ -432,7 +434,7 @@ export const ContactSection = ({
             {content.title ?? "Let's Build Something Great"}
           </h2>
           <p
-            className="mt-0 text-base md:text-lg leading-relaxed mb-5 text-(--qs-text-muted) max-w-xl"
+            className="mt-0 text-base @md:text-lg leading-relaxed mb-5 text-(--qs-text-muted) max-w-xl"
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
@@ -442,14 +444,14 @@ export const ContactSection = ({
             {content.desc ??
               "Ready to start your next project? Reach out and let's make it happen."}
           </p>
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full mt-1">
-            <CtaLink
+          <div className="flex flex-col @sm:flex-row items-center gap-3 w-full mt-1">
+            <EditableLinkButton
               isEditor={isEditor}
               label={content.primaryButton ?? "Send a Message"}
               linkConfig={content.primaryButtonLink}
               onLabelChange={(v) => onUpdate("content.primaryButton", v)}
               onLinkChange={(cfg) => onUpdate("content.primaryButtonLink", cfg)}
-              className="rounded-lg px-6 py-3 font-bold text-center w-full sm:w-auto transition-all duration-200 hover:-translate-y-1 bg-(--qs-primary) text-(--qs-primary-fg)"
+              className="rounded-lg px-6 py-3 font-bold text-center w-full @sm:w-auto transition-all duration-200 hover:-translate-y-1 bg-(--qs-primary) text-(--qs-primary-fg)"
             />
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { SectionProps } from "../../types";
 import Container from "@/components/shared/Container";
-import CtaLink from "@/components/shared/CtaLinkModal";
+import EditableLinkButton from "@/components/shared/EditableLink";
 
 // Utility: Render subheading only if present and styled
 function CtaSubheading({
@@ -8,6 +8,7 @@ function CtaSubheading({
   subheadingClass,
   isEditor,
   onUpdate,
+
 }: {
   subheading?: string;
   subheadingClass: string;
@@ -34,6 +35,8 @@ export const CtaSection = ({
   onUpdate,
   variant,
   position,
+  anchorName,
+  path
 }: SectionProps) => {
   const isEven = position % 2 === 0;
   const sectionBg = isEven ? "var(--qs-bg)" : "var(--qs-bg-alt)";
@@ -53,13 +56,13 @@ export const CtaSection = ({
   // Headings
   const headingClass =
     variant === "simple"
-      ? "text-2xl md:text-3xl font-extrabold mb-2 tracking-tight"
+      ? "text-2xl @md:text-3xl font-extrabold mb-2 tracking-tight"
       : variant === "banner"
-      ? "text-4xl md:text-5xl font-black mb-3 tracking-tight"
-      : "text-3xl md:text-4xl font-bold mb-3";
+      ? "text-4xl @md:text-5xl font-black mb-3 tracking-tight"
+      : "text-3xl @md:text-4xl font-bold mb-3";
   const subheadingClass =
     variant === "banner"
-      ? "mb-7 text-lg md:text-xl opacity-80"
+      ? "mb-7 text-lg @md:text-xl opacity-80"
       : variant === "simple"
       ? "mb-4 text-base opacity-80"
       : "mb-4 text-base opacity-80";
@@ -70,7 +73,7 @@ export const CtaSection = ({
     variant === "simple"
       ? "inline-block bg-[var(--qs-primary)] text-[var(--qs-primary-fg)] px-6 py-2.5 rounded-xl font-semibold shadow hover:shadow-lg transition-colors duration-150 focus:outline-none focus:ring focus:ring-primary/30"
       : variant === "banner"
-      ? "inline-block bg-[var(--qs-primary)] text-[var(--qs-primary-fg)] px-10 py-3.5 md:px-14 md:py-4 rounded-2xl font-bold text-lg shadow-xl hover:scale-105 transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-primary/30"
+      ? "inline-block bg-[var(--qs-primary)] text-[var(--qs-primary-fg)] px-10 py-3.5 @md:px-14 @md:py-4 rounded-2xl font-bold text-lg shadow-xl hover:scale-105 transition-transform duration-150 focus:outline-none focus:ring-2 focus:ring-primary/30"
       : "inline-block bg-[var(--qs-primary)] text-[var(--qs-primary-fg)] px-7 py-2.5 rounded-lg font-semibold shadow hover:shadow-lg transition-colors duration-150 focus:outline-none focus:ring focus:ring-primary/30";
 
   const sectionStyle = {
@@ -93,7 +96,7 @@ export const CtaSection = ({
   // Banner Variant
   if (variant === "banner") {
     return (
-      <section className={sectionCommon} style={sectionStyle}>
+      <section className={sectionCommon} style={sectionStyle} id={anchorName}>
         <Container className={`${containerMaxWidth} px-4`}>
           <div className="text-center flex flex-col items-center gap-4">
             <h2
@@ -112,7 +115,7 @@ export const CtaSection = ({
               isEditor={isEditor}
               onUpdate={onUpdate}
             />
-            <CtaLink
+            <EditableLinkButton
               isEditor={isEditor}
               label={content?.primaryButton ?? "Request a Demo"}
               linkConfig={content?.primaryLink}
@@ -132,7 +135,7 @@ export const CtaSection = ({
   // Minimal/simple Variant
   if (variant === "simple") {
     return (
-      <section className={sectionCommon} style={sectionStyle}>
+      <section className={sectionCommon} style={sectionStyle} id={anchorName}>
         <Container className={`${containerMaxWidth} px-4`}>
           <div className="text-center flex flex-col items-center gap-2">
             <h2
@@ -145,7 +148,7 @@ export const CtaSection = ({
             >
               {content?.heading ?? "Let's Talk"}
             </h2>
-            <CtaLink
+            <EditableLinkButton
               isEditor={isEditor}
               label={content?.primaryButton ?? "Contact Us"}
               linkConfig={content?.primaryLink}
@@ -164,7 +167,7 @@ export const CtaSection = ({
 
   // Default Variant
   return (
-    <section className={sectionCommon} style={sectionStyle}>
+    <section className={sectionCommon} style={sectionStyle} id={anchorName}>
       <Container className={`${containerMaxWidth} px-4`}>
         <div className="text-center flex flex-col items-center gap-4">
           <h2
@@ -183,7 +186,7 @@ export const CtaSection = ({
             isEditor={isEditor}
             onUpdate={onUpdate}
           />
-          <CtaLink
+          <EditableLinkButton
             isEditor={isEditor}
             label={content?.primaryButton ?? "Get in Touch"}
             linkConfig={content?.primaryLink}

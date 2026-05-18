@@ -12,21 +12,23 @@ import React from "react";
 export type SectionProps = TemplateComponentProps & {
   variant?: SectionVariantKey;
   position: number;
+  anchorName: string;
+  path: string;
 };
 
 // ─── Block Variant Keys ───────────────────────────────────────────────────────
 // Each union represents the available style variants for that block.
 // Extend these as you add new variants to the variant files.
 
-export type NavbarVariantKey = "classic" | "glass" | "centered" | "logo";
+export type NavbarVariantKey = "classic" | "minimal";
 export type HeroVariantKey =
-  | "dynamic" // DynamicHero — switches between background/side
+  | "background" // DynamicHero — switches between background/side
   | "split" // Explicit 50/50 image + text
   | "minimalist" // Large bold typography, no image
   | "centered"; // Text + CTA centered, optional bg image
 //   | "video"; // Full-bleed video background (future)
 
-export type FooterVariantKey = "classic" | "centered" | "minimal" | "columns";
+export type FooterVariantKey = "classic" | "centered" | "none" | "columns";
 
 export type SectionType =
   | "about"
@@ -38,6 +40,7 @@ export type SectionType =
   | "faq"
   | "pricing"
   | "cta"
+  | "text"
   | "features"
   | "team"
   | "gallery";
@@ -47,6 +50,7 @@ export type SectionVariantKey =
   | "split"
   | "grid"
   | "list"
+  | "card"
   | "carousel"
   | "timeline"
   | "cards"
@@ -56,6 +60,7 @@ export type SectionVariantKey =
   | "tags"
   | "icons"
   | "compact"
+  | "minimal-left"
   | "banner"
   | "form"
   | "simple"
@@ -78,6 +83,8 @@ export interface SectionConfig {
   enabled: boolean;
   /** Optional override title shown in the editor sidebar */
   label?: string;
+
+  anchorName: string;
 }
 
 // ─── Theme Config ─────────────────────────────────────────────────────────────
@@ -118,7 +125,14 @@ export type VariantRegistry<K extends string = string> = Record<
 
 export type SectionVariantRegistry = Record<
   SectionType,
-  React.FC<TemplateComponentProps & { variant: SectionVariantKey, position: number }>
+  React.FC<
+    TemplateComponentProps & {
+      variant: SectionVariantKey;
+      position: number;
+      anchorName: string;
+      path: string;
+    }
+  >
 >;
 
 // ─── Schema / Starter Content Helpers ────────────────────────────────────────
@@ -145,6 +159,7 @@ export interface NavbarContent {
   title: string;
   ctaButton: string;
   ctaButtonLink: Record<string, any>;
+  links: Record<string, string>[];
 }
 
 export interface HeroContent {
@@ -203,7 +218,11 @@ export interface TestimonialItem {
   name: string;
   role: string;
 }
-
+export interface TextContent {
+  title: string;
+  label: string;
+  desc: string;
+}
 export interface ContactContent {
   title: string;
   desc: string;
@@ -219,5 +238,5 @@ export interface ContactContent {
 export interface FooterContent {
   brand: string;
   copyright: string;
-  socials: string[];
+  socials: Record<string, any>[];
 }

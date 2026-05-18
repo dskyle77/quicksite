@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { variantOptions } from "./variantOptions";
 import {
   SchemaParams,
   NavbarContent,
@@ -7,6 +6,7 @@ import {
   AboutContent,
   SkillItem,
   ProjectItem,
+  TextContent,
   ExperienceItem,
   TestimonialItem,
   ContactContent,
@@ -26,6 +26,33 @@ const year = () => new Date().getFullYear();
 
 // ─── NAVBAR ───────────────────────────────────────────────────────────────────
 
+const defaultLinks = [
+  {
+    label: "About",
+    type: "anchor" as const,
+    anchor: "about",
+    href: "",
+  },
+  {
+    label: "Skills",
+    type: "anchor" as const,
+    anchor: "skills",
+    href: "",
+  },
+  {
+    label: "Projects",
+    type: "anchor" as const,
+    anchor: "projects",
+    href: "",
+  },
+  {
+    label: "GitHub",
+    type: "external" as const,
+    anchor: "#",
+    href: "https://github.com/",
+  },
+];
+
 const navbarSchema = ({
   selectedTitle,
   whatsappNumber,
@@ -35,6 +62,7 @@ const navbarSchema = ({
   title: selectedTitle ?? "",
   ctaButton: "",
   ctaButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  links: defaultLinks,
 });
 
 const navbarStarterContent = ({
@@ -46,6 +74,7 @@ const navbarStarterContent = ({
   title: selectedTitle ?? "My Portfolio",
   ctaButton: "Hire Me",
   ctaButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  links: defaultLinks,
 });
 
 // ─── HERO ─────────────────────────────────────────────────────────────────────
@@ -180,6 +209,18 @@ const projectsStarterContent = ({ defaultImage }: SchemaParams) => ({
   ] as ProjectItem[],
 });
 
+// ---- TEXT --------------------------------------------------------------------
+const textSchema = (): TextContent => ({
+  label: "",
+  title: "",
+  desc: "",
+});
+
+const textStarterContent = (): TextContent => ({
+  label: "Introduction",
+  title: "Crafting Digital Experiences That Matter",
+  desc: "We help brands, creators, and businesses communicate clearly through thoughtful design, modern technology, and powerful storytelling.",
+});
 // ─── EXPERIENCE ───────────────────────────────────────────────────────────────
 
 const experienceSchema = () => ({
@@ -259,7 +300,20 @@ const contactStarterContent = ({
 const footerSchema = ({ selectedTitle }: SchemaParams): FooterContent => ({
   brand: selectedTitle ?? "",
   copyright: `© ${year()} All rights reserved.`,
-  socials: ["GitHub", "LinkedIn", "Twitter"],
+  socials: [
+    {
+      label: "GitHub",
+      linkConfig: { type: "url", url: "" },
+    },
+    {
+      label: "LinkedIn",
+      linkConfig: { type: "url", url: "" },
+    },
+    {
+      label: "Twitter",
+      linkConfig: { type: "url", url: "" },
+    },
+  ],
 });
 
 const footerStarterContent = ({
@@ -267,7 +321,20 @@ const footerStarterContent = ({
 }: SchemaParams): FooterContent => ({
   brand: selectedTitle ?? "Alex Morgan",
   copyright: `© ${year()} All rights reserved.`,
-  socials: ["GitHub", "LinkedIn", "Twitter"],
+  socials: [
+    {
+      label: "GitHub",
+      linkConfig: { type: "url", url: "https://github.com/" },
+    },
+    {
+      label: "LinkedIn",
+      linkConfig: { type: "url", url: "https://www.linkedin.com/" },
+    },
+    {
+      label: "Twitter",
+      linkConfig: { type: "url", url: "https://twitter.com/" },
+    },
+  ],
 });
 
 // ─── FEATURES ────────────────────────────────────────────────────────────────
@@ -396,6 +463,7 @@ export const starterMap: Record<string, any> = {
   about: aboutStarterContent,
   skills: skillsStarterContent,
   projects: projectsStarterContent,
+  text: textStarterContent,
   experience: experienceStarterContent,
   testimonials: testimonialsStarterContent,
   contact: contactStarterContent,
@@ -413,6 +481,7 @@ export const schemaMap: Record<string, any> = {
   about: aboutSchema,
   skills: skillsSchema,
   projects: projectsSchema,
+  text: textSchema,
   experience: experienceSchema,
   testimonials: testimonialsSchema,
   contact: contactSchema,
@@ -469,17 +538,17 @@ export const buildSchema = ({
 }) => {
   const schema: any = {
     builderConfig: {
-      _note: `AI: Use valid variant keys from ${JSON.stringify(
-        variantOptions,
-      )} for navbar, hero, footer and sections.`,
-      navbar: "classic | glass | centered",
-      hero: "dynamic | split | minimalist | centered",
-      footer: "classic | centered | minimal | columns",
+      _note: `Instructions: For navbar, hero, footer, and all sections, use only the allowed variant keys found in variantOptions: ${JSON.stringify(variantOptions)}. Assign a meaningful anchorName to each section that reflects its use and context (for example, rename 'projects' to 'menu' if used as a menu section).`,
+
+      navbar: "",
+      hero: "",
+      footer: "",
       sections: config.sections.map((sec: any) => ({
         id: sec.id,
         type: sec.type,
-        variant: "Pick a valid variant",
+        variant: "",
         enabled: true,
+        anchorName: "",
       })),
     },
     navbar: schemaMap.navbar(params),
@@ -499,3 +568,19 @@ export const buildSchema = ({
   return schema;
 };
 
+export const variantOptions: Record<string, string[]> = {
+  navbar: ["classic", "minimal"],
+  hero: ["background", "split", "minimalist", "centered"],
+  about: ["split", "card-stats", "centered"],
+  skills: ["grid", "tags", "icons-list"],
+  projects: ["list", "card-grid"],
+  text: ["card", "minimal", "minimal-left", "default"],
+  experience: ["timeline", "card-stack", "compact-list"],
+  testimonials: ["grid", "carousel", "list"],
+  contact: ["default", "split", "minimal", "form"],
+  features: ["default", "list", "icons"],
+  pricing: ["default", "highlight-top", "compact"],
+  faq: ["default", "accordion", "numbered"],
+  cta: ["default", "banner", "simple"],
+  footer: ["classic", "centered", "columns", "none"],
+};

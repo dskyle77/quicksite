@@ -1,36 +1,134 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 /* eslint-disable @next/next/no-img-element */
-import { useRef, useState } from "react";
-import authFetch from "@/lib/authFetch";
-
+import { useRef, useState, useEffect } from "react";
+import { Upload } from "lucide-react";
 import { useSiteEditorStore } from "@/store/useSiteEditorStore";
 
 type TemplateImageProps = {
   source?: string;
-  /** Cloudinary publicId of the current image — used to delete it on replace */
-  publicId?: string;
-  onImageChange?: (url: string, publicId: string) => void;
   isEditor: boolean;
   alt?: string;
+  path: string;
+  variant?: "default" | "background";
+  children?: React.ReactNode;
 };
 
 export default function TemplateImage({
   source,
-  publicId,
   isEditor,
-  onImageChange,
   alt,
+  variant = "default",
+  children,
+  path,
 }: TemplateImageProps) {
-  const site = useSiteEditorStore((state) => state.site);
-  const slug = site?.slug || "";
-
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Incrementing this forces React to remount <img>, busting the browser cache
-  const [imgKey, setImgKey] = useState(0);
-  // Local preview for the uploaded image in the editor
-  const [preview, setPreview] = useState<string | null>(null);
 
+  const setImage = useSiteEditorStore((state) => state.setImage);
+  const images = useSiteEditorStore((state) => state.images);
+
+  // imageFile is always a File, or undefined if not set
+  const imageFile: File | undefined = images?.[path];
+
+  // Generate a local preview URL if imageFile is present
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (imageFile instanceof File) {
+      const url = URL.createObjectURL(imageFile);
+      setPreviewUrl(url);
+      return () => {
+        URL.revokeObjectURL(url);
+      };
+    } else {
+      setPreviewUrl(null);
+    }
+  }, [imageFile]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setError(null);
+
+    if (isEditor) {
+      setImage(path, file); // images[path] = file
+      setUploading(false);
+    }
+  };
+
+  // ───────────── Helper Logic for Image Source ─────────────
+  let effectiveSource: string | undefined;
+  if (isEditor) {
+    if (imageFile instanceof File && previewUrl) {
+      effectiveSource = previewUrl;
+    } else {
+      // If imageFile is undefined, fall back to source
+      effectiveSource = source;
+    }
+  } else {
+    // Not in editor mode: always use source
+    effectiveSource = source;
+  }
+
+  // ───────────── BACKGROUND VARIANT ─────────────
+  if (variant === "background") {
+    return (
+      <div className="relative w-full overflow-hidden min-h-[600px] flex items-center">
+        {effectiveSource && (
+          <div className="absolute inset-0 z-0">
+            <img
+              src={effectiveSource}
+              alt={alt || ""}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
+          </div>
+        )}
+        <div className="relative z-10 w-full">{children}</div>
+        {isEditor && (
+          <div className="absolute top-4 right-4 z-20">
+            <button
+              onClick={() => inputRef.current?.click()}
+              className={[
+                !uploading && "cursor-pointer",
+                "flex items-center gap-2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-lg border border-white/20 transition",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+              disabled={uploading}
+            >
+              <Upload size={18} />
+              <span className="text-sm">
+                {uploading ? "Uploading..." : "Change Background"}
+              </span>
+            </button>
+            <input
+              ref={inputRef}
+              type="file"
+              className="hidden"
+              onChange={handleFileChange}
+              accept="image/*"
+              disabled={uploading}
+            />
+          </div>
+        )}
+        {isEditor && error && !uploading && (
+          <div className="absolute bottom-2 left-2 right-10 bg-red-500/90 text-white text-xs rounded-lg px-2 py-1 truncate z-30">
+            {error}
+          </div>
+        )}
+        {isEditor && uploading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-30">
+            <span className="text-xs text-white font-medium">Uploading…</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ───────────── DEFAULT VARIANT ─────────────
   const handleUploadClick = () => {
     if (!isEditor || uploading) return;
     if (inputRef.current) {
@@ -39,95 +137,13 @@ export default function TemplateImage({
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Use FileReader to show preview immediately
-    if (isEditor) {
-      const reader = new FileReader();
-      reader.onload = function (event) {
-        if (typeof event.target?.result === "string") {
-          setPreview(event.target.result);
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-
-    setUploading(true);
-    setError(null);
-
-    try {
-      // ── 1. Delete the old image ────────────────────────────────────────────
-      if (publicId) {
-        try {
-          const deleteRes = await authFetch("/api/imageDelete", {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ publicId, slug }),
-          });
-          if (!deleteRes.ok) {
-            console.warn("Old image deletion failed — continuing with upload");
-          }
-        } catch (err) {
-          console.warn("Delete request failed — continuing with upload:", err);
-        }
-      }
-
-      // ── 2. Upload the new image ────────────────────────────────────────────
-      const formData = new FormData();
-      formData.append("image", file);
-      formData.append("slug", slug);
-
-      const res = await authFetch("/api/imageUpload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const { error: msg } = await res.json().catch(() => ({}));
-        throw new Error(msg ?? `Upload failed with status ${res.status}`);
-      }
-
-      const { secureUrl, publicId: newPublicId } = await res.json();
-      if (!secureUrl) throw new Error("No URL returned from upload API");
-
-      setImgKey((k) => k + 1);
-      setPreview(null);
-      onImageChange?.(secureUrl, newPublicId);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : "Upload failed";
-      console.error("Image upload error:", err);
-      setError(message);
-    } finally {
-      setUploading(false);
-    }
-  };
-
   let showImage: React.ReactNode = null;
-  if (isEditor && preview) {
+
+  if (effectiveSource) {
     showImage = (
       <img
-        key={`preview-${imgKey}`}
         alt={alt}
-        src={preview}
-        className={[
-          "object-cover w-full h-full rounded-2xl",
-          "hover:brightness-75",
-          "opacity-70 grayscale",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        loading="eager"
-        style={{ display: "block" }}
-      />
-    );
-  } else if (source) {
-    showImage = (
-      <img
-        key={imgKey}
-        alt={alt}
-        src={source}
+        src={effectiveSource}
         className={[
           "object-cover w-full h-full rounded-2xl",
           isEditor ? "hover:brightness-75" : "",
@@ -140,14 +156,9 @@ export default function TemplateImage({
       />
     );
   } else if (isEditor) {
-    // No image source or preview, but in editor mode: show a clickable placeholder
     showImage = (
       <div
-        className={[
-          "flex flex-col items-center justify-center w-full h-full rounded-2xl",
-          "transition border-2 border-dashed border-(--qs-border)",
-          "hover:bg-(--qs-bg) hover:border-(--qs-primary)",
-        ].join(" ")}
+        className="flex flex-col items-center justify-center w-full h-full rounded-2xl transition border-2 border-dashed border-(--qs-border) hover:bg-(--qs-bg) hover:border-(--qs-primary)"
         style={{ minHeight: 80, color: "var(--qs-text-muted)" }}
       >
         <span className="text-sm" aria-label="Add image">
@@ -169,25 +180,22 @@ export default function TemplateImage({
       }}
     >
       {showImage}
-
       {isEditor && (
         <>
           <input
             ref={inputRef}
             type="file"
-            accept="image/*"
+            accept="image/png,image/jpeg,image/jpg,image/webp,image/gif,image/bmp,image/svg+xml"
             className="hidden"
             onChange={handleFileChange}
             tabIndex={-1}
             disabled={uploading}
           />
-
           {uploading && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-2xl">
               <span className="text-xs text-white font-medium">Uploading…</span>
             </div>
           )}
-
           {error && !uploading && (
             <div className="absolute bottom-2 left-2 right-10 bg-red-500/90 text-white text-xs rounded-lg px-2 py-1 truncate">
               {error}

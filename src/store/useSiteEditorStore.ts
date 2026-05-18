@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 // src/store/useSiteEditorStore.ts
-// saveSite hits PATCH /api/sites/[id]/content — auth enforced server-side.
+// saveSite hits PATCH /api/sites/[id] — auth enforced server-side.
 
 import { create } from "zustand";
 import { getPrivateSite } from "@/lib/firestore";
@@ -8,17 +9,20 @@ import authFetch from "@/lib/authFetch";
 
 interface SiteEditorState {
   site: Site | null;
+  images: Record<string, File>;
   loading: boolean;
   isSaving: boolean;
 
   fetchSite: (uid: string, slug: string) => Promise<void>;
   updateSite: (updates: Partial<Site>) => void;
   saveSite: () => Promise<void>;
+  setImage: (pos: string, data: File) => void;
   reset: () => void;
 }
 
 export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
   site: null,
+  images: {},
   loading: true,
   isSaving: false,
 
@@ -43,24 +47,38 @@ export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
     set({ site: { ...current, ...updates } });
   },
 
-  // 💾 Save via API route — auth validated server-side
+  setImage: (path, data) => {
+    set((state) => ({
+      images: { ...state.images, [path]: data },
+    }));
+  },
+
   saveSite: async () => {
-    const { site } = get();
-    if (!site) return;
+    const { site, images } = get();
+    if (!site || !images) return;
 
     try {
       set({ isSaving: true });
 
+      // Use FormData instead of JSON
+      const form = new FormData();
+      form.append("name", site.name ?? "");
+      form.append("theme", site.theme ? JSON.stringify(site.theme) : "");
+      form.append("content", JSON.stringify(site.content ?? {}));
+
+      // Append each image as a file in FormData (e.g., images[path])
+      if (images) {
+        Object.entries(images).forEach(([path, file]) => {
+          if (file) {
+            // you could use a key like 'images[path]' or simply path
+            form.append(`images[${path}]`, file);
+          }
+        });
+      }
+
       const res = await authFetch(`/api/sites/${site.id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          content: site.content,
-          theme: site.theme,
-          name: site.name,
-        }),
+        body: form,
       });
 
       if (!res.ok) {
@@ -75,6 +93,5 @@ export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
     }
   },
 
-  // 🧹 Reset editor state
   reset: () => set({ site: null, loading: true, isSaving: false }),
 }));

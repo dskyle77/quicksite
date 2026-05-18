@@ -2,11 +2,10 @@
 // ─── Footer Variants ──────────────────────────────────────────────────────────
 // Register new footer variants here. Key must match FooterVariantKey in types.ts.
 
-import {
-  VariantRegistry,
-  FooterVariantKey,
-} from "../types";
+import { VariantRegistry, FooterVariantKey } from "../types";
 import { TemplateComponentProps } from "@/lib/templates";
+
+import EditableLinkButton from "@/components/shared/EditableLink";
 
 import Branding from "@/components/shared/Branding";
 
@@ -18,11 +17,11 @@ const ClassicFooter = ({
   content,
   onUpdate,
 }: TemplateComponentProps) => {
-  const socials: string[] = content?.footer?.socials ?? [
-    "GitHub",
-    "LinkedIn",
-    "Twitter",
-    "Dribbble",
+  const socials = content?.socials ?? [
+    { label: "GitHub", linkConfig: { type: "url" as const, url: "" } },
+    { label: "LinkedIn", linkConfig: { type: "url" as const, url: "" } },
+    { label: "Twitter", linkConfig: { type: "url" as const, url: "" } },
+    { label: "Dribbble", linkConfig: { type: "url" as const, url: "" } },
   ];
   return (
     <footer
@@ -32,40 +31,54 @@ const ClassicFooter = ({
         borderColor: "var(--qs-border)",
       }}
     >
-      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10 md:flex-row md:items-center md:justify-between">
+      <div className="mx-auto flex max-w-6xl flex-col gap-6 px-6 py-10 @md:flex-row @md:items-center @md:justify-between">
         <div>
           <p
             className="font-semibold"
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
-              onUpdate("footer.brand", e.currentTarget.textContent?.trim())
+              onUpdate("brand", e.currentTarget.textContent?.trim())
             }
           >
-            {content?.footer?.brand ?? "My Brand"}
+            {content?.brand ?? "My Brand"}
           </p>
           <p className="mt-1 text-sm" style={{ color: "var(--qs-text-muted)" }}>
-            {content?.footer?.copyright ??
+            {content?.copyright ??
               `© ${new Date().getFullYear()} All rights reserved.`}
           </p>
           {!isEditor && <Branding />}
         </div>
         <div className="flex flex-wrap gap-6 text-sm">
-          {socials.map((social, i) => (
-            <a
+          {socials.map((social: any, i: any) => (
+            <EditableLinkButton
               key={i}
-              href="#"
+              isEditor={isEditor}
               className="transition-opacity hover:opacity-70"
-              contentEditable={isEditor}
-              suppressContentEditableWarning
-              onBlur={(e) => {
+              noPreview={true}
+              label={
+                typeof social === "string" ? social : (social?.label ?? "")
+              }
+              linkConfig={
+                typeof social === "string" ? undefined : social?.linkConfig
+              }
+              onLabelChange={(label) => {
                 const next = [...socials];
-                next[i] = e.currentTarget.textContent?.trim() || social;
-                onUpdate("footer.socials", next);
+                next[i] =
+                  typeof social === "string"
+                    ? { label, linkConfig: { type: "url", url: "" } }
+                    : { ...next[i], label };
+                onUpdate("socials", next);
               }}
-            >
-              {social}
-            </a>
+              onLinkChange={(linkConfig) => {
+                const next = [...socials];
+                next[i] =
+                  typeof social === "string"
+                    ? { label: social, linkConfig }
+                    : { ...next[i], linkConfig };
+                onUpdate("socials", next);
+              }}
+            />
           ))}
         </div>
       </div>
@@ -98,31 +111,16 @@ const CenteredFooter = ({
       style={{ color: "var(--qs-text-muted)" }}
       contentEditable={isEditor}
       suppressContentEditableWarning
-      onBlur={(e) =>
-        onUpdate("footer.copyright", e.currentTarget.textContent?.trim())
-      }
+      onBlur={(e) => onUpdate("copyright", e.currentTarget.textContent?.trim())}
     >
-      {content?.footer?.copyright ??
+      {content?.copyright ??
         `© ${new Date().getFullYear()} All rights reserved.`}
     </p>
     <div className="mt-6 flex justify-center">{!isEditor && <Branding />}</div>
   </footer>
 );
 
-// ─── 3. Minimal ───────────────────────────────────────────────────────────────
-// Single-line bar — just brand and copyright.
-
-const MinimalFooter = ({ content }: TemplateComponentProps) => (
-  <footer
-    className="py-6 px-6 border-t flex justify-between items-center text-[10px] uppercase tracking-widest"
-    style={{ borderColor: "var(--qs-border)", color: "var(--qs-text-muted)" }}
-  >
-    <div>{content?.footer?.brand}</div>
-    <div>{content?.footer?.copyright}</div>
-  </footer>
-);
-
-// ─── 4. Columns ───────────────────────────────────────────────────────────────
+// ─── 3. Columns ───────────────────────────────────────────────────────────────
 // Multi-column layout — brand column + link groups. Good for landing pages.
 
 const ColumnsFooter = ({
@@ -130,10 +128,16 @@ const ColumnsFooter = ({
   content,
   onUpdate,
 }: TemplateComponentProps) => {
-  const socials: string[] = content?.footer?.socials ?? [
-    "GitHub",
-    "LinkedIn",
-    "Twitter",
+  const socials = content?.socials ?? [
+    {
+      label: "Twitter",
+    },
+    {
+      label: "LinkedIn",
+    },
+    {
+      label: "GitHub",
+    },
   ];
   return (
     <footer
@@ -143,18 +147,18 @@ const ColumnsFooter = ({
         borderColor: "var(--qs-border)",
       }}
     >
-      <div className="mx-auto max-w-6xl grid gap-10 md:grid-cols-4">
+      <div className="mx-auto max-w-6xl grid gap-10 @md:grid-cols-4">
         {/* Brand Column */}
-        <div className="md:col-span-2">
+        <div className="@md:col-span-2">
           <p
             className="text-xl font-bold"
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
-              onUpdate("footer.brand", e.currentTarget.textContent?.trim())
+              onUpdate("brand", e.currentTarget.textContent?.trim())
             }
           >
-            {content?.footer?.brand ?? "My Brand"}
+            {content?.brand ?? "My Brand"}
           </p>
           <p
             className="mt-3 text-sm leading-6"
@@ -178,21 +182,31 @@ const ColumnsFooter = ({
             Connect
           </p>
           <div className="flex flex-col gap-2 text-sm">
-            {socials.map((s, i) => (
-              <a
-                key={i}
-                href="#"
+            {[0, 1, 2].map((n: any) => (
+              <EditableLinkButton
+                key={n}
+                isEditor={isEditor}
                 className="hover:opacity-70 transition-opacity"
-                contentEditable={isEditor}
-                suppressContentEditableWarning
-                onBlur={(e) => {
-                  const next = [...socials];
-                  next[i] = e.currentTarget.textContent?.trim() || s;
-                  onUpdate("footer.socials", next);
+                noPreview={true}
+                label={socials[n]?.label}
+                linkConfig={socials[n]?.linkConfig}
+                onLabelChange={(label) => {
+                  const updtd = [...socials];
+                  updtd[n] = {
+                    ...updtd[n],
+                    label,
+                  };
+                  onUpdate("socials", updtd);
                 }}
-              >
-                {s}
-              </a>
+                onLinkChange={(linkConfig) => {
+                  const updtd = [...socials];
+                  updtd[n] = {
+                    ...updtd[n],
+                    linkConfig,
+                  };
+                  onUpdate("socials", updtd);
+                }}
+              />
             ))}
           </div>
         </div>
@@ -226,18 +240,22 @@ const ColumnsFooter = ({
           color: "var(--qs-text-muted)",
         }}
       >
-        {content?.footer?.copyright ??
+        {content?.copyright ??
           `© ${new Date().getFullYear()} All rights reserved.`}
       </div>
     </footer>
   );
 };
 
+// None variant: Renders no footer at all.
+
+const None = () => <div></div>;
+
 // ─── Registry ─────────────────────────────────────────────────────────────────
 
 export const FooterVariants: VariantRegistry<FooterVariantKey> = {
   classic: ClassicFooter,
   centered: CenteredFooter,
-  minimal: MinimalFooter,
+  none: None,
   columns: ColumnsFooter,
 };
