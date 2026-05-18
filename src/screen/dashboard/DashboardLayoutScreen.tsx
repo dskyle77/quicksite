@@ -25,6 +25,7 @@ import {
   Sun,
   Moon,
   Menu,
+  Mail,
 } from "lucide-react";
 
 const SITE_STANDARD_NAME = process.env.NEXT_PUBLIC_SITE_STANDARD_NAME;
@@ -49,6 +50,7 @@ export default function DashboardLayoutScreen({
     { icon: Globe, label: "My Sites", href: "/dashboard/sites" },
     { icon: Globe, label: "Domains", href: "/dashboard/domains" },
     { icon: BarChart2, label: "Analytics", href: "/dashboard/analytics" },
+    { icon: Mail, label: "Messages", href: "/dashboard/messages" },
     { icon: Settings, label: "Settings", href: "/dashboard/settings" },
   ];
 

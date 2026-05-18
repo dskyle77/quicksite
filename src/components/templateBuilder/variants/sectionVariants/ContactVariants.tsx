@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SectionProps } from "../../types";
 import EditableLinkButton from "@/components/shared/EditableLink";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import Container from "@/components/shared/Container";
+import useFormSubmit from "@/hooks/useFormSubmit";
 
 export const ContactSection = ({
   variant,
@@ -10,12 +12,11 @@ export const ContactSection = ({
   onUpdate,
   position,
   anchorName,
-  path
+  slugs,
 }: SectionProps) => {
   const isEven = position % 2 === 0;
 
   const sectionBg = isEven ? "var(--qs-bg)" : "var(--qs-bg-alt)";
-
   const cardBg = isEven ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.05)";
 
   const [formData, setFormData] = useState({
@@ -23,6 +24,11 @@ export const ContactSection = ({
     email: "",
     message: "",
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const submitForm = useFormSubmit();
 
   // ─────────────────────────────────────────────
   // SPLIT VARIANT
@@ -189,24 +195,35 @@ export const ContactSection = ({
   // ─────────────────────────────────────────────
 
   if (variant === "form") {
-    // State for form fields to construct the message override
-
-    // Helper to handle input/textarea events
     const handleInput = (key: keyof typeof formData, value: string) => {
       setFormData((prev) => ({ ...prev, [key]: value }));
+      setSubmitSuccess(false);
+      setSubmitError(null);
     };
 
-    // Build the message to pass to the CtaLink as messageOverride
-    const messageOverride = [
-      formData.name && `Name: ${formData.name}`,
-      formData.email && `Email: ${formData.email}`,
-      formData.message && `Message: ${formData.message}`,
-    ]
-      .filter(Boolean)
-      .join("\n");
+    const handleSubmit = async (e: FormEvent) => {
+      e.preventDefault();
+      if (isEditor) return;
+
+      await submitForm({
+        formData,
+        setFormData,
+        setSubmitting,
+        setSubmitSuccess,
+        setSubmitError,
+        siteSlug: slugs?.slug,
+        anchorName,
+      });
+    };
+
+    const primaryButtonLabel = content.primaryButton ?? "Send Message";
 
     return (
-      <section id={anchorName} className="py-24" style={{ background: sectionBg }}>
+      <section
+        id={anchorName}
+        className="py-24"
+        style={{ background: sectionBg }}
+      >
         <div className="max-w-6xl mx-auto px-4">
           <div
             className="grid @lg:grid-cols-2 gap-10 rounded-[36px] border overflow-hidden"
@@ -317,7 +334,7 @@ export const ContactSection = ({
                 background: "rgba(255,255,255,0.02)",
               }}
             >
-              <div className="space-y-5">
+              <form className="space-y-5" onSubmit={handleSubmit} noValidate>
                 <div>
                   <label
                     className="block text-sm font-semibold mb-2"
@@ -329,7 +346,8 @@ export const ContactSection = ({
                   <input
                     type="text"
                     placeholder="John Doe"
-                    className="w-full rounded-2xl px-5 py-4 outline-none"
+                    disabled={isEditor || submitting}
+                    className="w-full rounded-2xl px-5 py-4 outline-none disabled:opacity-60"
                     style={{
                       background: "var(--qs-bg)",
                       border: "1px solid var(--qs-border)",
@@ -351,7 +369,8 @@ export const ContactSection = ({
                   <input
                     type="email"
                     placeholder="john@example.com"
-                    className="w-full rounded-2xl px-5 py-4 outline-none"
+                    disabled={isEditor || submitting}
+                    className="w-full rounded-2xl px-5 py-4 outline-none disabled:opacity-60"
                     style={{
                       background: "var(--qs-bg)",
                       border: "1px solid var(--qs-border)",
@@ -372,8 +391,10 @@ export const ContactSection = ({
 
                   <textarea
                     rows={6}
+                    required
                     placeholder="Tell me about your project..."
-                    className="w-full rounded-2xl px-5 py-4 outline-none resize-none"
+                    disabled={isEditor || submitting}
+                    className="w-full rounded-2xl px-5 py-4 outline-none resize-none disabled:opacity-60"
                     style={{
                       background: "var(--qs-bg)",
                       border: "1px solid var(--qs-border)",
@@ -384,24 +405,46 @@ export const ContactSection = ({
                   />
                 </div>
 
-                <div className="pt-2">
-                  <EditableLinkButton
-                    isEditor={isEditor}
-                    label={content.primaryButton ?? "Send Message"}
-                    linkConfig={content.primaryButtonLink}
-                    onLabelChange={(v) => onUpdate("content.primaryButton", v)}
-                    onLinkChange={(cfg) =>
-                      onUpdate("content.primaryButtonLink", cfg)
-                    }
-                    className="w-full rounded-2xl px-8 py-5 font-bold text-center transition-all duration-300 hover:-translate-y-1"
+                <div className="pt-2 space-y-2">
+                  <button
+                    type={isEditor ? "button" : "submit"}
+                    disabled={!isEditor && submitting}
+                    className="w-full rounded-2xl px-8 py-5 font-bold text-center transition-all duration-300 hover:-translate-y-1 disabled:opacity-60 disabled:hover:translate-y-0"
                     style={{
                       background: "var(--qs-primary)",
                       color: "var(--qs-primary-fg)",
                     }}
-                    messageOverride={messageOverride}
-                  />
+                  >
+                    <span
+                      contentEditable={isEditor}
+                      suppressContentEditableWarning
+                      onBlur={(e) =>
+                        onUpdate(
+                          "content.primaryButton",
+                          e.currentTarget.textContent?.trim(),
+                        )
+                      }
+                    >
+                      {submitting && !isEditor
+                        ? "Sending…"
+                        : primaryButtonLabel}
+                    </span>
+                  </button>
+                  {submitSuccess && !isEditor && (
+                    <p
+                      className="text-sm text-center"
+                      style={{ color: "var(--qs-primary)" }}
+                    >
+                      Thanks! Your message was sent.
+                    </p>
+                  )}
+                  {submitError && !isEditor && (
+                    <p className="text-sm text-center text-red-500">
+                      {submitError}
+                    </p>
+                  )}
                 </div>
-              </div>
+              </form>
             </div>
           </div>
         </div>

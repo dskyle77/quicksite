@@ -2,6 +2,9 @@
 
 export type Plan = "free" | "growth" | "pro";
 
+/** Fully dynamic custom template builder */
+export const CUSTOM_TEMPLATE_TYPE = "template-builder";
+
 export const PLANS: {
   name: string;
   plan: Plan;
@@ -20,6 +23,7 @@ export const PLANS: {
       "1 mini-site",
       "Quicksite subdomain",
       "Basic templates",
+      "AI starter content (1/day)",
       "Quicksite branding",
     ],
     buttonText: "Get Started Free",
@@ -30,10 +34,10 @@ export const PLANS: {
     price: 2000,
     description: "Build your brand and grow your online presence",
     features: [
-      "Up to 5 mini-sites",
+      "Up to 10 mini-sites",
       "Custom domain",
       "More templates",
-      "AI starter content",
+      "AI starter content (10/day)",
       "Basic SEO",
       "Contact forms",
       "Remove Quicksite branding",
@@ -47,10 +51,11 @@ export const PLANS: {
     price: 5000,
     description: "Advanced tools for creators and businesses",
     features: [
-      "Up to 15 mini-sites",
+      "Up to 25 mini-sites",
       "Premium templates",
       "Analytics",
       "Sell products",
+      "AI starter content (25/day)",
       "Advanced SEO",
       "Priority support",
     ],
@@ -62,27 +67,33 @@ export const PLAN_LIMITS = {
   free: {
     sites: 1,
     customDomain: false,
+    customTemplate: false,
     analytics: false,
     payments: false,
-    ai: false,
+    ai: true,
+    messages: false,
     removeBranding: false,
   },
 
   growth: {
-    sites: 5,
+    sites: 10,
     customDomain: true,
+    customTemplate: true,
     analytics: false,
     payments: false,
     ai: true,
+    messages: true,
     removeBranding: true,
   },
 
   pro: {
-    sites: 15,
+    sites: 25,
     customDomain: true,
+    customTemplate: true,
     analytics: true,
     payments: false,
     ai: true,
+    messages: true,
     removeBranding: true,
   },
 } as const;

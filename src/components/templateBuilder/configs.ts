@@ -1,6 +1,6 @@
 export const portfolioConfig = () => ({
   navbar: "classic",
-  hero: "dynamic",
+  hero: "background",
   footer: "classic",
   sections: [
     {
@@ -64,7 +64,7 @@ export const portfolioConfig = () => ({
 
 export const builderConfig = () => ({
   navbar: "classic",
-  hero: "dynamic",
+  hero: "background",
   footer: "classic",
   sections: [
     {
@@ -119,14 +119,14 @@ export const builderConfig = () => ({
     {
       id: "init-features",
       type: "features",
-      variant: "grid",
+      variant: "default",
       enabled: true,
       anchorName: "features",
     },
     {
       id: "init-pricing",
       type: "pricing",
-      variant: "table",
+      variant: "default",
       enabled: true,
       anchorName: "pricing",
     },

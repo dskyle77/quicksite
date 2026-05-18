@@ -1,0 +1,129 @@
+import { NextResponse } from "next/server";
+import { getUserFromSession } from "@/server/auth";
+import { getMessagesForUser, submitMessage } from "@/server/messages";
+// Assume you have serverDeleteMessage function in server/firestore
+import { serverDeleteMessage } from "@/server/messages";
+
+export async function GET() {
+  try {
+    const user = await getUserFromSession();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
+    const messages = await getMessagesForUser(user.uid);
+    return NextResponse.json({
+      messages: messages.map((msg) => ({
+        id: msg.id,
+        name: msg.name,
+        email: msg.email,
+        subject: msg.subject,
+        body: msg.body,
+        anchorName: msg.anchorName,
+        createdAt: msg.createdAt,
+        site: msg.siteName ?? msg.siteSlug,
+      })),
+    });
+  } catch (err) {
+    console.error("[GET /api/messages]", err);
+    return NextResponse.json(
+      { error: "Failed to fetch messages." },
+      { status: 500 },
+    );
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const {
+      siteSlug,
+      slug,
+      name,
+      email,
+      subject,
+      body: messageBody,
+      message,
+      anchorName,
+    } = body;
+
+    const resolvedSlug = (siteSlug ?? slug) as string | undefined;
+    const resolvedBody = (messageBody ?? message) as string | undefined;
+
+    // Limit for message length
+    const MESSAGE_MAX_LENGTH = 2000;
+
+    if (!resolvedBody || typeof resolvedBody !== "string" || resolvedBody.trim().length === 0) {
+      return NextResponse.json({ error: "Message is required." }, { status: 400 });
+    }
+    if (resolvedBody.length > MESSAGE_MAX_LENGTH) {
+      return NextResponse.json(
+        { error: `Message must be no more than ${MESSAGE_MAX_LENGTH} characters.` },
+        { status: 400 }
+      );
+    }
+
+    const result = await submitMessage({
+      siteSlug: resolvedSlug ?? "",
+      name,
+      email,
+      subject,
+      anchorName,
+      body: resolvedBody,
+    });
+
+    return NextResponse.json({ success: true, id: result.id });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Server error.";
+    const status =
+      message === "Site not found."
+        ? 404
+        : message === "This site is not accepting messages." ||
+            message === "Contact forms are not available on this site." ||
+            message === "Site is required." ||
+            message === "Message is required." ||
+            message.startsWith("Message must be no more than ")
+          ? 400
+          : 500;
+
+    if (status === 500) {
+      console.error("[POST /api/messages]", err);
+    }
+
+    return NextResponse.json({ error: message }, { status });
+  }
+}
+
+// DELETE /api/messages?id=msgId
+export async function DELETE(req: Request) {
+  try {
+    const user = await getUserFromSession();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const id = searchParams.get("id");
+    if (!id) {
+      return NextResponse.json({ error: "Message ID is required." }, { status: 400 });
+    }
+
+    await serverDeleteMessage(user.uid, id);
+
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Server error.";
+    const status =
+      message === "Not authorized to delete this message."
+        ? 403
+        : message === "Message not found."
+          ? 404
+          : 500;
+
+    if (status === 500) {
+      console.error("[DELETE /api/messages]", err);
+    }
+
+    return NextResponse.json({ error: message }, { status });
+  }
+}

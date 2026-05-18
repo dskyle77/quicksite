@@ -4,6 +4,7 @@ import { ArrowRight, Loader2, Sparkles } from "lucide-react";
 
 import { useProfileStore } from "@/store/useProfileStore";
 import { canUseFeature } from "@/lib/plans";
+import { AI_DAILY_LIMITS } from "@/lib/rateLimit";
 
 const SITE_SHORT_NAME = process.env.NEXT_PUBLIC_SITE_SHORT_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
@@ -120,6 +121,7 @@ export function NewSiteForm({
                 <p className="text-sm font-bold">Generate with AI</p>
                 <p className="text-[10px] text-slate-500">
                   Auto-fill content based on your description
+                  {plan && ` (${AI_DAILY_LIMITS[plan]}/day)`}
                 </p>
               </div>
             </div>

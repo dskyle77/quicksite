@@ -9,6 +9,11 @@ import authFetch from "@/lib/authFetch";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileStore } from "@/store/useProfileStore";
 import { isValidTemplate } from "@/lib/templates";
+import {
+  CUSTOM_TEMPLATE_TYPE,
+  canUseFeature,
+  type Plan,
+} from "@/lib/plans";
 
 import { NewSiteForm } from "./NewSiteForm";
 import { TemplatePicker } from "./TemplatesPicker";
@@ -17,16 +22,23 @@ export default function CreateSitePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user } = useAuth();
+  const userProfile = useProfileStore().profile;
+  const userPlan = (userProfile?.plan ?? "free") as Plan;
+  const canUseCustomTemplate = canUseFeature(userPlan, "customTemplate");
 
   const templateTypeFromQuery = searchParams.get("template") || "";
-  const selectedTemplateType = isValidTemplate(templateTypeFromQuery)
+  let selectedTemplateType = isValidTemplate(templateTypeFromQuery)
     ? templateTypeFromQuery
     : "template-1";
+  if (
+    selectedTemplateType === CUSTOM_TEMPLATE_TYPE &&
+    !canUseCustomTemplate
+  ) {
+    selectedTemplateType = "template-1";
+  }
 
   const paramsName = searchParams.get("name");
   const paramsSlug = searchParams.get("slug");
-
-  const userProfile = useProfileStore().profile;
   const defaultMessage = userProfile?.defaultMessage;
   const whatsappNumber = userProfile?.whatsappNumber;
 
@@ -68,6 +80,14 @@ export default function CreateSitePage() {
     if (!formData.description && formData.generateWithAI) {
       return toast.error("Please provide a description to use AI generation.");
     }
+    if (
+      formData.type === CUSTOM_TEMPLATE_TYPE &&
+      !canUseCustomTemplate
+    ) {
+      return toast.error(
+        "Custom template requires Growth or Pro. Please upgrade your plan.",
+      );
+    }
 
     setLoading(true);
 
@@ -94,9 +114,11 @@ export default function CreateSitePage() {
 
       toast.success("Site created!");
       router.push(`/editor/${data.slug}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error("Something went wrong.");
+      toast.error(
+        error instanceof Error ? error.message : "Something went wrong.",
+      );
     } finally {
       setLoading(false);
     }
@@ -122,6 +144,7 @@ export default function CreateSitePage() {
             onTemplateChange={handleTemplateChange}
             slugForPreview={formData.slug}
             nameForPreview={formData.name}
+            canUseCustomTemplate={canUseCustomTemplate}
           />
         </div>
 

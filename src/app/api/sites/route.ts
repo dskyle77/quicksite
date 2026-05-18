@@ -5,8 +5,12 @@ import { serverCreateSite, getUserPlan } from "@/server/firestore";
 import { getTemplateContentByType } from "@/lib/templatesContent";
 import { generateSiteContentWithAI } from "@/server/ai-content";
 
-import { aiRateLimiter } from "@/lib/rateLimit";
-import type { Plan } from "@/lib/plans";
+import { AI_DAILY_LIMITS, getAiRateLimiter } from "@/lib/rateLimit";
+import {
+  CUSTOM_TEMPLATE_TYPE,
+  canUseFeature,
+  type Plan,
+} from "@/lib/plans";
 
 export async function POST(req: Request) {
   try {
@@ -50,12 +54,26 @@ export async function POST(req: Request) {
       );
     }
 
-    const plan = await getUserPlan(user.uid);
+    const plan = (await getUserPlan(user.uid)) as Plan;
+
+    if (
+      type === CUSTOM_TEMPLATE_TYPE &&
+      !canUseFeature(plan, "customTemplate")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Custom template is available on Growth and Pro plans. Please upgrade to use it.",
+        },
+        { status: 403 },
+      );
+    }
 
     const defaultImage =
       "https://image-source-sk.vercel.app/projects/default-image.jpg";
 
     let finalContent = null;
+    let siteTheme = templateEntry.config.theme ?? "warm";
     const schemaBase = templateEntry.getSchema({
       selectedTitle: normalizedName,
       defaultMessage,
@@ -64,12 +82,26 @@ export async function POST(req: Request) {
     });
 
     // 1. Try to generate with AI if requested
-    if (generateWithAI === true && description && plan !== "free") {
-      const { success, reset } = await aiRateLimiter.limit(user.uid);
+    if (generateWithAI === true && description) {
+      if (!canUseFeature(plan, "ai")) {
+        return NextResponse.json(
+          {
+            error:
+              "AI content generation is available on Growth and Pro plans.",
+          },
+          { status: 403 },
+        );
+      }
+
+      const limiter = getAiRateLimiter(plan);
+      const { success, reset } = await limiter.limit(user.uid);
 
       if (!success) {
+        const dailyCap = AI_DAILY_LIMITS[plan];
         return NextResponse.json(
-          { error: "AI Generation limit reached. Try again in an hour." },
+          {
+            error: `Daily AI limit reached (${dailyCap}/day). Try again tomorrow.`,
+          },
           {
             status: 429,
             headers: { "X-RateLimit-Reset": reset.toString() },
@@ -77,11 +109,14 @@ export async function POST(req: Request) {
         );
       }
       try {
-        finalContent = await generateSiteContentWithAI({
+        const aiResult = await generateSiteContentWithAI({
           selectedTitle: normalizedName,
           description,
           schemaBase,
+          defaultThemeId: siteTheme,
         });
+        finalContent = aiResult.content;
+        siteTheme = aiResult.themeId;
       } catch (error) {
         console.error("AI Generation failed, falling back to default:", error);
         finalContent = null;
@@ -105,7 +140,7 @@ export async function POST(req: Request) {
         slug: normalizedSlug,
         type,
         name: normalizedName,
-        theme: templateEntry.config.theme,
+        theme: siteTheme,
         status: "draft",
         content: finalContent, // Use the final merged content
       },

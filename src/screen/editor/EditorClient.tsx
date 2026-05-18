@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Link from "next/link";
@@ -27,8 +28,8 @@ export default function EditorClient({ slug, subslug }: EditorClientProps) {
     try {
       await saveSite();
       toast.success("Changes saved successfully");
-    } catch (error) {
-      toast.error("Error saving changes");
+    } catch (err: any) {
+      toast.error(err instanceof Error ? err.message : "Server error.");
     }
   };
 

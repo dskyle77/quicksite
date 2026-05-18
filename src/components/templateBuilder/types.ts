@@ -195,6 +195,8 @@ export interface AboutContent {
 export interface SkillItem {
   name: string;
   level: string | number;
+  icon?: string;
+  desc?: string;
 }
 
 export interface ProjectItem {

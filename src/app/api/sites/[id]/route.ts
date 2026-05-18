@@ -13,21 +13,27 @@ interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
+// Helper function to check serialized data size (excluding images)
+function isTooLarge(obj: unknown, maxBytes = 450_000): boolean {
+  // About 450KB, safely under the 512KB Firestore/RTDB/most field limits
+  try {
+    const json = JSON.stringify(obj);
+    return new TextEncoder().encode(json).length > maxBytes;
+  } catch {
+    return true;
+  }
+}
+
 export async function PATCH(req: Request, { params }: RouteContext) {
   try {
-    console.log("[PATCH] — Begin processing PATCH /api/sites/[id]");
     const user = await getUserFromSession();
-    console.log("[PATCH] User retrieved:", !!user, user?.uid);
 
     if (!user) {
-      console.log("[PATCH] No user. Unauthorized.");
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
     const { id: slug } = await params;
-    console.log("[PATCH] Got site slug:", slug);
     if (!slug) {
-      console.log("[PATCH] No slug provided.");
       return NextResponse.json(
         { error: "Site ID is required." },
         { status: 400 },
@@ -36,14 +42,11 @@ export async function PATCH(req: Request, { params }: RouteContext) {
 
     // Parse multipart form data instead of JSON body
     const formData = await req.formData();
-    console.log("[PATCH] formData received:", formData);
 
     // Required fields: name (string), theme (stringified JSON), content (stringified JSON)
     const name = formData.get("name");
     const themeRaw = formData.get("theme");
     const contentRaw = formData.get("content");
-
-    console.log("[PATCH] form values — name:", name, "themeRaw:", themeRaw, "contentRaw:", contentRaw);
 
     // Parse theme and content if present
     let theme = undefined;
@@ -51,18 +54,15 @@ export async function PATCH(req: Request, { params }: RouteContext) {
     try {
       if (themeRaw && typeof themeRaw === "string" && themeRaw !== "") {
         theme = JSON.parse(themeRaw);
-        console.log("[PATCH] theme parsed:", theme);
       }
     } catch (themeErr) {
-      console.log("[PATCH] Theme parsing failed:", themeErr);
+      // Swallow theme parsing errors; continue
     }
     try {
       if (contentRaw && typeof contentRaw === "string") {
         content = JSON.parse(contentRaw);
-        console.log("[PATCH] content parsed", content);
       }
     } catch (err) {
-      console.log("[PATCH] Content JSON parse error:", err);
       return NextResponse.json({ error: "Invalid content." }, { status: 400 });
     }
 
@@ -73,15 +73,12 @@ export async function PATCH(req: Request, { params }: RouteContext) {
         const path = key.slice(7, -1);
         if (value instanceof File && value.size > 0) {
           images[path] = value;
-          console.log(`[PATCH] Image file found — path: ${path}, size: ${value.size}B`);
         }
       }
     }
-    console.log("[PATCH] images collected:", Object.keys(images));
 
     // Upload images and get mapping: path -> image URL
     const imagesWithUrl = await uploadSiteImages(slug, user.uid, images);
-    console.log("[PATCH] imagesWithUrl:", imagesWithUrl);
 
     // Patch content with new image URLs at those paths
     // Defensive: Only attempt patch if content is present
@@ -89,21 +86,26 @@ export async function PATCH(req: Request, { params }: RouteContext) {
     if (content !== undefined && imagesWithUrl && Object.keys(imagesWithUrl).length > 0) {
       const contentClone = JSON.parse(JSON.stringify(content));
       newContent = batchUpdateByPath(contentClone, imagesWithUrl);
-      console.log("[PATCH] Content patched with image URLs.");
     }
 
-    // Build refined body
-    const refinedBody = {
+    // Build refined body, but first check data size, excluding images
+    // Images are not included in the serialized body
+    // We trim fields to prevent accidental excess
+    const toSerialize = {
       name: typeof name === "string" ? name : "",
       content: newContent,
       theme,
     };
 
-    console.log("[PATCH] Refined site body to update:", refinedBody);
+    if (isTooLarge(toSerialize)) {
+      return NextResponse.json(
+        { error: "Site content is too large. Reduce text or data." },
+        { status: 413 },
+      );
+    }
 
-    await serverUpdateSite(slug, user.uid, refinedBody);
+    await serverUpdateSite(slug, user.uid, toSerialize);
 
-    console.log("[PATCH] Site update success!");
     return NextResponse.json({ success: true });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Server error.";
@@ -120,19 +122,14 @@ export async function PATCH(req: Request, { params }: RouteContext) {
 
 export async function DELETE(_req: Request, { params }: RouteContext) {
   try {
-    console.log("[DELETE] — Begin processing DELETE /api/sites/[id]");
     const user = await getUserFromSession();
-    console.log("[DELETE] User retrieved:", !!user, user?.uid);
 
     if (!user) {
-      console.log("[DELETE] No user. Unauthorized.");
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
     const { id: slug } = await params;
-    console.log("[DELETE] Got site slug:", slug);
     if (!slug) {
-      console.log("[DELETE] No slug provided.");
       return NextResponse.json(
         { error: "Site ID is required." },
         { status: 400 },
@@ -141,7 +138,6 @@ export async function DELETE(_req: Request, { params }: RouteContext) {
 
     await serverDeleteSite(slug, user.uid);
 
-    console.log("[DELETE] Site deletion success!");
     return NextResponse.json({ success: true });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Server error.";

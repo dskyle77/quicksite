@@ -26,31 +26,17 @@ const year = () => new Date().getFullYear();
 
 // ─── NAVBAR ───────────────────────────────────────────────────────────────────
 
-const defaultLinks = [
-  {
-    label: "About",
-    type: "anchor" as const,
-    anchor: "about",
-    href: "",
-  },
-  {
-    label: "Skills",
-    type: "anchor" as const,
-    anchor: "skills",
-    href: "",
-  },
-  {
-    label: "Projects",
-    type: "anchor" as const,
-    anchor: "projects",
-    href: "",
-  },
-  {
-    label: "GitHub",
-    type: "external" as const,
-    anchor: "#",
-    href: "https://github.com/",
-  },
+/** Empty anchor rows for AI — labels/anchors filled from enabled sections */
+const navbarLinksSchema = () => [
+  { label: "", type: "anchor" as const, anchor: "", href: "" },
+  { label: "", type: "anchor" as const, anchor: "", href: "" },
+  { label: "", type: "anchor" as const, anchor: "", href: "" },
+];
+
+const defaultStarterLinks = [
+  { label: "About", type: "anchor" as const, anchor: "about", href: "" },
+  { label: "Services", type: "anchor" as const, anchor: "features", href: "" },
+  { label: "Contact", type: "anchor" as const, anchor: "contact", href: "" },
 ];
 
 const navbarSchema = ({
@@ -62,7 +48,7 @@ const navbarSchema = ({
   title: selectedTitle ?? "",
   ctaButton: "",
   ctaButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
-  links: defaultLinks,
+  links: navbarLinksSchema(),
 });
 
 const navbarStarterContent = ({
@@ -71,10 +57,10 @@ const navbarStarterContent = ({
   defaultMessage,
 }: SchemaParams): NavbarContent => ({
   logo: "✦",
-  title: selectedTitle ?? "My Portfolio",
-  ctaButton: "Hire Me",
+  title: selectedTitle ?? "My Business",
+  ctaButton: "Chat on WhatsApp",
   ctaButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
-  links: defaultLinks,
+  links: defaultStarterLinks,
 });
 
 // ─── HERO ─────────────────────────────────────────────────────────────────────
@@ -102,14 +88,14 @@ const heroStarterContent = ({
   defaultImage,
 }: SchemaParams): HeroContent => ({
   type: "background",
-  badge: "👋 Available for Work",
+  badge: "Open for orders",
   image1: img(defaultImage),
   image1PId: "",
-  title: "Hi, I'm Alex — Creative Developer",
-  desc: "I craft beautiful digital experiences — from sleek web apps to polished mobile products.",
-  primaryButton: "View My Work",
+  title: "Welcome — We're Glad You're Here",
+  desc: "Quality service, fair prices, and a team that cares about every customer.",
+  primaryButton: "Chat on WhatsApp",
   primaryButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
-  secondaryButton: "Download CV",
+  secondaryButton: "Learn More",
   secondaryButtonLink: {},
 });
 
@@ -155,7 +141,10 @@ const aboutStarterContent = ({ defaultImage }: SchemaParams): AboutContent => ({
 const skillsSchema = () => ({
   heading: "",
   subheading: "",
-  items: [{ name: "", level: "1-100" }] as SkillItem[],
+  items: [
+    { name: "", level: "80", icon: "", desc: "" },
+    { name: "", level: "80", icon: "", desc: "" },
+  ] satisfies SkillItem[],
   skillTags: [] as string[],
 });
 
@@ -182,6 +171,7 @@ const projectsSchema = ({ defaultImage }: SchemaParams) => ({
   heading: "",
   subheading: "",
   items: [
+    { title: "", desc: "", tags: [], image: img(defaultImage), imagePId: "" },
     { title: "", desc: "", tags: [], image: img(defaultImage), imagePId: "" },
   ] as ProjectItem[],
 });
@@ -247,7 +237,10 @@ const experienceStarterContent = () => ({
 const testimonialsSchema = () => ({
   heading: "",
   subheading: "",
-  items: [{ quote: "", name: "", role: "" }] as TestimonialItem[],
+  items: [
+    { quote: "", name: "", role: "" },
+    { quote: "", name: "", role: "" },
+  ] as TestimonialItem[],
 });
 
 const testimonialsStarterContent = () => ({
@@ -342,7 +335,10 @@ const footerStarterContent = ({
 const featuresSchema = () => ({
   heading: "",
   subheading: "",
-  items: [{ icon: "", title: "", desc: "" }],
+  items: [
+    { icon: "", title: "", desc: "" },
+    { icon: "", title: "", desc: "" },
+  ],
 });
 
 const featuresStarterContent = () => ({
@@ -364,20 +360,27 @@ const featuresStarterContent = () => ({
 
 // ─── PRICING ─────────────────────────────────────────────────────────────────
 
+const emptyPricingPlan = (
+  whatsappNumber?: string,
+  defaultMessage?: string,
+  highlighted = false,
+) => ({
+  name: "",
+  price: "",
+  period: "",
+  desc: "",
+  features: [] as string[],
+  ctaLabel: "",
+  ctaLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  highlighted,
+});
+
 const pricingSchema = ({ whatsappNumber, defaultMessage }: SchemaParams) => ({
   heading: "",
   subheading: "",
   plans: [
-    {
-      name: "",
-      price: "",
-      period: "",
-      desc: "",
-      features: [] as string[],
-      ctaLabel: "",
-      ctaLink: makeWhatsappLink(whatsappNumber, defaultMessage),
-      highlighted: false,
-    },
+    emptyPricingPlan(whatsappNumber, defaultMessage, false),
+    emptyPricingPlan(whatsappNumber, defaultMessage, true),
   ],
 });
 
@@ -416,7 +419,10 @@ const pricingStarterContent = ({
 const faqSchema = () => ({
   heading: "",
   subheading: "",
-  items: [{ question: "", answer: "" }],
+  items: [
+    { question: "", answer: "" },
+    { question: "", answer: "" },
+  ],
 });
 
 const faqStarterContent = () => ({
@@ -523,51 +529,7 @@ export const buildStarterContent = ({
   return content;
 };
 
-// New helper: buildSchema
-export const buildSchema = ({
-  config,
-  params,
-}: {
-  config: any;
-  params: {
-    selectedTitle?: string;
-    whatsappNumber?: string;
-    defaultMessage?: string;
-    defaultImage?: string;
-  };
-}) => {
-  const schema: any = {
-    builderConfig: {
-      _note: `Instructions: For navbar, hero, footer, and all sections, use only the allowed variant keys found in variantOptions: ${JSON.stringify(variantOptions)}. Assign a meaningful anchorName to each section that reflects its use and context (for example, rename 'projects' to 'menu' if used as a menu section).`,
-
-      navbar: "",
-      hero: "",
-      footer: "",
-      sections: config.sections.map((sec: any) => ({
-        id: sec.id,
-        type: sec.type,
-        variant: "",
-        enabled: true,
-        anchorName: "",
-      })),
-    },
-    navbar: schemaMap.navbar(params),
-    hero: schemaMap.hero(params),
-    footer: schemaMap.footer(params),
-  };
-
-  // Inject scoped schemas for AI to fill
-  config.sections.forEach((sec: any) => {
-    const schemaFn = schemaMap[sec.type];
-    if (schemaFn) {
-      const contentKey = `${sec.id}${sec.type}`;
-      schema[contentKey] = schemaFn(params);
-    }
-  });
-
-  return schema;
-};
-
+/** Allowed layout variants — must match variant component registries */
 export const variantOptions: Record<string, string[]> = {
   navbar: ["classic", "minimal"],
   hero: ["background", "split", "minimalist", "centered"],
@@ -583,4 +545,62 @@ export const variantOptions: Record<string, string[]> = {
   faq: ["default", "accordion", "numbered"],
   cta: ["default", "banner", "simple"],
   footer: ["classic", "centered", "columns", "none"],
+};
+
+/** builderConfig shape sent to AI — variants left empty for the model to choose */
+export const buildAIBuilderConfig = (config: {
+  navbar?: string;
+  hero?: string;
+  footer?: string;
+  sections?: Array<{
+    id: string;
+    type: string;
+    variant?: string;
+    enabled?: boolean;
+    anchorName?: string;
+  }>;
+}) => ({
+  navbar: "",
+  hero: "",
+  footer: "",
+  sections: (config.sections ?? []).map((sec) => ({
+    id: sec.id,
+    type: sec.type,
+    variant: "",
+    enabled: sec.enabled ?? true,
+    anchorName: sec.anchorName ?? sec.type,
+  })),
+});
+
+export const buildSchema = ({
+  config,
+  params,
+  defaultThemeId,
+}: {
+  config: any;
+  params: {
+    selectedTitle?: string;
+    whatsappNumber?: string;
+    defaultMessage?: string;
+    defaultImage?: string;
+  };
+  defaultThemeId?: string;
+}) => {
+  const schema: any = {
+    theme: defaultThemeId ?? "",
+    builderConfig: buildAIBuilderConfig(config),
+    navbar: schemaMap.navbar(params),
+    hero: schemaMap.hero(params),
+    footer: schemaMap.footer(params),
+  };
+
+  config.sections.forEach((sec: any) => {
+    const schemaFn = schemaMap[sec.type];
+    if (schemaFn) {
+      const contentKey = `${sec.id}${sec.type}`;
+      schema[contentKey] = schemaFn(params);
+    }
+  });
+
+  return schema;
 };

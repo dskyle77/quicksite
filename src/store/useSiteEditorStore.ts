@@ -18,6 +18,7 @@ interface SiteEditorState {
   saveSite: () => Promise<void>;
   setImage: (pos: string, data: File) => void;
   reset: () => void;
+  
 }
 
 export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
@@ -85,9 +86,15 @@ export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
         const data = await res.json().catch(() => ({}));
         throw new Error(data.error ?? `Save failed (${res.status})`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Save error:", err);
-      throw err;
+      if (err instanceof Error) {
+        throw err;
+      }
+      if (typeof err === "object" && err && "error" in err) {
+        throw new Error((err as any).error);
+      }
+      throw new Error("Server error.");
     } finally {
       set({ isSaving: false });
     }

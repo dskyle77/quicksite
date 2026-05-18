@@ -538,6 +538,17 @@ export const getAllThemes = () =>
     ...theme,
   }));
 
+/** Compact theme list for AI site generation prompts */
+export const getThemeOptionsForAI = () =>
+  Object.entries(themeRegistry).map(([id, theme]) => ({
+    id,
+    name: theme.name,
+    description: theme.description,
+  }));
+
+export const isValidThemeId = (id: string): boolean =>
+  Object.hasOwn(themeRegistry, id);
+
 export const getTheme = (id: string): Theme => {
   return themeRegistry[id] || lightTheme;
 };

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from "next/link";
-import { Layout, CheckCircle2, Eye } from "lucide-react";
+import { Layout, CheckCircle2, Eye, Lock } from "lucide-react";
 import { templatesRegistry } from "@/lib/templates";
+import { CUSTOM_TEMPLATE_TYPE } from "@/lib/plans";
 import { useMemo, useState } from "react";
 
 interface TemplatePickerProps {
@@ -9,6 +10,7 @@ interface TemplatePickerProps {
   onTemplateChange: (type: string) => void;
   slugForPreview: string;
   nameForPreview: string;
+  canUseCustomTemplate?: boolean;
 }
 
 export function TemplatePicker({
@@ -16,6 +18,7 @@ export function TemplatePicker({
   onTemplateChange,
   slugForPreview,
   nameForPreview,
+  canUseCustomTemplate = true,
 }: TemplatePickerProps) {
   const [search, setSearch] = useState("");
 
@@ -186,34 +189,51 @@ export function TemplatePicker({
             <button
               key={templateBuilderTemplate.config.type}
               type="button"
+              disabled={!canUseCustomTemplate}
               className={[
-                "relative p-3 rounded-2xl border-2 transition-all text-left",
-                selectedType === "template-builder"
-                  ? "border-primary bg-primary/5"
-                  : "border-transparent bg-muted/40",
+                "relative p-3 rounded-2xl border-2 transition-all text-left w-full",
+                !canUseCustomTemplate
+                  ? "opacity-60 cursor-not-allowed border-transparent bg-muted/30"
+                  : selectedType === CUSTOM_TEMPLATE_TYPE
+                    ? "border-primary bg-primary/5"
+                    : "border-transparent bg-muted/40",
               ].join(" ")}
-              tabIndex={0}
-              onClick={() => onTemplateChange("template-builder")}
+              tabIndex={canUseCustomTemplate ? 0 : -1}
+              onClick={() => {
+                if (canUseCustomTemplate) {
+                  onTemplateChange(CUSTOM_TEMPLATE_TYPE);
+                }
+              }}
             >
               <div className="flex items-center gap-3">
                 <div
                   className={[
                     "p-2 rounded-lg border shadow-sm transition-all shrink-0",
-                    selectedType === "template-builder"
+                    selectedType === CUSTOM_TEMPLATE_TYPE
                       ? "bg-white border-primary"
                       : "bg-slate-50 border-slate-200",
                   ].join(" ")}
                 >
-                  <Layout
-                    size={16}
-                    className={selectedType === "template-builder" ? "text-primary" : "text-slate-400"}
-                  />
+                  {!canUseCustomTemplate ? (
+                    <Lock size={16} className="text-slate-400" />
+                  ) : (
+                    <Layout
+                      size={16}
+                      className={
+                        selectedType === CUSTOM_TEMPLATE_TYPE
+                          ? "text-primary"
+                          : "text-slate-400"
+                      }
+                    />
+                  )}
                 </div>
                 <div className="min-w-0">
                   <h3
                     className={[
                       "font-bold text-sm truncate transition-colors",
-                      selectedType === "template-builder" ? "text-primary" : "text-foreground",
+                      selectedType === CUSTOM_TEMPLATE_TYPE
+                        ? "text-primary"
+                        : "text-foreground",
                     ].join(" ")}
                   >
                     {templateBuilderTemplate.meta?.title ?? "Custom Builder"}
@@ -221,15 +241,19 @@ export function TemplatePicker({
                   <p
                     className={[
                       "text-[10px] line-clamp-3 transition-colors",
-                      selectedType === "template-builder" ? "text-primary/80" : "text-slate-500",
+                      selectedType === CUSTOM_TEMPLATE_TYPE
+                        ? "text-primary/80"
+                        : "text-slate-500",
                     ].join(" ")}
                   >
-                    {templateBuilderTemplate.meta?.description ??
-                      "Fully dynamic template builder supporting multiple section instances."}
+                    {!canUseCustomTemplate
+                      ? "Upgrade to Growth or Pro to build with custom sections."
+                      : (templateBuilderTemplate.meta?.description ??
+                        "Fully dynamic template builder supporting multiple section instances.")}
                   </p>
                 </div>
               </div>
-              {selectedType === "template-builder" && (
+              {selectedType === CUSTOM_TEMPLATE_TYPE && canUseCustomTemplate && (
                 <CheckCircle2
                   className="absolute top-2 right-2 text-primary drop-shadow"
                   size={16}
