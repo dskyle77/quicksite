@@ -1,97 +1,77 @@
 import { NextResponse, NextRequest } from "next/server";
-import { generalApiLimiter } from "@/lib/rateLimit"; // Ensure this path is correct
+import { generalApiLimiter } from "@/lib/rateLimit";
+
+const ROOT_DOMAIN = "quicksiteio.vercel.app";
+const SHORT_DOMAIN = "qsio.vercel.app";
 
 export async function middleware(req: NextRequest) {
-  const url = req.nextUrl;
+  const { pathname } = req.nextUrl;
   const hostname = req.headers.get("host") || "";
-  const path = url.pathname;
-
-  const rootDomain = "quicksiteio.vercel.app";
-  const shortDomain = "qsio.vercel.app";
 
   /**
-   * 1. Rate Limiting for API Routes
-   * We apply this first to block spam before any other logic runs.
+   * 1. Rate limit API routes
    */
-  if (path.startsWith("/api")) {
-    // Robust IP detection to satisfy TypeScript
+  if (pathname.startsWith("/api")) {
     const forwarded = req.headers.get("x-forwarded-for");
     const ip = forwarded ? forwarded.split(",")[0] : "127.0.0.1";
-
     const { success, reset } = await generalApiLimiter.limit(ip);
 
     if (!success) {
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
-        {
-          status: 429,
-          headers: { "X-RateLimit-Reset": reset.toString() },
-        },
+        { status: 429, headers: { "X-RateLimit-Reset": reset.toString() } },
       );
     }
-    // If successful, allow the request to proceed to the actual API route
     return NextResponse.next();
   }
 
   /**
-   * 2. Standard exclusions
-   * Ignore Next.js internals, static files, and files with extensions (favicon.ico, etc.)
+   * 2. Skip Next.js internals and static files
    */
   if (
-    path.startsWith("/_next") ||
-    path.startsWith("/static") ||
-    path.includes(".")
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/static") ||
+    pathname.includes(".")
   ) {
     return NextResponse.next();
   }
 
   /**
-   * 3. Root Domain Logic
+   * 3. Root domain — no rewrite needed
    */
-  const isRootDomain = hostname === rootDomain || hostname === "localhost:3000";
-  if (isRootDomain) {
+  if (hostname === ROOT_DOMAIN || hostname === "localhost:3000") {
     return NextResponse.next();
   }
 
   /**
-   * 4. Short Domain Logic (qsio.vercel.app)
+   * 4. Short domain (qsio.vercel.app)
+   * / → redirect to root domain landing page
+   * /my-site → rewrite to /s/my-site
    */
-  const isShortDomain = hostname === shortDomain;
-
-  if (isShortDomain) {
-    // If user hits the base short domain, send them to the landing page
-    if (path === "/") {
-      return NextResponse.redirect(`https://${rootDomain}`);
+  if (hostname === SHORT_DOMAIN) {
+    if (pathname === "/") {
+      return NextResponse.redirect(`https://${ROOT_DOMAIN}`);
     }
-
-    // Rewrite: qsio.vercel.app/my-site -> /s/my-site
-    const rewriteUrl = new URL(`/s${path}`, req.url);
+    const rewriteUrl = new URL(`/s${pathname}`, req.url);
     const response = NextResponse.rewrite(rewriteUrl);
     response.headers.set("x-is-site", "true");
     return response;
   }
 
   /**
-   * 5. Custom Domain Logic
-   * Maps customdomain.com/path to /s/domain/customdomain.com/path
+   * 5. Custom domain
+   * customdomain.com/ → rewrite to /s/customdomain.com
+   * customdomain.com/path → rewrite to /s/customdomain.com/path
    */
   const cleanHostname = hostname.split(":")[0];
-  const rewriteUrl = new URL(`/s/domain/${cleanHostname}${path}`, req.url);
+  const slugPath = pathname === "/" ? "" : pathname;
+  const rewriteUrl = new URL(`/s/${cleanHostname}${slugPath}`, req.url);
   const response = NextResponse.rewrite(rewriteUrl);
   response.headers.set("x-is-site", "true");
-
+  response.headers.set("x-is-custom-domain", "true");
   return response;
 }
 
-// Ensure the middleware only runs on relevant paths to keep the app fast
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    "/((?!_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

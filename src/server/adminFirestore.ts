@@ -8,6 +8,7 @@ import type {
   PricingConfig,
   OverviewStats,
 } from "@/screen/admin/adminTypes";
+import type { Site } from "@/lib/types";
 
 // ── Serialization helper ──────────────────────────────────────────────────────
 
@@ -241,6 +242,35 @@ export async function adminDeleteSite(siteId: string): Promise<void> {
   }
 
   await batch.commit();
+}
+
+// lib/firestore-admin.ts
+
+export async function getSiteByLookup(
+  identifier: string,
+): Promise<Site | null> {
+  if (!identifier) return null;
+  const clean = identifier.toLowerCase();
+
+  const snap = await adminDb.collection("sites").doc(clean).get();
+  if (snap.exists && snap.data()?.status === "published") {
+    return { id: snap.id, ...snap.data() } as Site;
+  }
+
+  // Try custom domain
+  const querySnap = await adminDb
+    .collection("sites")
+    .where("customDomain", "==", clean)
+    .where("status", "==", "published")
+    .limit(1)
+    .get();
+
+  if (!querySnap.empty) {
+    const d = querySnap.docs[0];
+    return { id: d.id, ...d.data() } as Site;
+  }
+
+  return null;
 }
 
 // ── Domains (top-level collection, paginated + search) ────────────────────────

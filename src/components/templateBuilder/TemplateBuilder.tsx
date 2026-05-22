@@ -165,9 +165,6 @@ export default function TemplateBuilder({
   return (
     <div
       className="relative flex min-h-0 w-full"
-      style={{
-        height: "calc(100vh - 4rem)",
-      }}
     >
       {customize && isEditor && sidebarOpen && (
         <BuilderSidebar

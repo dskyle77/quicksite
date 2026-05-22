@@ -101,8 +101,6 @@ export async function getUserSites(uid: string): Promise<Site[]> {
   return snap.docs.map((d) => serializeData<Site>({ id: d.id, ...d.data() }));
 }
 
-// src/lib/firestore.ts
-
 /**
  * PUBLIC: Fetches a site.
  * Priority 1: Document ID (Slug)

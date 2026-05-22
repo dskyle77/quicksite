@@ -26,6 +26,8 @@ export interface Site {
   status: string;
   visits?: number;
   whatsappClicks?: number;
+  description?: string;
+  ogImage?: string;
   createdAt?: Timestamp | null;
   updatedAt?: Timestamp | null;
   content: Record<string, any>;

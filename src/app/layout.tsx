@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: `${SITE_NAME} — Your business online in minutes`,
-    template: `%s | ${SITE_NAME}`,
+    template: `%s`,
   },
   description:
     "Build a professional website for your Nigerian business in minutes. No coding needed, mobile-friendly, and SEO-optimized.",

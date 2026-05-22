@@ -11,7 +11,10 @@ export default function SiteRenderer({
   isCustomDomain,
 }: {
   site: Site;
-  slugs: Record<string, string>;
+  slugs: {
+    slug: string;
+    subslug?: string;
+  };
   isCustomDomain?: boolean;
 }) {
   // Validate template exists

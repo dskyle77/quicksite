@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { useSiteDisplayStore } from "@/store/useSiteDisplayStore";
+import { useSiteContext } from "@/context/SiteContext";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -50,7 +50,9 @@ function LinkConfigMenu({
   onClose,
   messageOverride,
 }: LinkConfigMenuProps) {
-  const [tab, setTab] = useState<"whatsapp" | "url" | "anchor">(value?.type ?? "whatsapp");
+  const [tab, setTab] = useState<"whatsapp" | "url" | "anchor">(
+    value?.type ?? "whatsapp",
+  );
   const [phone, setPhone] = useState(value?.phone ?? "");
   const [message, setMessage] = useState(value?.message ?? "");
   const [url, setUrl] = useState(value?.url ?? "");
@@ -115,8 +117,8 @@ function LinkConfigMenu({
             tab === "whatsapp"
               ? "1px solid #25D366"
               : tab === "anchor"
-              ? "1px solid #ffa500"
-              : "1px solid #e5e7eb",
+                ? "1px solid #ffa500"
+                : "1px solid #e5e7eb",
         }}
       >
         {/* Tabs */}
@@ -148,13 +150,13 @@ function LinkConfigMenu({
                     ? isWhatsAppTab
                       ? "#075E54"
                       : isAnchorTab
-                      ? "#ffa500"
-                      : "#0051ff"
+                        ? "#ffa500"
+                        : "#0051ff"
                     : "transparent",
                   color: isActive ? "#fff" : "#6B7280",
                 }}
               >
-                 <span>{label}</span>
+                <span>{label}</span>
               </button>
             );
           })}
@@ -229,7 +231,8 @@ function LinkConfigMenu({
               }}
             />
             <p className="mt-1 text-[10px] text-gray-500 italic">
-              This will link to a section on this page (e.g., <code>#about</code>).
+              This will link to a section on this page (e.g.,{" "}
+              <code>#about</code>).
             </p>
           </div>
         ) : (
@@ -263,22 +266,22 @@ function LinkConfigMenu({
                 tab === "whatsapp"
                   ? "#25D366"
                   : tab === "anchor"
-                  ? "#ffa500"
-                  : "#0051ff",
+                    ? "#ffa500"
+                    : "#0051ff",
               color: "#fff",
               boxShadow:
                 tab === "whatsapp"
                   ? "0 2px 8px rgba(37, 211, 102, 0.3)"
                   : tab === "anchor"
-                  ? "0 2px 8px rgba(255, 165, 0, 0.2)"
-                  : "none",
+                    ? "0 2px 8px rgba(255, 165, 0, 0.2)"
+                    : "none",
             }}
           >
             {tab === "whatsapp"
               ? "Set WhatsApp Link"
               : tab === "anchor"
-              ? "Set Section Link"
-              : "Save URL"}
+                ? "Set Section Link"
+                : "Save URL"}
           </button>
 
           <button
@@ -319,7 +322,7 @@ export default function EditableLinkButton({
   messageOverride,
   noPreview,
 }: EditableLinkButtonProps) {
-  const { slug } = useSiteDisplayStore();
+  const { slug } = useSiteContext();
   const [menuOpen, setMenuOpen] = useState(false);
   const wrapRef = useRef<HTMLSpanElement>(null);
 
@@ -374,15 +377,15 @@ export default function EditableLinkButton({
               linkConfig?.type === "whatsapp"
                 ? "#25D366"
                 : linkConfig?.type === "anchor"
-                ? "#ffa500"
-                : "var(--qs-bg-alt)",
+                  ? "#ffa500"
+                  : "var(--qs-bg-alt)",
             border: "1px solid var(--qs-border)",
             color:
               linkConfig?.type === "whatsapp"
                 ? "#fff"
                 : linkConfig?.type === "anchor"
-                ? "#fff"
-                : "var(--qs-text-muted)",
+                  ? "#fff"
+                  : "var(--qs-text-muted)",
             flexShrink: 0,
           }}
           onClick={(e) => {
@@ -393,8 +396,8 @@ export default function EditableLinkButton({
           {linkConfig?.type === "whatsapp"
             ? "📱"
             : linkConfig?.type === "anchor"
-            ? "🔗"
-            : "🔗"}
+              ? "🔗"
+              : "🔗"}
         </button>
       </span>
 
@@ -406,15 +409,15 @@ export default function EditableLinkButton({
               linkConfig.type === "whatsapp"
                 ? "#128C7E"
                 : linkConfig.type === "anchor"
-                ? "#ffa500"
-                : "var(--qs-text-muted)",
+                  ? "#ffa500"
+                  : "var(--qs-text-muted)",
           }}
         >
           {linkConfig.type === "whatsapp"
             ? `wa.me/${linkConfig.phone ?? ""}`
             : linkConfig.type === "anchor"
-            ? `#${linkConfig.anchorId ?? ""}`
-            : linkConfig.url ?? ""}
+              ? `#${linkConfig.anchorId ?? ""}`
+              : (linkConfig.url ?? "")}
         </span>
       )}
 
