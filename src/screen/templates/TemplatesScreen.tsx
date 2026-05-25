@@ -32,7 +32,7 @@ export default function TemplateGallery() {
         search.trim() === "" ||
         t.meta.title.toLowerCase().includes(search.toLowerCase()) ||
         t.meta.description?.toLowerCase().includes(search.toLowerCase()) ||
-        t.meta.category.toLowerCase().includes(search.toLowerCase());
+        t.meta.category.toLowerCase().includes(search.toLowerCase()) 
 
       const matchesCategory =
         selectedCategory === "all" || t.meta.category === selectedCategory;

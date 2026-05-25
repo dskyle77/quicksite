@@ -11,12 +11,16 @@ import {
   TestimonialItem,
   ContactContent,
   FooterContent,
+  MenuItem,
 } from "./types";
+import { HeroVariantList } from "./variants/HeroVariants";
+import { ExperienceVariantList } from "./variants/sectionVariants/ExperienceVariants";
+import { SkillsVariantList } from "./variants/sectionVariants/SkillsVariants";
 
 // ─── Shared Helpers ───────────────────────────────────────────────────────────
 
-const makeWhatsappLink = (phone?: string, message?: string) =>
-  phone ? { type: "whatsapp", phone, message: message ?? "" } : {};
+export const makeWhatsappLink = (phone?: string) =>
+  phone ? { type: "whatsapp", phone, message: "" } : {};
 
 const DEFAULT_IMAGE =
   "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg";
@@ -42,24 +46,22 @@ const defaultStarterLinks = [
 const navbarSchema = ({
   selectedTitle,
   whatsappNumber,
-  defaultMessage,
 }: SchemaParams): NavbarContent => ({
   logo: "✦",
   title: selectedTitle ?? "",
   ctaButton: "",
-  ctaButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  ctaButtonLink: makeWhatsappLink(whatsappNumber),
   links: navbarLinksSchema(),
 });
 
 const navbarStarterContent = ({
   selectedTitle,
   whatsappNumber,
-  defaultMessage,
 }: SchemaParams): NavbarContent => ({
   logo: "✦",
   title: selectedTitle ?? "My Business",
   ctaButton: "Chat on WhatsApp",
-  ctaButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  ctaButtonLink: makeWhatsappLink(whatsappNumber),
   links: defaultStarterLinks,
 });
 
@@ -67,7 +69,6 @@ const navbarStarterContent = ({
 
 const heroSchema = ({
   whatsappNumber,
-  defaultMessage,
   defaultImage,
 }: SchemaParams): HeroContent => ({
   type: "background",
@@ -77,14 +78,13 @@ const heroSchema = ({
   title: "",
   desc: "",
   primaryButton: "",
-  primaryButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  primaryButtonLink: makeWhatsappLink(whatsappNumber),
   secondaryButton: "",
   secondaryButtonLink: {},
 });
 
 const heroStarterContent = ({
   whatsappNumber,
-  defaultMessage,
   defaultImage,
 }: SchemaParams): HeroContent => ({
   type: "background",
@@ -94,7 +94,7 @@ const heroStarterContent = ({
   title: "Welcome — We're Glad You're Here",
   desc: "Quality service, fair prices, and a team that cares about every customer.",
   primaryButton: "Chat on WhatsApp",
-  primaryButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  primaryButtonLink: makeWhatsappLink(whatsappNumber),
   secondaryButton: "Learn More",
   secondaryButtonLink: {},
 });
@@ -171,8 +171,22 @@ const projectsSchema = ({ defaultImage }: SchemaParams) => ({
   heading: "",
   subheading: "",
   items: [
-    { title: "", desc: "", tags: [], image: img(defaultImage), imagePId: "" },
-    { title: "", desc: "", tags: [], image: img(defaultImage), imagePId: "" },
+    {
+      title: "",
+      desc: "",
+      tags: [],
+      image: img(defaultImage),
+      imagePId: "",
+      btnLabel: "",
+    },
+    {
+      title: "",
+      desc: "",
+      tags: [],
+      image: img(defaultImage),
+      imagePId: "",
+      btnLabel: "",
+    },
   ] as ProjectItem[],
 });
 
@@ -187,6 +201,7 @@ const projectsStarterContent = ({ defaultImage }: SchemaParams) => ({
       image: img(defaultImage),
       imagePId: "",
       previewLink: "",
+      btnLabel: "View Project",
     },
     {
       title: "Task Management App",
@@ -195,10 +210,73 @@ const projectsStarterContent = ({ defaultImage }: SchemaParams) => ({
       image: img(defaultImage),
       imagePId: "",
       previewLink: "",
+      btnLabel: "View Project",
     },
   ] as ProjectItem[],
 });
+// ─── MENU ────────────────────────────────────────────────────────────────────
 
+const menuSchema = ({ defaultImage }: SchemaParams) => ({
+  heading: "",
+  subheading: "",
+  items: [
+    {
+      title: "",
+      desc: "",
+      price: "",
+      tags: [],
+      image: img(defaultImage),
+      imagePId: "",
+      btnLabel: "",
+    },
+    {
+      title: "",
+      desc: "",
+      price: "",
+      tags: [],
+      image: img(defaultImage),
+      imagePId: "",
+      btnLabel: "",
+    },
+  ] as MenuItem[],
+});
+const menuStarterContent = ({ defaultImage }: SchemaParams) => ({
+  heading: "Our Menu",
+  subheading: "Fresh meals made daily. Order instantly on WhatsApp.",
+
+  items: [
+    {
+      title: "Chicken Shawarma",
+      desc: "Juicy chicken wrapped with fresh veggies and sauce.",
+      price: "₦4,500",
+      tags: ["Best Seller", "Spicy"],
+      image: img(defaultImage),
+      imagePId: "",
+      btnLabel: "Order Now",
+      menuBtnLink: { type: "url", url: "" },
+    },
+    {
+      title: "Jollof Rice Combo",
+      desc: "Classic Nigerian jollof rice served with chicken.",
+      price: "₦3,000",
+      tags: ["Popular"],
+      image: img(defaultImage),
+      imagePId: "",
+      btnLabel: "Order Now",
+      menuBtnLink: { type: "url", url: "" },
+    },
+    {
+      title: "Fried Plantain & Egg",
+      desc: "Simple, fast, and delicious breakfast option.",
+      price: "₦2,000",
+      tags: ["Breakfast"],
+      image: img(defaultImage),
+      imagePId: "",
+      btnLabel: "Order Now",
+      menuBtnLink: { type: "url", url: "" },
+    },
+  ] as MenuItem[],
+});
 // ---- TEXT --------------------------------------------------------------------
 const textSchema = (): TextContent => ({
   label: "",
@@ -258,24 +336,20 @@ const testimonialsStarterContent = () => ({
 
 // ─── CONTACT ──────────────────────────────────────────────────────────────────
 
-const contactSchema = ({
-  whatsappNumber,
-  defaultMessage,
-}: SchemaParams): ContactContent => ({
+const contactSchema = ({ whatsappNumber }: SchemaParams): ContactContent => ({
   title: "",
   desc: "",
   email: "hello@example.com",
   phone: whatsappNumber,
   location: "e.g: Lagos, Nigeria",
   primaryButton: "",
-  primaryButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  primaryButtonLink: makeWhatsappLink(whatsappNumber),
   secondaryButton: "",
-  secondaryButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  secondaryButtonLink: makeWhatsappLink(whatsappNumber),
 });
 
 const contactStarterContent = ({
   whatsappNumber,
-  defaultMessage,
 }: SchemaParams): ContactContent => ({
   title: "Let's Work Together",
   email: "hello@example.com",
@@ -283,9 +357,9 @@ const contactStarterContent = ({
   location: "Lagos, Nigeria",
   desc: "Have a project in mind? Let's chat and see how I can help.",
   primaryButton: "Send a Message",
-  primaryButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  primaryButtonLink: makeWhatsappLink(whatsappNumber),
   secondaryButton: "Schedule a Call",
-  secondaryButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  secondaryButtonLink: makeWhatsappLink(whatsappNumber),
 });
 
 // ─── FOOTER ───────────────────────────────────────────────────────────────────
@@ -360,34 +434,27 @@ const featuresStarterContent = () => ({
 
 // ─── PRICING ─────────────────────────────────────────────────────────────────
 
-const emptyPricingPlan = (
-  whatsappNumber?: string,
-  defaultMessage?: string,
-  highlighted = false,
-) => ({
+const emptyPricingPlan = (whatsappNumber?: string, highlighted = false) => ({
   name: "",
   price: "",
   period: "",
   desc: "",
   features: [] as string[],
   ctaLabel: "",
-  ctaLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  ctaLink: makeWhatsappLink(whatsappNumber),
   highlighted,
 });
 
-const pricingSchema = ({ whatsappNumber, defaultMessage }: SchemaParams) => ({
+const pricingSchema = ({ whatsappNumber }: SchemaParams) => ({
   heading: "",
   subheading: "",
   plans: [
-    emptyPricingPlan(whatsappNumber, defaultMessage, false),
-    emptyPricingPlan(whatsappNumber, defaultMessage, true),
+    emptyPricingPlan(whatsappNumber, false),
+    emptyPricingPlan(whatsappNumber, true),
   ],
 });
 
-const pricingStarterContent = ({
-  whatsappNumber,
-  defaultMessage,
-}: SchemaParams) => ({
+const pricingStarterContent = ({ whatsappNumber }: SchemaParams) => ({
   heading: "Simple, Transparent Pricing",
   subheading: "No hidden fees. Cancel anytime.",
   plans: [
@@ -398,7 +465,7 @@ const pricingStarterContent = ({
       desc: "Perfect for solo founders.",
       features: ["Up to 5 projects", "Email support"],
       ctaLabel: "Get Started",
-      ctaLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+      ctaLink: makeWhatsappLink(whatsappNumber),
       highlighted: false,
     },
     {
@@ -408,7 +475,7 @@ const pricingStarterContent = ({
       desc: "For growing teams.",
       features: ["Unlimited projects", "Priority support"],
       ctaLabel: "Start Free Trial",
-      ctaLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+      ctaLink: makeWhatsappLink(whatsappNumber),
       highlighted: true,
     },
   ],
@@ -442,23 +509,20 @@ const faqStarterContent = () => ({
 
 // ─── CTA BANNER ───────────────────────────────────────────────────────────────
 
-const ctaSchema = ({ whatsappNumber, defaultMessage }: SchemaParams) => ({
+const ctaSchema = ({ whatsappNumber }: SchemaParams) => ({
   heading: "",
   subheading: "",
   primaryButton: "",
-  primaryButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  primaryButtonLink: makeWhatsappLink(whatsappNumber),
   secondaryButton: "",
   secondaryButtonLink: {},
 });
 
-const ctaStarterContent = ({
-  whatsappNumber,
-  defaultMessage,
-}: SchemaParams) => ({
+const ctaStarterContent = ({ whatsappNumber }: SchemaParams) => ({
   heading: "Ready to Get Started?",
   subheading: "Join thousands of teams already building with us.",
   primaryButton: "Start for Free",
-  primaryButtonLink: makeWhatsappLink(whatsappNumber, defaultMessage),
+  primaryButtonLink: makeWhatsappLink(whatsappNumber),
   secondaryButton: "See a Demo",
   secondaryButtonLink: {},
 });
@@ -469,6 +533,7 @@ export const starterMap: Record<string, any> = {
   about: aboutStarterContent,
   skills: skillsStarterContent,
   projects: projectsStarterContent,
+  menu: menuStarterContent,
   text: textStarterContent,
   experience: experienceStarterContent,
   testimonials: testimonialsStarterContent,
@@ -487,6 +552,7 @@ export const schemaMap: Record<string, any> = {
   about: aboutSchema,
   skills: skillsSchema,
   projects: projectsSchema,
+  menu: menuSchema,
   text: textSchema,
   experience: experienceSchema,
   testimonials: testimonialsSchema,
@@ -498,46 +564,16 @@ export const schemaMap: Record<string, any> = {
   footer: footerSchema,
 };
 
-// New helper: buildStarterContent
-export const buildStarterContent = ({
-  config,
-  params,
-}: {
-  config: any;
-  params: {
-    selectedTitle?: string;
-    whatsappNumber?: string;
-    defaultMessage?: string;
-    defaultImage?: string;
-  };
-}) => {
-  const content: any = {
-    builderConfig: config,
-    navbar: starterMap.navbar(params),
-    hero: starterMap.hero(params),
-    footer: starterMap.footer(params),
-  };
-
-  config.sections.forEach((sec: any) => {
-    const starterFn = starterMap[sec.type];
-    if (starterFn) {
-      const contentKey = `${sec.id}${sec.type}`;
-      content[contentKey] = starterFn(params);
-    }
-  });
-
-  return content;
-};
-
 /** Allowed layout variants — must match variant component registries */
 export const variantOptions: Record<string, string[]> = {
-  navbar: ["classic", "minimal"],
-  hero: ["background", "split", "minimalist", "centered"],
+  navbar: ["classic", "minimal", "none"],
+  hero: HeroVariantList,
   about: ["split", "card-stats", "centered"],
-  skills: ["grid", "tags", "icons-list"],
+  skills: SkillsVariantList,
   projects: ["list", "card-grid"],
+  menu: ["list", "grid"],
   text: ["card", "minimal", "minimal-left", "default"],
-  experience: ["timeline", "card-stack", "compact-list"],
+  experience: ExperienceVariantList,
   testimonials: ["grid", "carousel", "list"],
   contact: ["default", "split", "minimal", "form"],
   features: ["default", "list", "icons"],
@@ -545,62 +581,4 @@ export const variantOptions: Record<string, string[]> = {
   faq: ["default", "accordion", "numbered"],
   cta: ["default", "banner", "simple"],
   footer: ["classic", "centered", "columns", "none"],
-};
-
-/** builderConfig shape sent to AI — variants left empty for the model to choose */
-export const buildAIBuilderConfig = (config: {
-  navbar?: string;
-  hero?: string;
-  footer?: string;
-  sections?: Array<{
-    id: string;
-    type: string;
-    variant?: string;
-    enabled?: boolean;
-    anchorName?: string;
-  }>;
-}) => ({
-  navbar: "",
-  hero: "",
-  footer: "",
-  sections: (config.sections ?? []).map((sec) => ({
-    id: sec.id,
-    type: sec.type,
-    variant: "",
-    enabled: sec.enabled ?? true,
-    anchorName: sec.anchorName ?? sec.type,
-  })),
-});
-
-export const buildSchema = ({
-  config,
-  params,
-  defaultThemeId,
-}: {
-  config: any;
-  params: {
-    selectedTitle?: string;
-    whatsappNumber?: string;
-    defaultMessage?: string;
-    defaultImage?: string;
-  };
-  defaultThemeId?: string;
-}) => {
-  const schema: any = {
-    theme: defaultThemeId ?? "",
-    builderConfig: buildAIBuilderConfig(config),
-    navbar: schemaMap.navbar(params),
-    hero: schemaMap.hero(params),
-    footer: schemaMap.footer(params),
-  };
-
-  config.sections.forEach((sec: any) => {
-    const schemaFn = schemaMap[sec.type];
-    if (schemaFn) {
-      const contentKey = `${sec.id}${sec.type}`;
-      schema[contentKey] = schemaFn(params);
-    }
-  });
-
-  return schema;
 };

@@ -1,11 +1,13 @@
 // src/screen/home/HeroSection.tsx
-import { ArrowRight, Star, Sparkles, MessageCircle } from "lucide-react";
 import Link from "next/link";
+import { ArrowRight, Star, Sparkles, MessageCircle } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const SITE_SHORT_NAME = process.env.NEXT_PUBLIC_SITE_SHORT_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
 
 export default function HeroSection() {
+  const { user } = useAuth();
   return (
     <section className="relative overflow-hidden pt-12 pb-24 sm:pt-20 sm:pb-32 bg-background text-foreground">
       {/* Background blobs */}
@@ -54,12 +56,22 @@ export default function HeroSection() {
           </p>
 
           <div className="flex flex-wrap gap-3">
-            <Link
-              href="/signup"
-              className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:opacity-90 rounded-full font-semibold h-12 px-7 transition-all shadow-lg shadow-primary/20"
-            >
-              Start for Free <ArrowRight className="h-4 w-4" />
-            </Link>
+            {user ? (
+              <Link
+                href="/dashboard/new"
+                className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:opacity-90 rounded-full font-semibold h-12 px-7 transition-all shadow-lg shadow-primary/20"
+              >
+                Create New <ArrowRight className="h-4 w-4" />
+              </Link>
+            ) : (
+              <Link
+                href="/signup"
+                className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:opacity-90 rounded-full font-semibold h-12 px-7 transition-all shadow-lg shadow-primary/20"
+              >
+                Start for Free <ArrowRight className="h-4 w-4" />
+              </Link>
+            )}
+       
             <Link
               href="/templates"
               className="inline-flex items-center justify-center gap-2 border-2 border-input bg-background hover:bg-muted rounded-full font-semibold h-12 px-7 transition-colors"

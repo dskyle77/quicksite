@@ -5,6 +5,7 @@ import { setDeep } from "@/lib/helpers";
 
 import { getTemplateByType } from "@/lib/templates";
 import { getTheme } from "@/lib/themes";
+import Template from "@/components/siteTemplates/Template";
 
 interface EditorScreenProps {
   data: Site;
@@ -15,7 +16,6 @@ interface EditorScreenProps {
 export default function EditorScreen({
   data,
   onChange,
-  slugs,
 }: EditorScreenProps) {
   const templateEntry = getTemplateByType(data.type);
   const theme = getTheme(data.theme);
@@ -34,8 +34,8 @@ export default function EditorScreen({
     const updated = setDeep(data.content, path, value);
     onChange({ ...data, content: updated });
   };
-  const Template = templateEntry.template;
 
+  const canCustomize = templateEntry.config.canCustomize;
   return (
     <div className={`w-full h-full ${theme.className}`}>
       <style>{theme.css}</style>
@@ -43,7 +43,7 @@ export default function EditorScreen({
         isEditor={true}
         content={data.content}
         onUpdate={handleUpdate}
-        slugs={slugs}
+        canCustomize={canCustomize}
       />
     </div>
   );

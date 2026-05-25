@@ -2,15 +2,12 @@
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/server/auth";
 import { serverCreateSite, getUserPlan } from "@/server/firestore";
-import { getTemplateContentByType } from "@/lib/templatesContent";
 import { generateSiteContentWithAI } from "@/server/ai-content";
+import { getTemplateByType } from "@/lib/templates";
+import { buildSchema, buildStarterContent } from "@/lib/templates";
 
 import { AI_DAILY_LIMITS, getAiRateLimiter } from "@/lib/rateLimit";
-import {
-  CUSTOM_TEMPLATE_TYPE,
-  canUseFeature,
-  type Plan,
-} from "@/lib/plans";
+import { CUSTOM_TEMPLATE_TYPE, canUseFeature, type Plan } from "@/lib/plans";
 
 export async function POST(req: Request) {
   try {
@@ -46,7 +43,7 @@ export async function POST(req: Request) {
     const normalizedName = (name as string).trim();
     const normalizedSlug = (slug as string).trim();
 
-    const templateEntry = getTemplateContentByType(type);
+    const templateEntry = getTemplateByType(type);
     if (!templateEntry) {
       return NextResponse.json(
         { error: "Invalid template type." },
@@ -74,7 +71,7 @@ export async function POST(req: Request) {
 
     let finalContent = null;
     let siteTheme = templateEntry.config.theme ?? "warm";
-    const schemaBase = templateEntry.getSchema({
+    const schemaBase = buildSchema(templateEntry.contentConfig, {
       selectedTitle: normalizedName,
       defaultMessage,
       whatsappNumber,
@@ -125,7 +122,7 @@ export async function POST(req: Request) {
 
     // 2. Fallback: If AI failed or wasn't requested, use the standard template starter
     if (!finalContent) {
-      finalContent = templateEntry.getStarterContent({
+      finalContent = buildStarterContent(templateEntry.contentConfig, {
         selectedTitle: normalizedName,
         defaultMessage,
         whatsappNumber,
@@ -141,8 +138,9 @@ export async function POST(req: Request) {
         type,
         name: normalizedName,
         theme: siteTheme,
+        whatsappNumber,
         status: "draft",
-        content: finalContent, // Use the final merged content
+        content: finalContent,
       },
     );
 

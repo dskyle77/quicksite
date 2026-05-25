@@ -1,68 +1,8 @@
-export const portfolioConfig = () => ({
-  navbar: "classic",
-  hero: "background",
-  footer: "classic",
-  sections: [
-    {
-      id: "init-about",
-      type: "about",
-      variant: "split",
-      enabled: true,
-    },
-    {
-      id: "init-text",
-      type: "text",
-      variant: "default",
-      enabled: true,
-    },
-    {
-      id: "init-skills",
-      type: "skills",
-      variant: "grid",
-      enabled: true,
-    },
-    {
-      id: "init-projects",
-      type: "projects",
-      variant: "card-grid",
-      enabled: true,
-    },
-    {
-      id: "init-experience",
-      type: "experience",
-      variant: "timeline",
-      enabled: true,
-    },
 
-    {
-      id: "init-features",
-      type: "features",
-      variant: "default",
-      enabled: true,
-    },
-    {
-      id: "init-pricing",
-      type: "pricing",
-      variant: "default",
-      enabled: true,
-    },
-    {
-      id: "init-faq",
-      type: "faq",
-      variant: "accordion",
-      enabled: true,
-    },
 
-    {
-      id: "init-contact",
-      type: "contact",
-      variant: "default",
-      enabled: true,
-    },
-  ],
-});
 
-export const builderConfig = () => ({
+
+export const builderConfig = {
   navbar: "classic",
   hero: "background",
   footer: "classic",
@@ -94,6 +34,13 @@ export const builderConfig = () => ({
       variant: "card-grid",
       enabled: true,
       anchorName: "projects",
+    },
+    {
+      id: "init-menu",
+      type: "menu",
+      variant: "card-grid",
+      enabled: true,
+      anchorName: "menu",
     },
     {
       id: "init-experience",
@@ -145,4 +92,4 @@ export const builderConfig = () => ({
       anchorName: "cta",
     },
   ],
-});
+};

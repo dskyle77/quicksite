@@ -1,19 +1,22 @@
+import { Site } from "@/lib/types";
 import { createContext, useContext, ReactNode } from "react";
 
 // 1. Define the shape of your context value.
 // You can extend this to include any site-level data you want accessible in children.
 export interface SiteContextValue {
-  slug: string;
-  subslug: string;
+  slugs?: Record<string, string>;
+  isCustomDomain?: boolean;
+  site?: Site;
   // Add other properties as desired for your project, such as:
   // siteId?: string;
   // siteName?: string;
-  // isCustomDomain?: boolean;
   // [key: string]: any;
 }
 
 // 2. Create the context (supports undefined to allow no value by default).
-export const SiteContext = createContext<SiteContextValue | undefined>(undefined);
+export const SiteContext = createContext<SiteContextValue | undefined>(
+  undefined,
+);
 
 // 3. Custom hook to consume context (throws an error if used outside provider).
 export function useSiteContext(): SiteContextValue {
@@ -33,7 +36,5 @@ export function SiteProvider({
   value: SiteContextValue;
   children: ReactNode;
 }) {
-  return (
-    <SiteContext.Provider value={value}>{children}</SiteContext.Provider>
-  );
+  return <SiteContext.Provider value={value}>{children}</SiteContext.Provider>;
 }

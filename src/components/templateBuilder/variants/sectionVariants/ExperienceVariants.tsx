@@ -17,7 +17,6 @@ export const ExperienceSection = ({
   onUpdate,
   position,
   anchorName,
-  path
 }: SectionProps) => {
   // Determine if this section is in an even or odd position
   const isEven = position % 2 === 0;
@@ -325,7 +324,6 @@ export const ExperienceSection = ({
               key={i}
               className="relative group flex flex-col @sm:flex-row gap-3 @sm:gap-8 @sm:items-start p-3 @sm:p-5 bg-opacity-70 rounded-lg border border-solid @sm:border-0 shadow-sm hover:shadow transition-all"
               style={{
-         
                 borderColor: "var(--qs-border)",
                 background: i % 2 === 0 ? itemBg : sectionBg,
               }}
@@ -406,3 +404,10 @@ export const ExperienceSection = ({
     </section>
   );
 };
+
+export type ExperienceSectionVariant = "timeline" | "default" | "card-stack";
+export const ExperienceVariantList: ExperienceSectionVariant[] = [
+  "timeline",
+  "default",
+  "card-stack",
+];

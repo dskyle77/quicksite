@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
@@ -9,11 +8,7 @@ import authFetch from "@/lib/authFetch";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileStore } from "@/store/useProfileStore";
 import { isValidTemplate } from "@/lib/templates";
-import {
-  CUSTOM_TEMPLATE_TYPE,
-  canUseFeature,
-  type Plan,
-} from "@/lib/plans";
+import { CUSTOM_TEMPLATE_TYPE, canUseFeature, type Plan } from "@/lib/plans";
 
 import { NewSiteForm } from "./NewSiteForm";
 import { TemplatePicker } from "./TemplatesPicker";
@@ -29,12 +24,9 @@ export default function CreateSitePage() {
   const templateTypeFromQuery = searchParams.get("template") || "";
   let selectedTemplateType = isValidTemplate(templateTypeFromQuery)
     ? templateTypeFromQuery
-    : "template-1";
-  if (
-    selectedTemplateType === CUSTOM_TEMPLATE_TYPE &&
-    !canUseCustomTemplate
-  ) {
-    selectedTemplateType = "template-1";
+    : "";
+  if (selectedTemplateType === CUSTOM_TEMPLATE_TYPE && !canUseCustomTemplate) {
+    selectedTemplateType = "";
   }
 
   const paramsName = searchParams.get("name");
@@ -49,7 +41,7 @@ export default function CreateSitePage() {
     description: "",
     type: selectedTemplateType,
     whatsappNumber: whatsappNumber || "",
-    generateWithAI: false, // New toggle
+    generateWithAI: false,
   });
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,16 +72,26 @@ export default function CreateSitePage() {
     if (!formData.description && formData.generateWithAI) {
       return toast.error("Please provide a description to use AI generation.");
     }
-    if (
-      formData.type === CUSTOM_TEMPLATE_TYPE &&
-      !canUseCustomTemplate
-    ) {
+    if (formData.type === "") {
+      return toast.error("Please select a site template.");
+    }
+    if (formData.type === CUSTOM_TEMPLATE_TYPE && !canUseCustomTemplate) {
       return toast.error(
         "Custom template requires Growth or Pro. Please upgrade your plan.",
       );
     }
 
     setLoading(true);
+
+    console.log({
+      name: normalizedName,
+      slug: normalizedSlug,
+      type: formData.type,
+      description: formData.description,
+      generateWithAI: formData.generateWithAI,
+      defaultMessage,
+      whatsappNumber: formData.whatsappNumber,
+    });
 
     try {
       const res = await authFetch("/api/sites", {

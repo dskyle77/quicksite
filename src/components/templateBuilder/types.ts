@@ -6,6 +6,7 @@ import { TemplateComponentProps } from "@/lib/templates";
 // component in the variants files — nothing else needs to change.
 
 import React from "react";
+import { LinkConfig } from "../shared/EditableLink";
 
 // ─── Shared Component Interface ───────────────────────────────────────────────
 
@@ -22,11 +23,11 @@ export type SectionProps = TemplateComponentProps & {
 
 export type NavbarVariantKey = "classic" | "minimal";
 export type HeroVariantKey =
-  | "background" // DynamicHero — switches between background/side
-  | "split" // Explicit 50/50 image + text
-  | "minimalist" // Large bold typography, no image
-  | "centered"; // Text + CTA centered, optional bg image
-//   | "video"; // Full-bleed video background (future)
+  | "background" 
+  | "split" 
+  | "minimalist" 
+  | "centered"
+  | "none"
 
 export type FooterVariantKey = "classic" | "centered" | "none" | "columns";
 
@@ -34,6 +35,7 @@ export type SectionType =
   | "about"
   | "skills"
   | "projects"
+  | "menu"
   | "experience"
   | "testimonials"
   | "contact"
@@ -143,8 +145,8 @@ export type SectionVariantRegistry = Record<
 export interface SchemaParams {
   selectedTitle?: string;
   whatsappNumber?: string;
-  defaultMessage?: string;
   defaultImage?: string;
+  
 }
 
 export type GetSchema = (params: SchemaParams) => Record<string, any>;
@@ -203,10 +205,21 @@ export interface ProjectItem {
   title: string;
   desc: string;
   tags: string[];
+  btnLabel: string;
   image: string;
   imagePId?: string;
   previewLink?: string;
 }
+export interface MenuItem{
+  title: string;
+  desc: string;
+  price?: string;
+  tags?: string[];
+  image?: string;
+  imagePId?: string;
+  btnLabel?: string;
+  menuBtnLink?: LinkConfig;
+};
 
 export interface ExperienceItem {
   role: string;

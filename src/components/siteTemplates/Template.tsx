@@ -3,17 +3,19 @@
 
 import type { TemplateProps } from "@/lib/templates";
 import TemplateBuilder from "@/components/templateBuilder/TemplateBuilder";
-import { templateBuilderContent } from "./content";
+import { useSiteContext } from "@/context/SiteContext";
 
-function TemplateBuilderTemplate({
+export default function Template({
   isEditor,
   content,
   onUpdate,
-  slugs,
+  canCustomize,
 }: TemplateProps) {
   const handleUpdate = (path: string, value: any) => {
     if (onUpdate) onUpdate(path, value);
   };
+
+  const { slugs } = useSiteContext();
 
   // ── Main page ───────────────────────────────────────────────────────────────
   return (
@@ -29,15 +31,8 @@ function TemplateBuilderTemplate({
         content={content}
         onUpdate={handleUpdate}
         slugs={slugs}
-        customize={true}
+        customize={canCustomize}
       />
     </div>
   );
 }
-
-// ─── Export ───────────────────────────────────────────────────────────────────
-
-export const templateBuilder = {
-  ...templateBuilderContent,
-  template: TemplateBuilderTemplate,
-};

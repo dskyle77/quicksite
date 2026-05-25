@@ -66,12 +66,14 @@ export default function SitePageShell({
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
-      <SiteProvider value={{ slug: slugs.slug, subslug: slugs.subslug }}>
-        <SiteRenderer
-          site={site}
-          slugs={slugs}
-          isCustomDomain={isCustomDomain}
-        />
+      <SiteProvider
+        value={{
+          slugs,
+          site: site,
+          isCustomDomain,
+        }}
+      >
+        <SiteRenderer/>
       </SiteProvider>
     </main>
   );

@@ -1,15 +1,20 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // @/lib/templates.ts
 
-import { templateBuilder } from "@/components/siteTemplates/templateBuilder"; // ← new
-import { portfolio3 } from "@/components/siteTemplates/portfolio3"; // ← new
+import templateBuilder from "@/components/siteTemplates/templateBuilder";
+import portfolio1 from "@/components/siteTemplates/portfolioOne";
+import menuOne from "@/components/siteTemplates/menuOne";
+import {
+  schemaMap,
+  starterMap,
+} from "@/components/templateBuilder/contentBlocks";
 
 /* -------------- TEMPLATES TYPES ---------------- */
 export interface TemplateProps {
   isEditor: boolean;
   content: AnyObject;
+  canCustomize: boolean;
   onUpdate?: (path: string, value: any) => void;
-  slugs?: Record<string, string>;
   isCustomDomain?: boolean;
 }
 
@@ -23,10 +28,27 @@ export interface TemplateComponentProps {
 
 type AnyObject = Record<string, any>;
 
+export type TemplateContent = {
+  meta: {
+    title: string;
+    image: string;
+    category: string;
+    description: string;
+  };
+  config: {
+    type: string;
+    theme: string;
+    canCustomize: boolean;
+  };
+  contentConfig: any; 
+  starterContent?: (...args: any[]) => any;
+};
+
 /* ---------------- REGISTRY ---------------- */
 
-export const templatesRegistry = [
-  portfolio3,
+export const templatesRegistry: TemplateContent[] = [
+  portfolio1,
+  menuOne,
   templateBuilder,
 ];
 
@@ -42,3 +64,85 @@ export const getTemplateByType = (type: string) =>
   templatesRegistry.find((t) => t.config.type === type);
 
 export const isValidTemplate = (type: string) => !!getTemplateByType(type);
+
+// New helper: buildStarterContent
+export const buildStarterContent = (
+  config: any,
+  params: {
+    selectedTitle?: string;
+    whatsappNumber?: string;
+    defaultMessage?: string;
+    defaultImage?: string;
+  },
+) => {
+  const content: any = {
+    builderConfig: config,
+    navbar: starterMap.navbar(params),
+    hero: starterMap.hero(params),
+    footer: starterMap.footer(params),
+  };
+
+  config.sections.forEach((sec: any) => {
+    const starterFn = starterMap[sec.type];
+    if (starterFn) {
+      const contentKey = `${sec.id}${sec.type}`;
+      content[contentKey] = starterFn(params);
+    }
+  });
+
+  return content;
+};
+// export const buildBuilderConfig = (config: {
+//   navbar?: string;
+//   hero?: string;
+//   footer?: string;
+//   sections?: Array<{
+//     id: string;
+//     type: string;
+//     variant?: string;
+//     enabled?: boolean;
+//     anchorName?: string;
+//   }>;
+// }) => ({
+//   navbar: "",
+//   hero: "",
+//   footer: "",
+//   sections: (config.sections ?? []).map((sec) => ({
+//     id: sec.id,
+//     type: sec.type,
+//     variant: "",
+//     enabled: sec.enabled ?? true,
+//     anchorName: sec.anchorName ?? sec.type,
+//   })),
+// });
+
+export const buildSchema = (
+  config: any,
+  params: {
+    selectedTitle?: string;
+    whatsappNumber?: string;
+    defaultMessage?: string;
+    defaultImage?: string;
+  } = {},
+  defaultThemeId?: string,
+) => {
+  const schema: any = {
+    theme: defaultThemeId ?? "",
+    builderConfig: config,
+    navbar: schemaMap.navbar(params),
+    hero: schemaMap.hero(params),
+    footer: schemaMap.footer(params),
+  };
+
+  if (Array.isArray(config.sections)) {
+    config.sections.forEach((sec: any) => {
+      const schemaFn = schemaMap[sec.type];
+      if (schemaFn) {
+        const contentKey = `${sec.id}${sec.type}`;
+        schema[contentKey] = schemaFn(params);
+      }
+    });
+  }
+
+  return schema;
+};

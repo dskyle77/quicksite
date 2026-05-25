@@ -9,6 +9,9 @@ import authFetch from "@/lib/authFetch";
 
 interface SiteEditorState {
   site: Site | null;
+  settings: {
+    whatsappNumber?: string;
+  };
   images: Record<string, File>;
   loading: boolean;
   isSaving: boolean;
@@ -16,14 +19,15 @@ interface SiteEditorState {
   fetchSite: (uid: string, slug: string) => Promise<void>;
   updateSite: (updates: Partial<Site>) => void;
   saveSite: () => Promise<void>;
+  setSettings: (newSettings: Partial<{ whatsappNumber: string }>) => void;
   setImage: (pos: string, data: File) => void;
   reset: () => void;
-  
 }
 
 export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
   site: null,
   images: {},
+  settings: { whatsappNumber: "" },
   loading: true,
   isSaving: false,
 
@@ -32,7 +36,7 @@ export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
       set({ loading: true });
       const data = await getPrivateSite(uid, slug);
       if (!data) throw new Error("Site not found.");
-      set({ site: data });
+      set({ site: data, settings: { whatsappNumber: data?.whatsappNumber } });
     } catch (err) {
       console.error("Editor fetch error:", err);
       set({ site: null });
@@ -51,6 +55,14 @@ export const useSiteEditorStore = create<SiteEditorState>((set, get) => ({
   setImage: (path, data) => {
     set((state) => ({
       images: { ...state.images, [path]: data },
+    }));
+  },
+  setSettings: (newSettings) => {
+    set((state) => ({
+      settings: {
+        ...state.settings,
+        ...newSettings,
+      },
     }));
   },
 

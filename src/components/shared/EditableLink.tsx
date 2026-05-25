@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useSiteContext } from "@/context/SiteContext";
@@ -322,14 +323,25 @@ export default function EditableLinkButton({
   messageOverride,
   noPreview,
 }: EditableLinkButtonProps) {
-  const { slug } = useSiteContext();
   const [menuOpen, setMenuOpen] = useState(false);
   const wrapRef = useRef<HTMLSpanElement>(null);
 
   const href = buildHref(linkConfig, messageOverride);
 
-  const handleClick = () => {
-    if (linkConfig?.type !== "whatsapp") return;
+  const { slugs } = useSiteContext();
+  const slug = slugs?.slug;
+
+  const handleClick = (e?: React.MouseEvent<HTMLAnchorElement>) => {
+    // If there is no linkConfig, prevent navigation and do nothing
+    if (!linkConfig) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      return;
+    }
+
+    if (linkConfig.type !== "whatsapp") return;
 
     fetch("api/analytics/whatsapp-click", {
       method: "POST",
@@ -341,11 +353,55 @@ export default function EditableLinkButton({
   if (!isEditor) {
     // For anchor links, do not add target="_blank"
     const isAnchor = linkConfig?.type === "anchor";
+
+    // next/link cannot be reliably used for external links, so only use next/link for anchor and internal URLs (i.e., links starting with "/")
+    const isInternal =
+      !!href &&
+      !href.startsWith("http://") &&
+      !href.startsWith("https://") &&
+      !href.startsWith("mailto:") &&
+      !href.startsWith("tel:") &&
+      !href.startsWith("wa.me/") &&
+      !/^\/\//.test(href) &&
+      !href.startsWith("#");
+
+    // Special: use next/link for anchor
+    if (isAnchor) {
+      return (
+        <Link
+          href={href}
+          className={className}
+          style={style}
+          onClick={handleClick}
+          scroll={true}
+        >
+          {label}
+        </Link>
+      );
+    }
+
+    // Use next/link for internal links only (excluding anchors above)
+    if (isInternal) {
+      return (
+        <Link
+          href={href}
+          className={className}
+          style={style}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={handleClick}
+        >
+          {label}
+        </Link>
+      );
+    }
+
+    // Otherwise, external link (including WhatsApp): use normal <a>
     return (
       <a
         href={href}
-        target={isAnchor ? undefined : "_blank"}
-        rel={isAnchor ? undefined : "noopener noreferrer"}
+        target="_blank"
+        rel="noopener noreferrer"
         className={className}
         style={style}
         onClick={handleClick}

@@ -1,23 +1,14 @@
 /* eslint-disable react-hooks/static-components */
 
+import { useSiteEditorStore } from "@/store/useSiteEditorStore";
 import { SectionProps } from "../../types";
 import TemplateImage from "@/components/shared/TemplateImage";
 import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
 import Container from "@/components/shared/Container";
 import EditableLinkButton from "@/components/shared/EditableLink";
-import { LinkConfig } from "@/components/shared/EditableLink";
+import { type MenuItem } from "../../types";
 
-type ProjectItem = {
-  title: string;
-  desc: string;
-  tags?: string[];
-  image?: string;
-  imagePId?: string;
-  btnLabel?: string;
-  projectBtnLink?: LinkConfig;
-};
-
-export const ProjectsSection = ({
+export const MenuSection = ({
   variant,
   isEditor,
   content,
@@ -26,15 +17,19 @@ export const ProjectsSection = ({
   anchorName,
   path,
 }: SectionProps) => {
-  const items: ProjectItem[] = content?.items || [];
+  const items: MenuItem[] = content?.items || [];
   const isEven = position % 2 === 0;
 
   const sectionBg = isEven ? "var(--qs-bg)" : "var(--qs-bg-alt)";
   const cardBg = isEven ? "var(--qs-card-bg)" : "var(--qs-card-bg-alt)";
 
-  const update = (next: ProjectItem[]) => onUpdate("items", next);
+  const settings = useSiteEditorStore((state) => state.settings);
 
-  const updateOne = (i: number, changes: Partial<ProjectItem>) => {
+  const { whatsappNumber } = settings;
+
+  const update = (next: MenuItem[]) => onUpdate("items", next);
+
+  const updateOne = (i: number, changes: Partial<MenuItem>) => {
     const next = [...items];
     next[i] = { ...next[i], ...changes };
     update(next);
@@ -50,16 +45,25 @@ export const ProjectsSection = ({
     update([
       ...items,
       {
-        title: "New Project",
-        desc: "Project description...",
-        tags: ["React"],
+        title: "Chicken Shawarma",
+        desc: "Fresh, tasty, and served hot.",
+        price: "₦4,500",
+        tags: ["Popular"],
         image:
           "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
         imagePId: "",
-        btnLabel: "View Project",
-        projectBtnLink: { type: "url", url: "" },
+        btnLabel: "Order Now",
       },
     ]);
+  };
+
+  const buildOrderMessage = (item: MenuItem) => {
+    return `Hello 👋 I want to order:
+
+🍽️ Item: ${item.title}
+💰 Price: ${item.price || "N/A"}
+
+Please confirm availability.`;
   };
 
   const Header = () => (
@@ -70,7 +74,7 @@ export const ProjectsSection = ({
         suppressContentEditableWarning
         onBlur={(e) => onUpdate("heading", e.currentTarget.textContent?.trim())}
       >
-        {content?.heading ?? "Projects"}
+        {content?.heading ?? "Our Menu"}
       </h2>
 
       <p
@@ -81,7 +85,7 @@ export const ProjectsSection = ({
           onUpdate("subheading", e.currentTarget.textContent?.trim())
         }
       >
-        {content?.subheading ?? "Showcase of my recent work"}
+        {content?.subheading ?? "Fresh meals, drinks, and snacks made daily"}
       </p>
     </div>
   );
@@ -104,7 +108,35 @@ export const ProjectsSection = ({
     updateOne(i, { tags: next });
   };
 
-  // ───────────────────────── LIST ─────────────────────────
+  const renderOrderButton = (item: MenuItem, i: number) => {
+    const messageOverride = buildOrderMessage(item);
+
+    return (
+      <EditableLinkButton
+        isEditor={isEditor}
+        label={item.btnLabel ?? "Order Now"}
+        linkConfig={{
+          type: "whatsapp",
+          phone: whatsappNumber,
+          message: messageOverride,
+        }}
+        messageOverride={messageOverride}
+        onLabelChange={(v) => updateOne(i, { btnLabel: v })}
+        onLinkChange={() => {
+          // Intentionally locked to system-generated WhatsApp link
+        }}
+        noPreview
+        className="rounded-lg px-4 py-2 font-semibold transition-transform hover:scale-[1.02]"
+        style={{
+          background: "var(--qs-primary)",
+          color: "var(--qs-primary-fg)",
+          marginTop: 0,
+        }}
+      />
+    );
+  };
+
+  // ───────────────────────── LIST VARIANT ─────────────────────────
   if (variant === "list") {
     return (
       <section id={anchorName} style={{ background: sectionBg }}>
@@ -112,10 +144,10 @@ export const ProjectsSection = ({
           <Header />
 
           <div className="space-y-12">
-            {items.map((p, i) => (
+            {items.map((item, i) => (
               <div
                 key={i}
-                className="relative grid @md:grid-cols-2 gap-10 p-8 rounded-3xl border transition"
+                className="relative grid @md:grid-cols-[180px_1fr] gap-6 p-6 rounded-3xl border transition"
                 style={{
                   background: cardBg,
                   border: "1px solid var(--qs-border)",
@@ -129,28 +161,43 @@ export const ProjectsSection = ({
 
                 <div className="rounded-2xl overflow-hidden">
                   <TemplateImage
-                    source={p.image}
+                    source={item.image}
                     path={path + `.items.${i}.image`}
                     isEditor={isEditor}
                   />
                 </div>
 
                 <div className="flex flex-col justify-center">
-                  <h3
-                    className="text-3xl font-bold"
-                    contentEditable={isEditor}
-                    suppressContentEditableWarning
-                    onBlur={(e) =>
-                      updateOne(i, {
-                        title: e.currentTarget.textContent?.trim(),
-                      })
-                    }
-                  >
-                    {p.title}
-                  </h3>
+                  <div className="flex items-start justify-between gap-4">
+                    <h3
+                      className="text-2xl font-bold"
+                      contentEditable={isEditor}
+                      suppressContentEditableWarning
+                      onBlur={(e) =>
+                        updateOne(i, {
+                          title: e.currentTarget.textContent?.trim(),
+                        })
+                      }
+                    >
+                      {item.title}
+                    </h3>
+
+                    <span
+                      className="shrink-0 text-lg font-extrabold"
+                      contentEditable={isEditor}
+                      suppressContentEditableWarning
+                      onBlur={(e) =>
+                        updateOne(i, {
+                          price: e.currentTarget.textContent?.trim(),
+                        })
+                      }
+                    >
+                      {item.price ?? "₦0"}
+                    </span>
+                  </div>
 
                   <p
-                    className="mt-4 opacity-70 leading-7"
+                    className="mt-3 opacity-70 leading-7"
                     contentEditable={isEditor}
                     suppressContentEditableWarning
                     onBlur={(e) =>
@@ -159,12 +206,12 @@ export const ProjectsSection = ({
                       })
                     }
                   >
-                    {p.desc}
+                    {item.desc}
                   </p>
 
-                  {!!p.tags?.length && (
+                  {!!item.tags?.length && (
                     <div className="mt-5 flex flex-wrap gap-2 items-center">
-                      {p.tags.map((t, j) => (
+                      {item.tags.map((t, j) => (
                         <div key={j} className="flex items-center gap-1">
                           <span
                             className="px-3 py-1 text-xs rounded-full border outline-none"
@@ -207,23 +254,7 @@ export const ProjectsSection = ({
                     </div>
                   )}
 
-                  <div className="mt-7">
-                    <EditableLinkButton
-                      isEditor={isEditor}
-                      label={p.btnLabel ?? "View Project"}
-                      linkConfig={p.projectBtnLink}
-                      onLabelChange={(v) => updateOne(i, { btnLabel: v })}
-                      onLinkChange={(cfg) =>
-                        updateOne(i, { projectBtnLink: cfg })
-                      }
-                      className="rounded-lg px-4 py-2 font-semibold transition-transform hover:scale-[1.02]"
-                      style={{
-                        background: "var(--qs-primary)",
-                        color: "var(--qs-primary-fg)",
-                        marginTop: 0,
-                      }}
-                    />
-                  </div>
+                  <div className="mt-7">{renderOrderButton(item, i)}</div>
                 </div>
               </div>
             ))}
@@ -231,7 +262,7 @@ export const ProjectsSection = ({
 
           {isEditor && (
             <div className="mt-12 flex justify-center">
-              <AddButton onClick={add}>Add Project</AddButton>
+              <AddButton onClick={add}>Add Menu Item</AddButton>
             </div>
           )}
         </Container>
@@ -239,14 +270,14 @@ export const ProjectsSection = ({
     );
   }
 
-  // ───────────────────────── GRID ─────────────────────────
+  // ───────────────────────── GRID VARIANT ─────────────────────────
   return (
     <section id={anchorName} style={{ background: sectionBg }}>
       <Container className="py-24">
         <Header />
 
         <div className="grid @md:grid-cols-2 @xl:grid-cols-3 gap-8">
-          {items.map((p, i) => (
+          {items.map((item, i) => (
             <div
               key={i}
               className="relative rounded-3xl border overflow-hidden hover:-translate-y-1 transition"
@@ -262,19 +293,56 @@ export const ProjectsSection = ({
               )}
 
               <TemplateImage
-                source={p.image}
+                source={item.image}
                 isEditor={isEditor}
                 path={path + `.items.${i}.image`}
               />
 
               <div className="p-6 flex flex-col h-full">
-                <h3 className="text-xl font-bold">{p.title}</h3>
+                <div className="flex items-start justify-between gap-4">
+                  <h3
+                    className="text-xl font-bold"
+                    contentEditable={isEditor}
+                    suppressContentEditableWarning
+                    onBlur={(e) =>
+                      updateOne(i, {
+                        title: e.currentTarget.textContent?.trim(),
+                      })
+                    }
+                  >
+                    {item.title}
+                  </h3>
 
-                <p className="mt-3 text-sm opacity-70">{p.desc}</p>
+                  <span
+                    className="text-lg font-extrabold"
+                    contentEditable={isEditor}
+                    suppressContentEditableWarning
+                    onBlur={(e) =>
+                      updateOne(i, {
+                        price: e.currentTarget.textContent?.trim(),
+                      })
+                    }
+                  >
+                    {item.price ?? "₦0"}
+                  </span>
+                </div>
 
-                {!!p.tags?.length && (
+                <p
+                  className="mt-3 text-sm opacity-70"
+                  contentEditable={isEditor}
+                  suppressContentEditableWarning
+                  onBlur={(e) =>
+                    updateOne(i, {
+                      desc: e.currentTarget.textContent?.trim(),
+                    })
+                  }
+                >
+                  {item.desc}
+                </p>
+
+                {!!item.tags?.length && (
                   <div className="mt-5 flex flex-wrap gap-2 items-center">
-                    {p.tags.map((t, j) => (
+                    {item.tags.map((t, j) => (
                       <div key={j} className="flex items-center gap-1">
                         <span
                           className="px-3 py-1 text-xs rounded-full border outline-none"
@@ -317,23 +385,7 @@ export const ProjectsSection = ({
                   </div>
                 )}
 
-                <div className="mt-7">
-                  <EditableLinkButton
-                    isEditor={isEditor}
-                    label={p.btnLabel ?? "View Project"}
-                    linkConfig={p.projectBtnLink}
-                    onLabelChange={(v) => updateOne(i, { btnLabel: v })}
-                    onLinkChange={(cfg) =>
-                      updateOne(i, { projectBtnLink: cfg })
-                    }
-                    className="rounded-lg px-4 py-2 font-semibold transition-transform hover:scale-[1.02]"
-                    style={{
-                      background: "var(--qs-primary)",
-                      color: "var(--qs-primary-fg)",
-                      marginTop: 0,
-                    }}
-                  />
-                </div>
+                <div className="mt-7">{renderOrderButton(item, i)}</div>
               </div>
             </div>
           ))}
@@ -341,7 +393,7 @@ export const ProjectsSection = ({
 
         {isEditor && (
           <div className="mt-12 flex justify-center">
-            <AddButton onClick={add}>Add Project</AddButton>
+            <AddButton onClick={add}>Add Menu Item</AddButton>
           </div>
         )}
       </Container>

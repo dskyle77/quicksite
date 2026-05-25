@@ -4,10 +4,12 @@
 import Link from "next/link";
 import { Loader2, Save, ArrowLeft, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
+
 import { useAuth } from "@/lib/useAuth";
 import { getAllThemes } from "@/lib/themes";
 import { useSiteEditorStore } from "@/store/useSiteEditorStore";
 import EditorScreen from "@/screen/editor/EditorScreen";
+import { SiteProvider } from "@/context/SiteContext";
 
 interface EditorClientProps {
   slug: string;
@@ -80,6 +82,8 @@ export default function EditorClient({ slug, subslug }: EditorClientProps) {
       </div>
     );
   }
+
+  if (!siteData) return null;
 
   // 5. Main Render
   return (
@@ -155,11 +159,13 @@ export default function EditorClient({ slug, subslug }: EditorClientProps) {
 
       <main className="flex-1">
         <div className="max-w-[1400px] mx-auto min-h-full">
-          <EditorScreen
-            data={siteData!}
-            onChange={(updated) => updateSite(updated)}
-            slugs={{ slug, subslug }}
-          />
+          <SiteProvider value={{ site: siteData }}>
+            <EditorScreen
+              data={siteData!}
+              onChange={(updated) => updateSite(updated)}
+              slugs={{ slug, subslug }}
+            />
+          </SiteProvider>
         </div>
       </main>
     </div>

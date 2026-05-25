@@ -10,11 +10,13 @@ import { FeaturesSection } from "./FeaturesVariants";
 import { PricingSection } from "./PricingVariants";
 import { FaqSection } from "./FaqVariants";
 import { CtaSection } from "./CtaVariants";
+import { MenuSection } from "./MenuVariants";
 
 export const SectionVariants: Partial<SectionVariantRegistry> = {
   about: AboutSection,
   skills: SkillsSection,
   projects: ProjectsSection,
+  menu: MenuSection,
   experience: ExperienceSection,
   testimonials: TestimonialsSection,
   contact: ContactSection,

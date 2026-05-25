@@ -1,25 +1,16 @@
+// @/screen/s/SiteRenderer.tsx
+import { useSiteContext } from "@/context/SiteContext";
 import { getTemplateByType } from "@/lib/templates";
 import { getTheme } from "@/lib/themes";
-
-import type { Site } from "@/lib/types";
-
+import Template from "@/components/siteTemplates/Template";
 import SiteTracker from "./SiteTracker";
 
-export default function SiteRenderer({
-  site,
-  slugs,
-  isCustomDomain,
-}: {
-  site: Site;
-  slugs: {
-    slug: string;
-    subslug?: string;
-  };
-  isCustomDomain?: boolean;
-}) {
+export default function SiteRenderer() {
+  const { isCustomDomain, site } = useSiteContext();
+
   // Validate template exists
-  const templateEntry = getTemplateByType(site.type);
-  if (!templateEntry?.template) {
+  const templateEntry = getTemplateByType(site?.type || "");
+  if (!templateEntry?.config) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-50">
         <div className="text-center p-8 max-w-md">
@@ -34,7 +25,7 @@ export default function SiteRenderer({
   }
 
   // Validate theme exists
-  const theme = getTheme(site.theme);
+  const theme = getTheme(site?.theme || "");
   if (!theme) {
     return (
       <div className="w-full h-full flex items-center justify-center bg-gray-50">
@@ -49,18 +40,16 @@ export default function SiteRenderer({
     );
   }
 
-  const Template = templateEntry.template;
-
   return (
     <div className={`w-full h-full ${theme.className || ""}`}>
       {theme.css && <style>{theme.css}</style>}
       <Template
         isEditor={false}
-        content={site.content || {}}
-        slugs={slugs}
+        canCustomize={false}
+        content={site?.content || {}}
         isCustomDomain={isCustomDomain}
       />
-      <SiteTracker slug={slugs.slug} />
+      <SiteTracker />
     </div>
   );
 }

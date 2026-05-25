@@ -102,39 +102,6 @@ export async function getUserSites(uid: string): Promise<Site[]> {
 }
 
 /**
- * PUBLIC: Fetches a site.
- * Priority 1: Document ID (Slug)
- * Priority 2: customDomain field
- */
-export async function getSiteByLookup(
-  identifier: string,
-): Promise<Site | null> {
-  if (!identifier) return null;
-  const clean = identifier.toLowerCase();
-
-  // Try Slug (ID)
-  const snap = await getDoc(doc(db, "sites", clean));
-  if (snap.exists() && snap.data().status === "published") {
-    return serializeData<Site>({ id: snap.id, ...snap.data() });
-  }
-
-  // Try Domain (Field)
-  const q = query(
-    collection(db, "sites"),
-    where("customDomain", "==", clean),
-    where("status", "==", "published"),
-  );
-  const querySnap = await getDocs(q);
-
-  if (!querySnap.empty) {
-    const d = querySnap.docs[0];
-    return serializeData<Site>({ id: d.id, ...d.data() });
-  }
-
-  return null;
-}
-
-/**
  * PRIVATE: Editor fetch
  */
 export async function getPrivateSite(

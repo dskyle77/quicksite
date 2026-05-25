@@ -1,10 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Groq from "groq-sdk";
 import { variantOptions } from "@/components/templateBuilder/contentBlocks";
-import {
-  getThemeOptionsForAI,
-  isValidThemeId,
-} from "@/lib/themes";
+import { getThemeOptionsForAI, isValidThemeId } from "@/lib/themes";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 

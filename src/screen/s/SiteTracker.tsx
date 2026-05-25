@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
+import { useSiteContext } from "@/context/SiteContext";
 
-export default function SiteTracker({ slug }: { slug: string }) {
+export default function SiteTracker() {
+  const { slugs } = useSiteContext();
+  const slug = slugs?.slug;
+
   useEffect(() => {
     const sessionKey = `v_sent_${slug}`;
 

@@ -410,7 +410,10 @@ const MinimalNavbar = ({
   );
 };
 
+const None = () => null;
+
 export const NavbarVariants = {
   classic: ClassicNavbar,
   minimal: MinimalNavbar,
+  none: None,
 };

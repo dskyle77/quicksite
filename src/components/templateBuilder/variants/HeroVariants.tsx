@@ -9,76 +9,64 @@ import TemplateImage from "@/components/shared/TemplateImage";
 const BackgroundVariant = (props: TemplateComponentProps) => {
   const { isEditor, content, onUpdate } = props;
 
+  // Helper to keep the JSX clean and dry for editable elements
+  const editableProps = (field: string) => ({
+    contentEditable: isEditor,
+    suppressContentEditableWarning: true,
+    onBlur: (e: React.FocusEvent<HTMLElement>) =>
+      onUpdate(field, e.currentTarget.textContent?.trim() || ""),
+  });
+
   return (
-    <section
-      className="relative flex min-h-[75vh] flex-col items-center justify-center text-center overflow-hidden"
-      style={{ background: "var(--qs-bg, #fff)" }}
-    >
-      {/* Image background */}
+    <section className="relative flex min-h-[80vh] flex-col items-center justify-center overflow-hidden bg-linear-to-b from-(--qs-bg,#fff) to-(--qs-bg-alt,#f7f7f7) text-center">
+      {/* Background Image Component */}
       <TemplateImage
         variant="background"
         source={content?.image1}
-        path={"hero.image1"}
+        path="hero.image1"
         isEditor={isEditor}
       >
-        {/* Inner Responsive Container */}
-        <div className="w-full max-w-5xl mx-auto px-4 @sm:px-6 py-12 @md:py-24 flex flex-col items-center justify-center">
+        {/* Ambient Gradient Overlay for Text Legibility */}
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-black/30" />
+
+        {/* Inner Content Container */}
+        <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center justify-center px-4 py-16 @sm:px-8 @md:py-32">
           {/* Badge */}
           <div
-            className="mb-5 inline-flex rounded-full px-4 py-2 text-xs @sm:text-sm font-medium"
-            style={{
-              background: "var(--qs-bg-alt)",
-              border: "1px solid var(--qs-border)",
-              color: "var(--qs-text-muted)",
-            }}
-            contentEditable={isEditor}
-            suppressContentEditableWarning
-            onBlur={(e) =>
-              onUpdate("badge", e.currentTarget.textContent?.trim())
-            }
+            {...editableProps("badge")}
+            className="mb-6 inline-flex scale-100 rounded-full border border-(--qs-primary) bg-(--qs-bg-alt,rgba(255,255,255,0.9)) px-4 py-1.5 text-xs font-semibold text-(--qs-primary) shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-105 @sm:text-sm"
           >
             {content?.badge ?? "👋 Available for Work"}
           </div>
 
-          <h2
-            className="max-w-3xl text-3xl @sm:text-5xl @md:text-6xl font-bold tracking-tight mx-auto"
-            style={{
-              color: "var(--qs-bg-contrast, var(--qs-primary-fg, white))",
-            }}
-            contentEditable={isEditor}
-            suppressContentEditableWarning
-            onBlur={(e) =>
-              onUpdate("title", e.currentTarget.textContent?.trim())
-            }
+          {/* Heading */}
+          <h1
+            {...editableProps("title")}
+            className="mx-auto max-w-4xl text-4xl font-extrabold tracking-tight text-(--qs-bg-contrast,var(--qs-primary-fg,#fff)) drop-shadow-md leading-tight outline-none @sm:text-6xl @md:text-7xl"
           >
             {content?.title ?? "Hi, I'm Alex"}
-          </h2>
+          </h1>
 
+          {/* Description */}
           <p
-            className="mt-6 max-w-xl text-sm @sm:text-base @md:text-lg leading-7 mx-auto"
-            style={{ color: "var(--qs-text-muted, #d1d5db)" }}
-            contentEditable={isEditor}
-            suppressContentEditableWarning
-            onBlur={(e) =>
-              onUpdate("desc", e.currentTarget.textContent?.trim())
-            }
+            {...editableProps("desc")}
+            className="mx-auto mt-6 max-w-2xl rounded-2xl border border-white/10 bg-black/20 px-6 py-4.5 text-base font-normal leading-relaxed text-gray-200 backdrop-blur-md outline-none @sm:text-lg @md:text-xl"
           >
-            {content?.desc}
+            {content?.desc ??
+              "Crafting digital experiences with precision and purpose."}
           </p>
 
-          <div className="mt-8 flex flex-col @sm:flex-row items-center justify-center gap-4 w-full @sm:w-auto">
+          {/* Call to Actions */}
+          <div className="mt-10 flex w-full flex-col items-center justify-center gap-4 @sm:w-auto @sm:flex-row">
             <EditableLinkButton
               isEditor={isEditor}
               label={content?.primaryButton ?? "View Work"}
               linkConfig={content?.primaryButtonLink}
               onLabelChange={(v) => onUpdate("primaryButton", v)}
               onLinkChange={(cfg) => onUpdate("primaryButtonLink", cfg)}
-              className="w-full @sm:w-auto text-center rounded-xl px-6 py-3 font-semibold transition-transform hover:scale-[1.02]"
-              style={{
-                background: "var(--qs-primary)",
-                color: "var(--qs-primary-fg)",
-              }}
+              className="w-full rounded-xl bg-(--qs-primary) px-8 py-4 text-base font-bold text-(--qs-primary-fg) shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_6px_24px_rgba(0,0,0,0.2)] active:translate-y-0 @sm:w-auto text-center"
             />
+
             {content?.secondaryButton && (
               <EditableLinkButton
                 isEditor={isEditor}
@@ -86,12 +74,7 @@ const BackgroundVariant = (props: TemplateComponentProps) => {
                 linkConfig={content?.secondaryButtonLink}
                 onLabelChange={(v) => onUpdate("secondaryButton", v)}
                 onLinkChange={(cfg) => onUpdate("secondaryButtonLink", cfg)}
-                className="w-full @sm:w-auto text-center rounded-xl px-6 py-3 font-semibold transition-transform hover:scale-[1.02]"
-                style={{
-                  background: "var(--qs-bg-alt)",
-                  color: "var(--qs-text)",
-                  border: "1px solid var(--qs-border)",
-                }}
+                className="w-full rounded-xl border border-(--qs-border) bg-(--qs-bg-alt,transparent) px-8 py-4 text-base font-semibold text-(--qs-text) backdrop-blur-sm transition-all duration-200 hover:bg-white/10 active:scale-98 @sm:w-auto text-center"
               />
             )}
           </div>
@@ -320,6 +303,8 @@ const CenteredVariant = ({
   </section>
 );
 
+const None = () => null;
+
 // ─── Registry ─────────────────────────────────────────────────────────────────
 
 export const HeroVariants: VariantRegistry<HeroVariantKey> = {
@@ -327,4 +312,13 @@ export const HeroVariants: VariantRegistry<HeroVariantKey> = {
   split: SplitVariant,
   minimalist: MinimalistVariant,
   centered: CenteredVariant,
+  none: None,
 };
+
+export const HeroVariantList: HeroVariantKey[] = [
+  "background",
+  "centered",
+  "minimalist",
+  "split",
+  "none",
+];

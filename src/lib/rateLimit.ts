@@ -8,7 +8,7 @@ const redis = Redis.fromEnv();
 export const AI_DAILY_LIMITS: Record<Plan, number> = {
   free: 1,
   growth: 10,
-  pro: 25,
+  pro: 20,
 };
 
 const aiRateLimiters: Record<Plan, Ratelimit> = {

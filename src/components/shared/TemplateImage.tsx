@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable @next/next/no-img-element */
+"use client";
 import { useRef, useState, useEffect } from "react";
 import { Upload } from "lucide-react";
 import { useSiteEditorStore } from "@/store/useSiteEditorStore";
+import NextImage from "next/image";
 
 type TemplateImageProps = {
   source?: string;
@@ -64,11 +65,9 @@ export default function TemplateImage({
     if (imageFile instanceof File && previewUrl) {
       effectiveSource = previewUrl;
     } else {
-      // If imageFile is undefined, fall back to source
       effectiveSource = source;
     }
   } else {
-    // Not in editor mode: always use source
     effectiveSource = source;
   }
 
@@ -77,11 +76,16 @@ export default function TemplateImage({
     return (
       <div className="relative w-full overflow-hidden min-h-[600px] flex items-center">
         {effectiveSource && (
-          <div className="absolute inset-0 z-0">
-            <img
+          <div className="absolute inset-0 z-0 w-full h-full">
+            <NextImage
               src={effectiveSource}
               alt={alt || ""}
               className="w-full h-full object-cover"
+              placeholder="empty"
+              fill
+              sizes="100vw"
+              priority
+              style={{ objectFit: "cover" }}
             />
             <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
           </div>
@@ -141,19 +145,26 @@ export default function TemplateImage({
 
   if (effectiveSource) {
     showImage = (
-      <img
-        alt={alt}
-        src={effectiveSource}
-        className={[
-          "object-cover w-full h-full rounded-2xl",
-          isEditor ? "hover:brightness-75" : "",
-          uploading ? "opacity-50 grayscale" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
-        loading="eager"
-        style={{ display: "block" }}
-      />
+      <div
+        className="relative w-full h-full"
+        style={{ minHeight: 120, minWidth: 120 }}
+      >
+        <NextImage
+          src={effectiveSource}
+          alt={alt || ""}
+          className={[
+            "object-cover w-full h-full rounded-2xl",
+            isEditor ? "hover:brightness-75" : "",
+            uploading ? "opacity-50 grayscale" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+          fill
+          sizes="100vw"
+          priority
+          style={{ objectFit: "cover", borderRadius: "1rem", display: "block" }}
+        />
+      </div>
     );
   } else if (isEditor) {
     showImage = (

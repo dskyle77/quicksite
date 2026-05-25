@@ -1,12 +1,17 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
-import { getTemplateByType } from "@/lib/templates";
-import { getAllThemes, getTheme } from "@/lib/themes";
 import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import Link from "next/link";
+
+import { ArrowLeft } from "lucide-react";
+
+import { getTemplateByType, buildStarterContent } from "@/lib/templates";
+import { getAllThemes, getTheme } from "@/lib/themes";
+
+import Template from "@/components/siteTemplates/Template";
+import { SiteProvider } from "@/context/SiteContext";
 
 export default function TemplatesPreview({ type }: { type: string }) {
   const templateEntry = getTemplateByType(type);
@@ -40,7 +45,6 @@ export default function TemplatesPreview({ type }: { type: string }) {
 
   // 3. ALWAYS derive the active theme from the state 'themeName'
   const theme = getTheme(themeName);
-  const Template = templateEntry.template;
 
   // Prepare URL logic
   // DEFAULT BACK BUTTON IS /templates
@@ -55,7 +59,16 @@ export default function TemplatesPreview({ type }: { type: string }) {
 
   const starterContentArgs: Record<string, string | undefined> = {};
   if (paramsName) starterContentArgs.selectedTitle = paramsName;
-  const templateData = templateEntry.getStarterContent(starterContentArgs);
+
+  const templateData = templateEntry?.starterContent
+    ? templateEntry.starterContent(starterContentArgs)
+    : buildStarterContent(
+        templateEntry.contentConfig,
+        starterContentArgs,
+      );
+
+
+      console.log(templateData)
 
   let useTemplateHref = `/dashboard/new?template=${encodeURIComponent(type)}`;
   const useQueryParams: string[] = [];
@@ -70,47 +83,56 @@ export default function TemplatesPreview({ type }: { type: string }) {
 
   return (
     <div className={`min-h-screen bg-white text-slate-900 ${theme.className}`}>
-      {/* Inject the dynamic CSS from the theme */}
-      <style>{theme.css}</style>
+      <SiteProvider
+        value={{
+          isCustomDomain: false,
+        }}
+      >
+        <style>{theme.css}</style>
 
-      <header className="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-50 shadow-sm">
-        <div className="flex items-center gap-4">
-          <Link
-            href={from}
-            className="flex p-2 hover:bg-slate-100 rounded-full transition-colors"
-          >
-            <ArrowLeft size={20} className="text-black" />
-          </Link>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="flex flex-col items-end">
-            <span className="text-[10px] text-slate-400 uppercase font-bold hidden sm:block">
-              Theme
-            </span>
-            <select
-              className="border border-slate-200 rounded-lg px-2 py-1 text-xs text-black bg-white focus:ring-2 focus:ring-primary outline-none transition-all cursor-pointer"
-              value={themeName}
-              onChange={(e) => setThemeName(e.target.value)}
+        <header className="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-50 shadow-sm">
+          <div className="flex items-center gap-4">
+            <Link
+              href={from}
+              className="flex p-2 hover:bg-slate-100 rounded-full transition-colors"
             >
-              {getAllThemes().map(({ id, name }) => (
-                <option key={id} value={id}>
-                  {name}
-                </option>
-              ))}
-            </select>
+              <ArrowLeft size={20} className="text-black" />
+            </Link>
           </div>
-          <Link href={useTemplateHref}>
-            <button className="flex items-center gap-2 bg-black text-white px-5 py-2 rounded-full font-bold text-sm transition-all shadow-md active:scale-95">
-              Use Template
-            </button>
-          </Link>
-        </div>
-      </header>
 
-      <main>
-        <Template isEditor={false} content={templateData} />
-      </main>
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col items-end">
+              <span className="text-[10px] text-slate-400 uppercase font-bold hidden sm:block">
+                Theme
+              </span>
+              <select
+                className="border border-slate-200 rounded-lg px-2 py-1 text-xs text-black bg-white focus:ring-2 focus:ring-primary outline-none transition-all cursor-pointer"
+                value={themeName}
+                onChange={(e) => setThemeName(e.target.value)}
+              >
+                {getAllThemes().map(({ id, name }) => (
+                  <option key={id} value={id}>
+                    {name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <Link href={useTemplateHref}>
+              <button className="flex items-center gap-2 bg-black text-white px-5 py-2 rounded-full font-bold text-sm transition-all shadow-md active:scale-95">
+                Use Template
+              </button>
+            </Link>
+          </div>
+        </header>
+
+        <main>
+          <Template
+            isEditor={false}
+            canCustomize={false}
+            content={templateData}
+          />
+        </main>
+      </SiteProvider>
     </div>
   );
 }

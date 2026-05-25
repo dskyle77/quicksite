@@ -1,4 +1,5 @@
 // src/features/home/HomeScreen.tsx
+"use client"
 import HeroSection from "./HeroSection";
 import FeaturesSection from "./FeaturesSection";
 import MobileReadySection from "./MobileReadySection";

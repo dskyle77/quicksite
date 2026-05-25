@@ -1,17 +1,14 @@
 // lib/theme.ts
 
 /**
- * GOOGLE FONTS REQUIRED
- * 
- * Add these links to your <head> or import them in your layout/root:
- * 
- * ```html
- * <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Fira+Code:wght@400;500&family=Archivo+Black&display=swap" rel="stylesheet">
+ * UPGRADED GOOGLE FONTS REQUIRED
+ * * Add this link to your <head> or import it in your layout/root:
+ * * ```html
+ * <link href="[https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Urbanist:wght@400;500;600;700&family=Syne:wght@700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Fira+Code:wght@400;500&family=Archivo+Black&display=swap](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Urbanist:wght@400;500;600;700&family=Syne:wght@700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Fira+Code:wght@400;500&family=Archivo+Black&display=swap)" rel="stylesheet">
  * ```
- * 
- * Or using @import in your global CSS:
+ * * Or using @import in your global CSS:
  * ```css
- * @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&family=Fira+Code:wght@400;500&family=Archivo+Black&display=swap');
+ * @import url('[https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Urbanist:wght@400;500;600;700&family=Syne:wght@700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Fira+Code:wght@400;500&family=Archivo+Black&display=swap](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Urbanist:wght@400;500;600;700&family=Syne:wght@700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=JetBrains+Mono:wght@400;500;700&family=Fira+Code:wght@400;500&family=Archivo+Black&display=swap)');
  * ```
  */
 
@@ -58,326 +55,326 @@ function makeTheme(params: ThemeParams): Theme {
 }
 
 /* =========================
-   RESTYLED THEMES
+   VIBRANT & MODERN THEMES
    ========================= */
 
-// 1. Light Modern
+// 1. Light Modern (Clean, crisp iOS/Stripe style aesthetic)
 export const lightTheme = makeTheme({
   name: "Light",
-  description: "Clean and minimal light theme",
-  font: "'Inter', system-ui, sans-serif",
-  preview: { bg: "#ffffff", primary: "#2563eb", text: "#0f172a" },
+  description: "Ultra-crisp neo-minimalist light interface",
+  font: "'Plus Jakarta Sans', system-ui, sans-serif",
+  preview: { bg: "#ffffff", primary: "#4f46e5", text: "#09090b" },
   colors: `
     --qs-bg: #ffffff;
-    --qs-bg-alt: #f8fafc;
-    --qs-card-bg: #ffffff;
-    --qs-card-bg-alt: #f8fafc;
-    --qs-primary: #2563eb;
-    --qs-primary-fg: #ffffff;
-    --qs-secondary: #0ea5e9;
-    --qs-secondary-fg: #ffffff;
-    --qs-text: #0f172a;
-    --qs-text-muted: #64748b;
-    --qs-border: #e2e8f0;
-    --qs-shadow: rgba(0, 0, 0, 0.06);
-  `,
-});
-
-// 2. Dark Modern
-export const darkTheme = makeTheme({
-  name: "Dark",
-  description: "Sleek dark theme for modern brands",
-  font: "'Inter', system-ui, sans-serif",
-  preview: { bg: "#0f172a", primary: "#3b82f6", text: "#f1f5f9" },
-  colors: `
-    --qs-bg: #0f172a;
-    --qs-bg-alt: #1e293b;
-    --qs-card-bg: #1e293b;
-    --qs-card-bg-alt: #334155;
-    --qs-primary: #3b82f6;
-    --qs-primary-fg: #ffffff;
-    --qs-secondary: #8b5cf6;
-    --qs-secondary-fg: #ffffff;
-    --qs-text: #f1f5f9;
-    --qs-text-muted: #94a3b8;
-    --qs-border: #334155;
-    --qs-shadow: rgba(0, 0, 0, 0.35);
-  `,
-});
-
-// 3. Warm Beige
-export const warmTheme = makeTheme({
-  name: "Warm",
-  description: "Cozy beige tones for lifestyle brands",
-  font: "'DM Sans', sans-serif",
-  preview: { bg: "#faf8f5", primary: "#d97706", text: "#292524" },
-  colors: `
-    --qs-bg: #faf8f5;
-    --qs-bg-alt: #f5f0e8;
-    --qs-card-bg: #ffffff;
-    --qs-card-bg-alt: #f8f4ed;
-    --qs-primary: #d97706;
-    --qs-primary-fg: #ffffff;
-    --qs-secondary: #ea580c;
-    --qs-secondary-fg: #ffffff;
-    --qs-text: #292524;
-    --qs-text-muted: #78716c;
-    --qs-border: #e7e5e4;
-    --qs-shadow: rgba(0, 0, 0, 0.05);
-  `,
-});
-
-// 4. Ocean Blue
-export const oceanTheme = makeTheme({
-  name: "Ocean",
-  description: "Calming blue palette for professional sites",
-  font: "'Inter', sans-serif",
-  preview: { bg: "#f0f9ff", primary: "#0369a1", text: "#0c4a6e" },
-  colors: `
-    --qs-bg: #f0f9ff;
-    --qs-bg-alt: #e0f2fe;
-    --qs-card-bg: #ffffff;
-    --qs-card-bg-alt: #f0f9ff;
-    --qs-primary: #0369a1;
-    --qs-primary-fg: #ffffff;
-    --qs-secondary: #0891b2;
-    --qs-secondary-fg: #ffffff;
-    --qs-text: #0c4a6e;
-    --qs-text-muted: #0284c7;
-    --qs-border: #bae6fd;
-    --qs-shadow: rgba(14, 165, 233, 0.1);
-  `,
-});
-
-// 5. Forest Green
-export const forestTheme = makeTheme({
-  name: "Forest",
-  description: "Natural green for eco and wellness brands",
-  font: "'DM Sans', sans-serif",
-  preview: { bg: "#f0fdf4", primary: "#15803d", text: "#14532d" },
-  colors: `
-    --qs-bg: #f0fdf4;
-    --qs-bg-alt: #e6f4eb;
-    --qs-card-bg: #ffffff;
-    --qs-card-bg-alt: #f0fdf4;
-    --qs-primary: #15803d;
-    --qs-primary-fg: #ffffff;
-    --qs-secondary: #059669;
-    --qs-secondary-fg: #ffffff;
-    --qs-text: #14532d;
-    --qs-text-muted: #166534;
-    --qs-border: #bbf7d0;
-    --qs-shadow: rgba(34, 197, 94, 0.1);
-  `,
-});
-
-// 6. Purple Luxury
-export const luxuryTheme = makeTheme({
-  name: "Luxury",
-  description: "Premium purple for high-end brands",
-  font: "'Inter', sans-serif",
-  preview: { bg: "#faf5ff", primary: "#7c3aed", text: "#581c87" },
-  colors: `
-    --qs-bg: #faf5ff;
-    --qs-bg-alt: #f3e8ff;
-    --qs-card-bg: #ffffff;
-    --qs-card-bg-alt: #faf5ff;
-    --qs-primary: #7c3aed;
-    --qs-primary-fg: #ffffff;
-    --qs-secondary: #a855f7;
-    --qs-secondary-fg: #ffffff;
-    --qs-text: #581c87;
-    --qs-text-muted: #6b21a8;
-    --qs-border: #e9d5ff;
-    --qs-shadow: rgba(168, 85, 247, 0.1);
-  `,
-});
-
-// 7. Midnight (Tech-Dark)
-export const midnightTheme = makeTheme({
-  name: "Midnight",
-  description: "Deep blue-black for tech and startups",
-  font: "'Inter', sans-serif",
-  preview: { bg: "#020617", primary: "#06b6d4", text: "#f8fafc" },
-  colors: `
-    --qs-bg: #020617;
-    --qs-bg-alt: #0f172a;
-    --qs-card-bg: #1e293b;
-    --qs-card-bg-alt: #334155;
-    --qs-primary: #06b6d4;
-    --qs-primary-fg: #020617;
-    --qs-secondary: #14b8a6;
-    --qs-secondary-fg: #020617;
-    --qs-text: #f8fafc;
-    --qs-text-muted: #94a3b8;
-    --qs-border: #1e293b;
-    --qs-shadow: rgba(6, 182, 212, 0.2);
-  `,
-});
-
-// 8. Coral Pink
-export const coralTheme = makeTheme({
-  name: "Coral",
-  description: "Vibrant coral for creative brands",
-  font: "'DM Sans', sans-serif",
-  preview: { bg: "#fff7ed", primary: "#ea580c", text: "#7c2d12" },
-  colors: `
-    --qs-bg: #fff7ed;
-    --qs-bg-alt: #ffe6d1;
-    --qs-card-bg: #ffffff;
-    --qs-card-bg-alt: #fff7ed;
-    --qs-primary: #ea580c;
-    --qs-primary-fg: #ffffff;
-    --qs-secondary: #f97316;
-    --qs-secondary-fg: #ffffff;
-    --qs-text: #7c2d12;
-    --qs-text-muted: #c2410c;
-    --qs-border: #fed7aa;
-    --qs-shadow: rgba(249, 115, 22, 0.1);
-  `,
-});
-
-// 9. Monochrome
-export const monoTheme = makeTheme({
-  name: "Mono",
-  description: "Bold black and white minimalism",
-  font: "'Space Grotesk', sans-serif",
-  preview: { bg: "#fafafa", primary: "#0a0a0a", text: "#0a0a0a" },
-  colors: `
-    --qs-bg: #fafafa;
     --qs-bg-alt: #f4f4f5;
     --qs-card-bg: #ffffff;
     --qs-card-bg-alt: #fafafa;
-    --qs-primary: #0a0a0a;
+    --qs-primary: #4f46e5;
     --qs-primary-fg: #ffffff;
-    --qs-secondary: #404040;
+    --qs-secondary: #06b6d4;
     --qs-secondary-fg: #ffffff;
-    --qs-text: #0a0a0a;
-    --qs-text-muted: #737373;
-    --qs-border: #e5e5e5;
-    --qs-shadow: rgba(0, 0, 0, 0.08);
+    --qs-text: #09090b;
+    --qs-text-muted: #71717a;
+    --qs-border: #e4e4e7;
+    --qs-shadow: rgba(79, 70, 229, 0.05);
   `,
 });
 
-// 10. Sunset
+// 2. Dark Modern (Deep obsidian background, punchy electric accents)
+export const darkTheme = makeTheme({
+  name: "Dark",
+  description: "Deep obsidian dark mode with electric accents",
+  font: "'Plus Jakarta Sans', system-ui, sans-serif",
+  preview: { bg: "#09090b", primary: "#3b82f6", text: "#f4f4f5" },
+  colors: `
+    --qs-bg: #09090b;
+    --qs-bg-alt: #18181b;
+    --qs-card-bg: #18181b;
+    --qs-card-bg-alt: #27272a;
+    --qs-primary: #3b82f6;
+    --qs-primary-fg: #ffffff;
+    --qs-secondary: #a855f7;
+    --qs-secondary-fg: #ffffff;
+    --qs-text: #f4f4f5;
+    --qs-text-muted: #a1a1aa;
+    --qs-border: #27272a;
+    --qs-shadow: rgba(0, 0, 0, 0.5);
+  `,
+});
+
+// 3. Warm Terracotta (Rich organic luxury cream and baked clay)
+export const warmTheme = makeTheme({
+  name: "Warm Beige",
+  description: "Rich organic luxury cream and baked earth tones",
+  font: "'Urbanist', sans-serif",
+  preview: { bg: "#fdfbf7", primary: "#c2410c", text: "#291e1a" },
+  colors: `
+    --qs-bg: #fdfbf7;
+    --qs-bg-alt: #f7f2ea;
+    --qs-card-bg: #ffffff;
+    --qs-card-bg-alt: #fbf9f3;
+    --qs-primary: #c2410c;
+    --qs-primary-fg: #ffffff;
+    --qs-secondary: #b45309;
+    --qs-secondary-fg: #ffffff;
+    --qs-text: #291e1a;
+    --qs-text-muted: #7c6e65;
+    --qs-border: #ebdccb;
+    --qs-shadow: rgba(194, 65, 12, 0.04);
+  `,
+});
+
+// 4. Deep Ocean (Vibrant oceanic glowing theme)
+export const oceanTheme = makeTheme({
+  name: "Ocean Blue",
+  description: "Abyssal blue paired with Bioluminescent Cyan",
+  font: "'Plus Jakarta Sans', sans-serif",
+  preview: { bg: "#020813", primary: "#06b6d4", text: "#e0f2fe" },
+  colors: `
+    --qs-bg: #020813;
+    --qs-bg-alt: #071329;
+    --qs-card-bg: #0b1932;
+    --qs-card-bg-alt: #0f2447;
+    --qs-primary: #06b6d4;
+    --qs-primary-fg: #020813;
+    --qs-secondary: #3b82f6;
+    --qs-secondary-fg: #ffffff;
+    --qs-text: #e0f2fe;
+    --qs-text-muted: #38bdf8;
+    --qs-border: #132f5c;
+    --qs-shadow: rgba(6, 182, 214, 0.15);
+  `,
+});
+
+// 5. Emerald Forest (Moody, premium dark botanical styling)
+export const forestTheme = makeTheme({
+  name: "Forest Green",
+  description: "Deep luxury botanical shades and active mint pops",
+  font: "'Urbanist', sans-serif",
+  preview: { bg: "#041c16", primary: "#10b981", text: "#e6f4f1" },
+  colors: `
+    --qs-bg: #041c16;
+    --qs-bg-alt: #082d24;
+    --qs-card-bg: #0b3a2e;
+    --qs-card-bg-alt: #0f4d3e;
+    --qs-primary: #10b981;
+    --qs-primary-fg: #041c16;
+    --qs-secondary: #34d399;
+    --qs-secondary-fg: #041c16;
+    --qs-text: #e6f4f1;
+    --qs-text-muted: #a7f3d0;
+    --qs-border: #125847;
+    --qs-shadow: rgba(16, 185, 129, 0.12);
+  `,
+});
+
+// 6. Royal Amethyst (Premium, velvet dark purple look)
+export const luxuryTheme = makeTheme({
+  name: "Luxury Purple",
+  description: "Deep amethyst velvet paired with vibrant magenta",
+  font: "'Plus Jakarta Sans', sans-serif",
+  preview: { bg: "#0f051d", primary: "#d946ef", text: "#fdf4ff" },
+  colors: `
+    --qs-bg: #0f051d;
+    --qs-bg-alt: #1a0b32;
+    --qs-card-bg: #220f43;
+    --qs-card-bg-alt: #30165c;
+    --qs-primary: #d946ef;
+    --qs-primary-fg: #ffffff;
+    --qs-secondary: #a855f7;
+    --qs-secondary-fg: #ffffff;
+    --qs-text: #fdf4ff;
+    --qs-text-muted: #e879f9;
+    --qs-border: #3c1a73;
+    --qs-shadow: rgba(217, 70, 239, 0.15);
+  `,
+});
+
+// 7. Midnight Neon (High-octane tech startup aesthetic)
+export const midnightTheme = makeTheme({
+  name: "Midnight Tech",
+  description: "Deep space backdrops with glowing neon infrastructure",
+  font: "'Space Grotesk', sans-serif",
+  preview: { bg: "#020205", primary: "#6366f1", text: "#f8fafc" },
+  colors: `
+    --qs-bg: #020205;
+    --qs-bg-alt: #0a0a16;
+    --qs-card-bg: #111126;
+    --qs-card-bg-alt: #191938;
+    --qs-primary: #6366f1;
+    --qs-primary-fg: #ffffff;
+    --qs-secondary: #38bdf8;
+    --qs-secondary-fg: #020205;
+    --qs-text: #f8fafc;
+    --qs-text-muted: #94a3b8;
+    --qs-border: #222244;
+    --qs-shadow: rgba(99, 102, 241, 0.25);
+  `,
+});
+
+// 8. Sunset Coral (High-fashion vibrant energetic coral)
+export const coralTheme = makeTheme({
+  name: "Coral Pink",
+  description: "High-contrast dynamic peach and vivid hyper-coral",
+  font: "'Urbanist', sans-serif",
+  preview: { bg: "#fffaf8", primary: "#ff4e3a", text: "#4a120b" },
+  colors: `
+    --qs-bg: #fffaf8;
+    --qs-bg-alt: #ffebe5;
+    --qs-card-bg: #ffffff;
+    --qs-card-bg-alt: #fff5f2;
+    --qs-primary: #ff4e3a;
+    --qs-primary-fg: #ffffff;
+    --qs-secondary: #f43f5e;
+    --qs-secondary-fg: #ffffff;
+    --qs-text: #4a120b;
+    --qs-text-muted: #b93c2a;
+    --qs-border: #ffd0c4;
+    --qs-shadow: rgba(255, 78, 58, 0.08);
+  `,
+});
+
+// 9. Neo-Monochrome (High fashion, avant-garde editorial look)
+export const monoTheme = makeTheme({
+  name: "Monochrome",
+  description: "High-fashion geometric minimalism and raw contrast",
+  font: "'Space Grotesk', sans-serif",
+  preview: { bg: "#f8f9fa", primary: "#000000", text: "#000000" },
+  colors: `
+    --qs-bg: #f8f9fa;
+    --qs-bg-alt: #e9ecef;
+    --qs-card-bg: #ffffff;
+    --qs-card-bg-alt: #f1f3f5;
+    --qs-primary: #000000;
+    --qs-primary-fg: #ffffff;
+    --qs-secondary: #343a40;
+    --qs-secondary-fg: #ffffff;
+    --qs-text: #000000;
+    --qs-text-muted: #6c757d;
+    --qs-border: #ced4da;
+    --qs-shadow: rgba(0, 0, 0, 0.15);
+  `,
+});
+
+// 10. Cosmic Sunset (Psychedelic solar gradients and violet hues)
 export const sunsetTheme = makeTheme({
   name: "Sunset",
-  description: "Warm gradient vibes",
-  font: "'DM Sans', sans-serif",
-  preview: { bg: "#fef3c7", primary: "#dc2626", text: "#7c2d12" },
+  description: "Vivid solar flare gradients flashing into dark violet",
+  font: "'Space Grotesk', sans-serif",
+  preview: { bg: "#120516", primary: "#f97316", text: "#fdf2f8" },
   colors: `
-    --qs-bg: #fef3c7;
-    --qs-bg-alt: #fde68a;
-    --qs-card-bg: #fffbeb;
-    --qs-card-bg-alt: #fef3c7;
-    --qs-primary: #dc2626;
+    --qs-bg: #120516;
+    --qs-bg-alt: #22092c;
+    --qs-card-bg: #2d0b3b;
+    --qs-card-bg-alt: #3d0f50;
+    --qs-primary: #f97316;
     --qs-primary-fg: #ffffff;
-    --qs-secondary: #f59e0b;
+    --qs-secondary: #ec4899;
     --qs-secondary-fg: #ffffff;
-    --qs-text: #7c2d12;
-    --qs-text-muted: #b45309;
-    --qs-border: #fde68a;
-    --qs-shadow: rgba(245, 158, 11, 0.15);
+    --qs-text: #fdf2f8;
+    --qs-text-muted: #f472b6;
+    --qs-border: #4d1466;
+    --qs-shadow: rgba(249, 115, 22, 0.2);
   `,
 });
 
-// 11. Slate
+// 11. Steel Slate (Refined industrial tech architecture)
 export const slateTheme = makeTheme({
-  name: "Slate",
-  description: "Sophisticated gray for corporate",
-  font: "'Inter', sans-serif",
-  preview: { bg: "#f8fafc", primary: "#475569", text: "#0f172a" },
+  name: "Slate Aluminum",
+  description: "Anodized aluminum surfaces with heavy structural contrast",
+  font: "'Plus Jakarta Sans', sans-serif",
+  preview: { bg: "#f1f5f9", primary: "#0f172a", text: "#0f172a" },
   colors: `
-    --qs-bg: #f8fafc;
-    --qs-bg-alt: #f1f5f9;
+    --qs-bg: #f1f5f9;
+    --qs-bg-alt: #e2e8f0;
     --qs-card-bg: #ffffff;
     --qs-card-bg-alt: #f8fafc;
-    --qs-primary: #475569;
+    --qs-primary: #0f172a;
     --qs-primary-fg: #ffffff;
-    --qs-secondary: #64748b;
+    --qs-secondary: #475569;
     --qs-secondary-fg: #ffffff;
     --qs-text: #0f172a;
     --qs-text-muted: #64748b;
-    --qs-border: #e2e8f0;
-    --qs-shadow: rgba(71, 85, 105, 0.08);
+    --qs-border: #cbd5e1;
+    --qs-shadow: rgba(15, 23, 42, 0.05);
   `,
 });
 
-// 12. Mint
+// 12. Hyper Mint (High energy electric health/fintech design)
 export const mintTheme = makeTheme({
-  name: "Mint",
-  description: "Fresh mint for health",
-  font: "'DM Sans', sans-serif",
-  preview: { bg: "#ecfdf5", primary: "#10b981", text: "#064e3b" },
+  name: "Mint Refresh",
+  description: "Vivid radioactive matcha and deep clean pine text",
+  font: "'Urbanist', sans-serif",
+  preview: { bg: "#f0fdf4", primary: "#059669", text: "#064e3b" },
   colors: `
-    --qs-bg: #ecfdf5;
-    --qs-bg-alt: #d1fae5;
+    --qs-bg: #f0fdf4;
+    --qs-bg-alt: #dcfce7;
     --qs-card-bg: #ffffff;
-    --qs-card-bg-alt: #ecfdf5;
-    --qs-primary: #10b981;
+    --qs-card-bg-alt: #f6fdf9;
+    --qs-primary: #059669;
     --qs-primary-fg: #ffffff;
-    --qs-secondary: #14b8a6;
+    --qs-secondary: #10b981;
     --qs-secondary-fg: #ffffff;
     --qs-text: #064e3b;
-    --qs-text-muted: #059669;
-    --qs-border: #a7f3d0;
-    --qs-shadow: rgba(16, 185, 129, 0.1);
+    --qs-text-muted: #16a34a;
+    --qs-border: #bbf7d0;
+    --qs-shadow: rgba(5, 150, 105, 0.08);
   `,
 });
 
 /* =========================
-   SPECIAL / TECH THEMES
+   SPECIALIST / THEMATIC THEMES
    ========================= */
 
-// 13. Cyberpunk
+// 13. Cyberpunk (Your Favorite — Optimized for explosive neon illumination)
 export const cyberpunkTheme = makeTheme({
   name: "Cyberpunk",
   description: "High-contrast neon for the future",
   font: "'JetBrains Mono', monospace",
-  preview: { bg: "#050505", primary: "#fdf500", text: "#00fff9" },
+  preview: { bg: "#000000", primary: "#fdf500", text: "#00fff9" },
   colors: `
-    --qs-bg: #050505;
-    --qs-bg-alt: #1a1a1a;
-    --qs-card-bg: #1a1a1a;
-    --qs-card-bg-alt: #2a2a2a;
+    --qs-bg: #000000;
+    --qs-bg-alt: #111111;
+    --qs-card-bg: #151515;
+    --qs-card-bg-alt: #222222;
     --qs-primary: #fdf500;
-    --qs-primary-fg: #050505;
+    --qs-primary-fg: #000000;
     --qs-secondary: #00fff9;
-    --qs-secondary-fg: #050505;
+    --qs-secondary-fg: #000000;
     --qs-text: #ff00ff;
     --qs-text-muted: #00fff9;
-    --qs-border: #333333;
-    --qs-shadow: rgba(253, 245, 0, 0.25);
+    --qs-border: #ff00ff;
+    --qs-shadow: 0px 0px 15px rgba(253, 245, 0, 0.4);
   `,
 });
 
-// 14. Terminal
+// 14. Terminal (True radioactive fallout console setup)
 export const terminalTheme = makeTheme({
   name: "Terminal",
-  description: "Classic green-on-black console",
+  description: "Hyper-bright glowing phosphorus matrix interface",
   font: "'Fira Code', monospace",
-  preview: { bg: "#0a0a0a", primary: "#22c55e", text: "#22c55e" },
+  preview: { bg: "#030503", primary: "#39ff14", text: "#39ff14" },
   colors: `
-    --qs-bg: #0a0a0a;
-    --qs-bg-alt: #111111;
-    --qs-card-bg: #111111;
-    --qs-card-bg-alt: #1a1a1a;
-    --qs-primary: #22c55e;
+    --qs-bg: #030503;
+    --qs-bg-alt: #0a0f0a;
+    --qs-card-bg: #0d140d;
+    --qs-card-bg-alt: #142114;
+    --qs-primary: #39ff14;
     --qs-primary-fg: #000000;
-    --qs-secondary: #4ade80;
+    --qs-secondary: #00ff66;
     --qs-secondary-fg: #000000;
-    --qs-text: #4ade80;
-    --qs-text-muted: #86efac;
-    --qs-border: #14532d;
-    --qs-shadow: rgba(34, 197, 94, 0.15);
+    --qs-text: #39ff14;
+    --qs-text-muted: #1f990d;
+    --qs-border: #1f5c15;
+    --qs-shadow: 0px 0px 10px rgba(57, 255, 20, 0.25);
   `,
 });
 
-// 15. Nord
+// 15. Nord Arctic (Premium calibrated Scandinavian frost colors)
 export const nordTheme = makeTheme({
-  name: "Nord",
-  description: "Arctic, north-bluish clean tech",
-  font: "'Inter', sans-serif",
+  name: "Nord Frost",
+  description: "Deep premium arctic slate balanced with bright north-lights",
+  font: "'Plus Jakarta Sans', sans-serif",
   preview: { bg: "#2e3440", primary: "#88c0d0", text: "#eceff4" },
   colors: `
     --qs-bg: #2e3440;
@@ -386,70 +383,70 @@ export const nordTheme = makeTheme({
     --qs-card-bg-alt: #434c5e;
     --qs-primary: #88c0d0;
     --qs-primary-fg: #2e3440;
-    --qs-secondary: #81a1c1;
+    --qs-secondary: #8fbcbb;
     --qs-secondary-fg: #2e3440;
     --qs-text: #eceff4;
     --qs-text-muted: #d8dee9;
     --qs-border: #4c566a;
-    --qs-shadow: rgba(0, 0, 0, 0.3);
+    --qs-shadow: rgba(0, 0, 0, 0.25);
   `,
 });
 
-// 16. Dracula
+// 16. Vampire Dracula (Rich, dark gothic programming palette)
 export const draculaTheme = makeTheme({
   name: "Dracula",
-  description: "Popular dark theme for developers",
+  description: "Vibrant high-contrast dark theme for night owls",
   font: "'Fira Code', monospace",
-  preview: { bg: "#282a36", primary: "#bd93f9", text: "#f8f8f2" },
+  preview: { bg: "#1e1f29", primary: "#ff79c6", text: "#f8f8f2" },
   colors: `
-    --qs-bg: #282a36;
-    --qs-bg-alt: #44475a;
-    --qs-card-bg: #44475a;
-    --qs-card-bg-alt: #4f5269;
-    --qs-primary: #bd93f9;
+    --qs-bg: #1e1f29;
+    --qs-bg-alt: #282a36;
+    --qs-card-bg: #282a36;
+    --qs-card-bg-alt: #343746;
+    --qs-primary: #ff79c6;
     --qs-primary-fg: #282a36;
-    --qs-secondary: #ff79c6;
+    --qs-secondary: #bd93f9;
     --qs-secondary-fg: #282a36;
     --qs-text: #f8f8f2;
     --qs-text-muted: #6272a4;
     --qs-border: #44475a;
-    --qs-shadow: rgba(189, 147, 249, 0.15);
+    --qs-shadow: rgba(255, 121, 198, 0.15);
   `,
 });
 
-// 17. Brutalist
+// 17. Hard Brutalist (Sharp high-impact comic layouts)
 export const brutalistTheme = makeTheme({
-  name: "Brutalist",
-  description: "Raw, unpolished, high-impact",
+  name: "Neo-Brutalist",
+  description: "Unpolished, raw structural panels and intensive ink drops",
   font: "'Archivo Black', sans-serif",
-  preview: { bg: "#ffffff", primary: "#000000", text: "#000000" },
+  preview: { bg: "#ffffff", primary: "#facc15", text: "#000000" },
   colors: `
     --qs-bg: #ffffff;
     --qs-bg-alt: #f4f4f5;
     --qs-card-bg: #ffffff;
-    --qs-card-bg-alt: #fafafa;
-    --qs-primary: #000000;
-    --qs-primary-fg: #ffffff;
-    --qs-secondary: #ff0000;
+    --qs-card-bg-alt: #facc15;
+    --qs-primary: #facc15;
+    --qs-primary-fg: #000000;
+    --qs-secondary: #3b82f6;
     --qs-secondary-fg: #ffffff;
     --qs-text: #000000;
-    --qs-text-muted: #262626;
+    --qs-text-muted: #27272a;
     --qs-border: #000000;
     --qs-shadow: 6px 6px 0px #000000;
   `,
 });
 
-// 18. Vaporwave
+// 18. Retro Vaporwave (80s digital neon nostalgia)
 export const vaporwaveTheme = makeTheme({
   name: "Vaporwave",
-  description: "80s aesthetics and digital nostalgia",
-  font: "'Space Grotesk', sans-serif",
-  preview: { bg: "#2d0a4e", primary: "#ff71ce", text: "#01cdfe" },
+  description: "Synthesizer dream sequences, hot pinks and rad cyans",
+  font: "'Syne', sans-serif",
+  preview: { bg: "#18002c", primary: "#ff71ce", text: "#01cdfe" },
   colors: `
-    --qs-bg: #2d0a4e;
-    --qs-bg-alt: #1f0738;
-    --qs-card-bg: #3a0f5e;
-    --qs-card-bg-alt: #2d0a4e;
+    --qs-bg: #18002c;
+    --qs-bg-alt: #2b004f;
+    --qs-card-bg: #2b004f;
+    --qs-card-bg-alt: #410077;
     --qs-primary: #ff71ce;
     --qs-primary-fg: #ffffff;
     --qs-secondary: #01cdfe;
@@ -457,51 +454,51 @@ export const vaporwaveTheme = makeTheme({
     --qs-text: #fffb96;
     --qs-text-muted: #b967ff;
     --qs-border: #ff71ce;
-    --qs-shadow: rgba(255, 113, 206, 0.35);
+    --qs-shadow: 0px 0px 12px rgba(255, 113, 206, 0.4);
   `,
 });
 
-// 19. Espresso
+// 19. Espresso Roast (Warm luxurious dark academic coffee shop)
 export const espressoTheme = makeTheme({
   name: "Espresso",
-  description: "Rich dark browns for late-night coding",
+  description: "Deep dark roasted coffee surfaces with warm cream typography",
   font: "'JetBrains Mono', monospace",
-  preview: { bg: "#1a1614", primary: "#d4a373", text: "#fefae0" },
+  preview: { bg: "#100b08", primary: "#e7bc91", text: "#fefae0" },
   colors: `
-    --qs-bg: #1a1614;
-    --qs-bg-alt: #2c2420;
-    --qs-card-bg: #2c2420;
-    --qs-card-bg-alt: #3a2f2a;
-    --qs-primary: #d4a373;
-    --qs-primary-fg: #1a1614;
-    --qs-secondary: #c19a6b;
-    --qs-secondary-fg: #1a1614;
+    --qs-bg: #100b08;
+    --qs-bg-alt: #1c140e;
+    --qs-card-bg: #1c140e;
+    --qs-card-bg-alt: #2b1f16;
+    --qs-primary: #e7bc91;
+    --qs-primary-fg: #100b08;
+    --qs-secondary: #bd8a5f;
+    --qs-secondary-fg: #100b08;
     --qs-text: #fefae0;
-    --qs-text-muted: #e6d5b8;
-    --qs-border: #3f342f;
-    --qs-shadow: rgba(0, 0, 0, 0.45);
+    --qs-text-muted: #d4a373;
+    --qs-border: #38291d;
+    --qs-shadow: rgba(0, 0, 0, 0.6);
   `,
 });
 
-// 20. Paper
+// 20. Luxury Paper (Editorial high-end publishing aesthetic)
 export const paperTheme = makeTheme({
-  name: "Paper",
-  description: "Optimized for long-form reading",
-  font: "'Georgia', serif",
-  preview: { bg: "#f4f1ea", primary: "#2c2c2c", text: "#1a1a1a" },
+  name: "Editorial Paper",
+  description: "Premium editorial setup crafted for deep long-form reading",
+  font: "'Fraunces', serif",
+  preview: { bg: "#fcfaf6", primary: "#1c1917", text: "#1c1917" },
   colors: `
-    --qs-bg: #f4f1ea;
-    --qs-bg-alt: #e8e4d9;
-    --qs-card-bg: #f9f6f0;
-    --qs-card-bg-alt: #f0ede4;
-    --qs-primary: #2c2c2c;
-    --qs-primary-fg: #f4f1ea;
-    --qs-secondary: #5a5a5a;
+    --qs-bg: #fcfaf6;
+    --qs-bg-alt: #f4eee1;
+    --qs-card-bg: #fdfdfc;
+    --qs-card-bg-alt: #f7f3e9;
+    --qs-primary: #1c1917;
+    --qs-primary-fg: #fcfaf6;
+    --qs-secondary: #44403c;
     --qs-secondary-fg: #ffffff;
-    --qs-text: #1a1a1a;
-    --qs-text-muted: #666666;
-    --qs-border: #dcd7c9;
-    --qs-shadow: rgba(0, 0, 0, 0.06);
+    --qs-text: #1c1917;
+    --qs-text-muted: #6b6661;
+    --qs-border: #e6dfd1;
+    --qs-shadow: rgba(28, 25, 23, 0.04);
   `,
 });
 

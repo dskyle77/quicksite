@@ -25,16 +25,19 @@ const Select = <T extends string>({
   value,
   options,
   onChange,
+  disabled,
 }: {
   value: T;
   options: readonly T[];
   onChange: (value: T) => void;
+  disabled?: boolean;
 }) => {
   return (
     <select
       value={value}
       onChange={(e) => onChange(e.target.value as T)}
-      className="w-full rounded-lg border px-3 py-2 text-sm bg-white  outline-blue-400 focus:outline-blue-500 focus:outline-4"
+      disabled={disabled}
+      className="w-full rounded-lg border px-3 py-2 text-sm bg-white outline-blue-400 focus:outline-blue-500 focus:outline-4 disabled:bg-gray-100 disabled:text-gray-400"
       style={{ outlineOffset: "2px" }}
     >
       {options.map((o) => (
@@ -46,7 +49,6 @@ const Select = <T extends string>({
   );
 };
 
-// Reusable SectionMenu component that accepts only config, section and index
 export const SectionMenu: React.FC<{
   config: BuilderConfig;
   section: SectionConfig;
@@ -111,32 +113,46 @@ export const SectionMenu: React.FC<{
     setInputValue(section.anchorName ?? "");
   }, [section.anchorName]);
 
+  // If the section is disabled, all UI should look and act disabled (grayed out, not interactive)
+  const isDisabled = !section.enabled;
+
   return (
     <div
-      className="rounded-xl border bg-gray-50 p-4 cursor-pointer transition hover:shadow-md"
+      className={`rounded-xl border bg-gray-50 p-4 transition hover:shadow-md ${
+        isDisabled ? "opacity-75 grayscale-[0.5] bg-gray-100" : "cursor-pointer"
+      }`}
       title={section.anchorName ? `Go to #${section.anchorName}` : ""}
-      onClick={() => {
-        if (section.anchorName) {
-          const el = document.getElementById(section.anchorName);
-          if (el) {
-            el.scrollIntoView({ behavior: "smooth", block: "start" });
-          } else {
-            window.location.hash = `#${section.anchorName}`;
-          }
-        }
-      }}
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if ((e.key === "Enter" || e.key === " ") && section.anchorName) {
-          const el = document.getElementById(section.anchorName);
-          if (el) {
-            el.scrollIntoView({ behavior: "smooth", block: "start" });
-          } else {
-            window.location.hash = `#${section.anchorName}`;
-          }
-        }
-      }}
+      onClick={
+        isDisabled
+          ? undefined
+          : () => {
+              if (section.anchorName) {
+                const el = document.getElementById(section.anchorName);
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth", block: "start" });
+                } else {
+                  window.location.hash = `#${section.anchorName}`;
+                }
+              }
+            }
+      }
+      tabIndex={isDisabled ? -1 : 0}
+      onKeyDown={
+        isDisabled
+          ? undefined
+          : (e) => {
+              if ((e.key === "Enter" || e.key === " ") && section.anchorName) {
+                const el = document.getElementById(section.anchorName);
+                if (el) {
+                  el.scrollIntoView({ behavior: "smooth", block: "start" });
+                } else {
+                  window.location.hash = `#${section.anchorName}`;
+                }
+              }
+            }
+      }
       role="button"
+      aria-disabled={isDisabled}
     >
       {/* HEADER */}
       <div
@@ -145,7 +161,11 @@ export const SectionMenu: React.FC<{
       >
         <div>
           <input
-            className={`w-full font-semibold text-lg bg-white rounded border ${showDuplicateError ? "border-red-400" : "border-gray-300"}  px-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition placeholder-gray-400  outline-blue-400 focus:outline-blue-500 focus:outline-4`}
+            className={`w-full font-semibold text-lg bg-white rounded border ${showDuplicateError ? "border-red-400" : "border-gray-300"}  px-2 focus:outline-none focus:ring-2 focus:ring-blue-400 transition placeholder-gray-400  outline-blue-400 focus:outline-blue-500 focus:outline-4 ${
+              isDisabled
+                ? "bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed placeholder-gray-300"
+                : ""
+            }`}
             style={{ outlineOffset: 2 }}
             type="text"
             value={inputValue}
@@ -153,6 +173,8 @@ export const SectionMenu: React.FC<{
             placeholder="Anchor name"
             spellCheck={false}
             autoComplete="off"
+            disabled={isDisabled}
+            aria-disabled={isDisabled}
           />
           {showDuplicateError ? (
             <p className="mt-0.5 text-[11px] text-red-500">
@@ -164,11 +186,16 @@ export const SectionMenu: React.FC<{
         <div className="flex flex-col gap-2 items-end min-w-[82px]">
           <button
             onClick={() => removeSection(section.id)}
-            className="flex items-center gap-1 text-xs font-semibold text-red-500 hover:bg-red-50 transition px-2 py-1 rounded disabled:opacity-30  outline-blue-400 focus:outline-blue-500 focus:outline-4"
+            className={`flex items-center gap-1 text-xs font-semibold text-red-500 hover:bg-red-50 transition px-2 py-1 rounded outline-blue-400 focus:outline-blue-500 focus:outline-4 ${
+              config.sections.length === 1 || isDisabled
+                ? "opacity-30 cursor-not-allowed bg-red-100 text-red-300"
+                : ""
+            }`}
             style={{ outlineOffset: 1 }}
-            disabled={config.sections.length === 1}
+            disabled={config.sections.length === 1 || isDisabled}
             type="button"
             title="Remove this section"
+            aria-disabled={config.sections.length === 1 || isDisabled}
           >
             <svg
               className="w-3.5 h-3.5"
@@ -181,20 +208,23 @@ export const SectionMenu: React.FC<{
             </svg>
             Remove
           </button>
+
+          {/* ENABLE / DISABLE TOGGLE */}
           <button
             onClick={() =>
               updateSection(section.id, {
                 enabled: !section.enabled,
               })
             }
-            className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded transition  outline-blue-400 focus:outline-blue-500 focus:outline-4 ${
+            className={`flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded transition outline-blue-400 focus:outline-blue-500 focus:outline-4 ${
               section.enabled
                 ? "text-gray-700 bg-gray-200 hover:bg-gray-300"
-                : "text-gray-400 bg-gray-100 hover:bg-gray-200"
+                : "text-blue-600 bg-blue-50 hover:bg-blue-100 border border-blue-200 shadow-sm"
             }`}
             style={{ outlineOffset: 1 }}
             type="button"
             title={section.enabled ? "Disable section" : "Enable section"}
+            // Removed disabled={isDisabled} so it remains clickable!
           >
             {section.enabled ? (
               <>
@@ -212,7 +242,7 @@ export const SectionMenu: React.FC<{
             ) : (
               <>
                 <svg
-                  className="w-3.5 h-3.5"
+                  className="w-3.5 h-3.5 animate-pulse"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
@@ -234,6 +264,7 @@ export const SectionMenu: React.FC<{
           value={section.variant}
           options={variants}
           onChange={(v) => updateSection(section.id, { variant: v })}
+          disabled={isDisabled}
         />
       </div>
 
@@ -244,18 +275,28 @@ export const SectionMenu: React.FC<{
       >
         <button
           onClick={() => moveSection(section.id, "up")}
-          disabled={index === 0}
-          className="text-xs px-2 py-1 border rounded disabled:opacity-30  outline-blue-400 focus:outline-blue-500 focus:outline-4"
+          disabled={index === 0 || isDisabled}
+          className={`text-xs px-2 py-1 border rounded outline-blue-400 focus:outline-blue-500 focus:outline-4 ${
+            index === 0 || isDisabled
+              ? "opacity-30 cursor-not-allowed bg-gray-100 text-gray-300"
+              : ""
+          }`}
           style={{ outlineOffset: 1 }}
+          aria-disabled={index === 0 || isDisabled}
         >
           ↑ Up
         </button>
 
         <button
           onClick={() => moveSection(section.id, "down")}
-          disabled={index === config.sections.length - 1}
-          className="text-xs px-2 py-1 border rounded disabled:opacity-30  outline-blue-400 focus:outline-blue-500 focus:outline-4"
+          disabled={index === config.sections.length - 1 || isDisabled}
+          className={`text-xs px-2 py-1 border rounded outline-blue-400 focus:outline-blue-500 focus:outline-4 ${
+            index === config.sections.length - 1 || isDisabled
+              ? "opacity-30 cursor-not-allowed bg-gray-100 text-gray-300"
+              : ""
+          }`}
           style={{ outlineOffset: 1 }}
+          aria-disabled={index === config.sections.length - 1 || isDisabled}
         >
           ↓ Down
         </button>
@@ -281,7 +322,6 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
   // ADD SECTION
   // ----------------------------
   const addSection = (type: string) => {
-    // Validate that type is actually a SectionType
     if (!Object.keys(variantOptions).includes(type)) {
       return;
     }
@@ -321,7 +361,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
           overflow-y-auto overflow-x-hidden border-r bg-white
           transform transition-transform duration-200 ease-out
           md:static md:top-auto md:z-auto md:h-full md:max-w-none md:shrink-0
-          ${open ? "translate-x-0" : "-translate-x-full"}
+          \${open ? "translate-x-0" : "-translate-x-full"}
         `}
       >
         {/* HEADER */}

@@ -419,3 +419,7 @@ export const SkillsSection = ({
     </section>
   );
 };
+
+
+export type SkillsSectionVariants = "grid" | "tags" | "icons-list"
+export const SkillsVariantList: SkillsSectionVariants[] = ["grid", "tags", "icons-list"];
