@@ -16,12 +16,44 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug: segments } = await params;
   const site = await getCachedSite(segments[0]);
+
+  const title = site?.name ?? "Site";
+  const description = site?.description ?? "";
+  const ogImage = site?.ogImage ?? null;
+  const tags = site?.tags ?? [];
+  const whatsappNumber = site?.whatsappNumber
+    ? site.whatsappNumber.replace(/\D/g, "") // strip non-digits for URL safety
+    : null;
+
   return {
-    title: site?.name ?? "Site",
-    description: site?.description ?? "",
+    title,
+    description,
+    keywords: tags,
+    ...(whatsappNumber && {
+      other: {
+        "contact:whatsapp": `https://wa.me/${whatsappNumber}`,
+      },
+    }),
     openGraph: {
-      title: site?.name,
-      images: site?.ogImage ? [site.ogImage] : [],
+      title,
+      description,
+      type: "website",
+      images: ogImage
+        ? [
+            {
+              url: ogImage,
+              width: 1200,
+              height: 630,
+              alt: title,
+            },
+          ]
+        : [],
+    },
+    twitter: {
+      card: ogImage ? "summary_large_image" : "summary",
+      title,
+      description,
+      ...(ogImage && { images: [ogImage] }),
     },
   };
 }

@@ -10,7 +10,7 @@ interface TemplatePickerProps {
   onTemplateChange: (type: string) => void;
   slugForPreview: string;
   nameForPreview: string;
-  canUseCustomTemplate?: boolean;
+  canUsePremiumTemplate?: boolean;
 }
 
 export function TemplatePicker({
@@ -18,7 +18,7 @@ export function TemplatePicker({
   onTemplateChange,
   slugForPreview,
   nameForPreview,
-  canUseCustomTemplate = true,
+  canUsePremiumTemplate = false,
 }: TemplatePickerProps) {
   const [search, setSearch] = useState("");
 
@@ -60,7 +60,10 @@ export function TemplatePicker({
 
     if (!cleanedSearch) {
       shownTemplates = [];
-      if (selectedTemplate && selectedTemplate.config.type !== "template-builder") {
+      if (
+        selectedTemplate &&
+        selectedTemplate.config.type !== "template-builder"
+      ) {
         shownTemplates.push(selectedTemplate);
       }
       for (const t of others) {
@@ -75,11 +78,9 @@ export function TemplatePicker({
       // On search, include "template-builder" in results only if it matches search
       if (
         builder &&
-        (
-          builder.meta?.title?.toLowerCase().includes(cleanedSearch) ||
+        (builder.meta?.title?.toLowerCase().includes(cleanedSearch) ||
           builder.meta?.category?.toLowerCase().includes(cleanedSearch) ||
-          builder.meta?.description?.toLowerCase().includes(cleanedSearch)
-        )
+          builder.meta?.description?.toLowerCase().includes(cleanedSearch))
       ) {
         // Remove template-builder from builder, push to end
       } else {
@@ -124,14 +125,22 @@ export function TemplatePicker({
               <button
                 key={type}
                 type="button"
+                // If template is premium and the user cannot use premium, dim and disable the button
+                disabled={t.config.isPremium && !canUsePremiumTemplate}
                 className={[
                   "relative p-3 rounded-2xl border-2 transition-all text-left",
-                  selected
-                    ? "border-primary bg-primary/5"
-                    : "border-transparent bg-muted/40",
+                  t.config.isPremium && !canUsePremiumTemplate
+                    ? "opacity-60 cursor-not-allowed border-transparent bg-muted/30"
+                    : selected
+                      ? "border-primary bg-primary/5"
+                      : "border-transparent bg-muted/40",
                 ].join(" ")}
-                tabIndex={0}
-                onClick={() => onTemplateChange(type)}
+                tabIndex={t.config.isPremium && !canUsePremiumTemplate ? -1 : 0}
+                onClick={() => {
+                  if (!(t.config.isPremium && !canUsePremiumTemplate)) {
+                    onTemplateChange(type);
+                  }
+                }}
               >
                 <div className="flex items-center gap-3">
                   <div
@@ -142,10 +151,23 @@ export function TemplatePicker({
                         : "bg-slate-50 border-slate-200",
                     ].join(" ")}
                   >
-                    <Layout
-                      size={16}
-                      className={selected ? "text-primary" : "text-slate-400"}
-                    />
+                    {t.config.isPremium ? (
+                      !canUsePremiumTemplate ? (
+                        <Lock size={16} className="text-slate-400" />
+                      ) : (
+                        <Layout
+                          size={16}
+                          className={
+                            selected ? "text-primary" : "text-slate-400"
+                          }
+                        />
+                      )
+                    ) : (
+                      <Layout
+                        size={16}
+                        className={selected ? "text-primary" : "text-slate-400"}
+                      />
+                    )}
                   </div>
                   <div className="min-w-0">
                     <h3
@@ -155,6 +177,11 @@ export function TemplatePicker({
                       ].join(" ")}
                     >
                       {t.meta?.title ?? "Production Template"}
+                      {t.config.isPremium && (
+                        <span className="ml-2 px-2 py-0.5 inline-block text-[10px] rounded-full bg-yellow-100 text-yellow-700 font-semibold align-middle">
+                          Premium
+                        </span>
+                      )}
                     </h3>
                     <p
                       className={[
@@ -189,18 +216,18 @@ export function TemplatePicker({
             <button
               key={templateBuilderTemplate.config.type}
               type="button"
-              disabled={!canUseCustomTemplate}
+              disabled={!canUsePremiumTemplate}
               className={[
                 "relative p-3 rounded-2xl border-2 transition-all text-left w-full",
-                !canUseCustomTemplate
+                !canUsePremiumTemplate
                   ? "opacity-60 cursor-not-allowed border-transparent bg-muted/30"
                   : selectedType === CUSTOM_TEMPLATE_TYPE
                     ? "border-primary bg-primary/5"
                     : "border-transparent bg-muted/40",
               ].join(" ")}
-              tabIndex={canUseCustomTemplate ? 0 : -1}
+              tabIndex={canUsePremiumTemplate ? 0 : -1}
               onClick={() => {
-                if (canUseCustomTemplate) {
+                if (canUsePremiumTemplate) {
                   onTemplateChange(CUSTOM_TEMPLATE_TYPE);
                 }
               }}
@@ -214,7 +241,7 @@ export function TemplatePicker({
                       : "bg-slate-50 border-slate-200",
                   ].join(" ")}
                 >
-                  {!canUseCustomTemplate ? (
+                  {!canUsePremiumTemplate ? (
                     <Lock size={16} className="text-slate-400" />
                   ) : (
                     <Layout
@@ -246,19 +273,20 @@ export function TemplatePicker({
                         : "text-slate-500",
                     ].join(" ")}
                   >
-                    {!canUseCustomTemplate
+                    {!canUsePremiumTemplate
                       ? "Upgrade to Growth or Pro to build with custom sections."
                       : (templateBuilderTemplate.meta?.description ??
                         "Fully dynamic template builder supporting multiple section instances.")}
                   </p>
                 </div>
               </div>
-              {selectedType === CUSTOM_TEMPLATE_TYPE && canUseCustomTemplate && (
-                <CheckCircle2
-                  className="absolute top-2 right-2 text-primary drop-shadow"
-                  size={16}
-                />
-              )}
+              {selectedType === CUSTOM_TEMPLATE_TYPE &&
+                canUsePremiumTemplate && (
+                  <CheckCircle2
+                    className="absolute top-2 right-2 text-primary drop-shadow"
+                    size={16}
+                  />
+                )}
             </button>
           </>
         )}

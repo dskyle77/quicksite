@@ -130,6 +130,7 @@ export default function TemplateGallery() {
                       description={template.meta.description}
                       category={template.meta.category}
                       image={template.meta.image}
+                      isPremium={template.config.isPremium}
                       previewHref={buildQuery(
                         `/templates/${template.config.type}`,
                         "?",

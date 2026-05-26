@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import "server-only"
+import "server-only";
 import Groq from "groq-sdk";
 import { variantOptions } from "@/components/templateBuilder/contentBlocks";
 import { getThemeOptionsForAI, isValidThemeId } from "@/lib/themes";
@@ -26,11 +26,13 @@ Business description from the owner: "${description}"
 
 OUTPUT RULES (non-negotiable):
 1. Return ONE JSON object matching this exact shape and keys: ${JSON.stringify(schemaBase)}
+   Also include these two extra top-level keys:
+   - "description": a 1–2 sentence SEO meta description for the business (under 160 chars, benefit-led, no hashtags)
+   - "tags": an array of 5–8 lowercase keyword strings relevant to the business (e.g. ["restaurant", "lagos", "nigerian food", "delivery"])
 2. Do NOT add, remove, or rename top-level keys. Section content keys follow the pattern "{sectionId}{sectionType}" (e.g. "init-aboutabout") — keep those keys unchanged.
 3. Fill every empty string with specific, credible copy grounded in the business description — except "theme", which must be a theme id from the SITE THEME list below. Do not use lorem ipsum or generic filler like "Lorem ipsum" or "Your Company Here".
 4. Keep all image URLs (image1, image, etc.) exactly as provided in the schema.
-5. Keep every object field named *Link or *linkConfig exactly as provided (primaryButtonLink, secondaryButtonLink, ctaLink, linkConfig, etc.) — only update human-readable button labels.
-6. Return ONLY valid JSON. No markdown, no code fences, no commentary.
+5. Return ONLY valid JSON. No markdown, no code fences, no commentary.
 
 COPY & TONE:
 - Write for Nigerian customers: warm, clear, professional, and benefit-led — not stiff corporate English.
@@ -90,6 +92,7 @@ NAVBAR:
 
 Match all copy — hero, about, section headings, FAQ, pricing — to "${selectedTitle}" and the description above. Every enabled section must read as one cohesive site, not disconnected templates.
 `;
+
   const response = await groq.chat.completions.create({
     model: "llama-3.3-70b-versatile",
     messages: [{ role: "system", content: systemPrompt }],
@@ -112,7 +115,17 @@ Match all copy — hero, about, section headings, FAQ, pricing — to "${selecte
       ? aiContent.theme
       : defaultThemeId;
 
-  const { theme: _theme, ...siteContent } = aiContent;
+  const {
+    theme: _theme,
+    description: siteDescription,
+    tags,
+    ...siteContent
+  } = aiContent;
 
-  return { content: siteContent, themeId };
+  return {
+    content: siteContent,
+    themeId,
+    description: siteDescription ?? "",
+    tags: Array.isArray(tags) ? tags : [],
+  };
 }

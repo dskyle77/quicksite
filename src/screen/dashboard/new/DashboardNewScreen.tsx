@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import authFetch from "@/lib/authFetch";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileStore } from "@/store/useProfileStore";
-import { isValidTemplate } from "@/lib/templates";
+import { isValidTemplate, premiumTemplates } from "@/lib/templates";
 import { CUSTOM_TEMPLATE_TYPE, canUseFeature, type Plan } from "@/lib/plans";
 
 import { NewSiteForm } from "./NewSiteForm";
@@ -19,13 +19,13 @@ export default function CreateSitePage() {
   const { user } = useAuth();
   const userProfile = useProfileStore().profile;
   const userPlan = (userProfile?.plan ?? "free") as Plan;
-  const canUseCustomTemplate = canUseFeature(userPlan, "customTemplate");
+  const canUsePremiumTemplate = canUseFeature(userPlan, "premiumTemplate");
 
   const templateTypeFromQuery = searchParams.get("template") || "";
   let selectedTemplateType = isValidTemplate(templateTypeFromQuery)
     ? templateTypeFromQuery
     : "";
-  if (selectedTemplateType === CUSTOM_TEMPLATE_TYPE && !canUseCustomTemplate) {
+  if (selectedTemplateType === CUSTOM_TEMPLATE_TYPE && !canUsePremiumTemplate) {
     selectedTemplateType = "";
   }
 
@@ -75,7 +75,7 @@ export default function CreateSitePage() {
     if (formData.type === "") {
       return toast.error("Please select a site template.");
     }
-    if (formData.type === CUSTOM_TEMPLATE_TYPE && !canUseCustomTemplate) {
+    if (formData.type === CUSTOM_TEMPLATE_TYPE && !canUsePremiumTemplate) {
       return toast.error(
         "Custom template requires Growth or Pro. Please upgrade your plan.",
       );
@@ -143,7 +143,7 @@ export default function CreateSitePage() {
             onTemplateChange={handleTemplateChange}
             slugForPreview={formData.slug}
             nameForPreview={formData.name}
-            canUseCustomTemplate={canUseCustomTemplate}
+            canUsePremiumTemplate={canUsePremiumTemplate}
           />
         </div>
 

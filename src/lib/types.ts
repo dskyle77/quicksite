@@ -28,6 +28,7 @@ export interface Site {
   whatsappNumber?: string;
   description?: string;
   ogImage?: string;
+  tags?: string[];
   createdAt?: Timestamp | null;
   updatedAt?: Timestamp | null;
   content: Record<string, any>;

@@ -1,6 +1,7 @@
 import { builderConfig } from "@/components/templateBuilder/configs";
+import { TemplateContent } from "@/lib/templates";
 
-const templateBuilderContent = {
+const templateBuilderContent: TemplateContent = {
   meta: {
     title: "Custom",
     image: "/ti/builder.png",
@@ -11,7 +12,9 @@ const templateBuilderContent = {
   config: {
     type: "template-builder",
     theme: "warm",
-    canCustomize: true
+    canCustomize: true,
+    isPremium: true
+
   },
   contentConfig: builderConfig,
 };

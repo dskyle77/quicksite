@@ -1,6 +1,7 @@
 import { LinkConfig } from "@/components/shared/EditableLink";
 import { makeWhatsappLink, makeCtaLink } from "@/components/shared/helpers";
 import { SchemaParams } from "@/components/templateBuilder/types";
+import { TemplateContent } from "@/lib/templates";
 
 export const menuOneConfig = {
   navbar: "none",
@@ -148,7 +149,7 @@ const starterContent = ({
   },
 });
 
-const menu1 = {
+const menu1: TemplateContent = {
   meta: {
     title: "Menu One",
     image: "/ti/menu-one.png",
@@ -159,7 +160,8 @@ const menu1 = {
   config: {
     type: "menu-one",
     theme: "warm",
-    canCustomize: true,
+    canCustomize: false,
+    isPremium: false,
   },
   contentConfig: menuOneConfig,
   starterContent,

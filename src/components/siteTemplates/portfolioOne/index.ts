@@ -8,6 +8,7 @@ import {
 } from "@/components/templateBuilder/variants/sections/ItemsVariants";
 import { SkillsSectionVariants } from "@/components/templateBuilder/variants/sections/SkillsVariants";
 import { makeCtaLink, makeWhatsappLink } from "@/components/shared/helpers";
+import { TemplateContent } from "@/lib/templates";
 
 export const portfolioConfig = {
   navbar: "none",
@@ -213,7 +214,7 @@ const starterContent = ({
   },
 });
 
-const portfolio1 = {
+const portfolio1: TemplateContent = {
   meta: {
     title: "Portfolio One",
     image: "/ti/builder.png",
@@ -224,7 +225,8 @@ const portfolio1 = {
   config: {
     type: "portfolio-1",
     theme: "terminal",
-    canCustomize: true,
+    canCustomize: false,
+    isPremium: true
   },
   contentConfig: portfolioConfig,
   starterContent,

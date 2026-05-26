@@ -4,6 +4,7 @@ import { getUserFromSession } from "@/server/auth";
 import { serverCreateSite, getUserPlan } from "@/server/serverFirestore";
 import { generateSiteContentWithAI } from "@/server/ai-content";
 import {
+  isPremiumTemplate,
   getTemplateByType,
   buildSchema,
   buildStarterContent,
@@ -15,7 +16,7 @@ import {
   withRateLimit,
   rateLimits,
 } from "@/server/rateLimit";
-import { CUSTOM_TEMPLATE_TYPE, canUseFeature, type Plan } from "@/lib/plans";
+import { canUseFeature, type Plan } from "@/lib/plans";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -52,7 +53,7 @@ async function uploadOgImage(image: File, uid: string, slug: string) {
     publicId: `ogImage`,
     allowedFormats: ["jpg", "png", "webp", "jpeg"],
     maxBytes: 5 * 1024 * 1024,
-    transformation: [{ width: 1200, height: 1200, crop: "limit" }],
+    transformation: [{ width: 1200, height: 630, crop: "fill", gravity: "auto" }],
   });
 
   return uploadResult.secureUrl;
@@ -121,7 +122,12 @@ async function resolveContent(
         schemaBase,
         defaultThemeId: defaultTheme,
       });
-      return { content: aiResult.content, themeId: aiResult.themeId };
+      return {
+        content: aiResult.content,
+        themeId: aiResult.themeId,
+        description: aiResult.description,
+        tags: aiResult.tags,
+      };
     } catch (error) {
       console.error("AI Generation failed, falling back to default:", error);
     }
@@ -180,14 +186,11 @@ export async function POST(req: Request) {
 
     const plan = (await getUserPlan(user.uid)) as Plan;
 
-    if (
-      type === CUSTOM_TEMPLATE_TYPE &&
-      !canUseFeature(plan, "customTemplate")
-    ) {
+    if (isPremiumTemplate(type) && !(plan === "growth" || plan === "pro")) {
       return NextResponse.json(
         {
           error:
-            "Custom template is available on Growth and Pro plans. Please upgrade to use it.",
+            "This template is available only on Growth and Pro plans. Please upgrade to use it.",
         },
         { status: 403 },
       );
@@ -230,6 +233,8 @@ export async function POST(req: Request) {
         type,
         name: normalizedName,
         theme: contentResult.themeId,
+        description: contentResult.description,
+        tags: contentResult.tags,
         whatsappNumber,
         status: "draft",
         content: contentResult.content,

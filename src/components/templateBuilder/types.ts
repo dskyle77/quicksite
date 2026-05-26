@@ -144,7 +144,7 @@ export type SectionVariantRegistry = Record<
 
 export interface SchemaParams {
   selectedTitle?: string;
-  whatsappNumber?: string;
+  whatsappNumber: string;
   defaultImage?: string;
   
 }

@@ -1,4 +1,4 @@
-export const makeWhatsappLink = (phone?: string, message?: string) =>
+export const makeWhatsappLink = (phone: string, message: string = "") =>
   phone && phone.trim() !== "" ? { type: "whatsapp", phone, message } : {};
 
 // Accepts args for any link type, returns the correct config object for EditableLink

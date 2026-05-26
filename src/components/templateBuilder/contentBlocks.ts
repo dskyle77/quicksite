@@ -363,7 +363,7 @@ const featuresStarterContent = () => ({
 
 // ─── PRICING ─────────────────────────────────────────────────────────────────
 
-const emptyPricingPlan = (whatsappNumber?: string, highlighted = false) => ({
+const emptyPricingPlan = (whatsappNumber: string, highlighted = false) => ({
   name: "",
   price: "",
   period: "",

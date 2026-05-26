@@ -36,9 +36,8 @@ export const PLANS: {
     features: [
       "Up to 10 mini-sites",
       "Custom domain",
-      "More templates",
+      "Premium templates",
       "AI starter content (5/day)",
-      "Basic SEO",
       "Contact forms",
       "Remove Quicksite branding",
     ],
@@ -52,11 +51,9 @@ export const PLANS: {
     description: "Advanced tools for creators and businesses",
     features: [
       "Up to 25 mini-sites",
-      "Premium templates",
       "Analytics",
       "Sell products",
       "AI starter content (10/day)",
-      "Advanced SEO",
       "Priority support",
     ],
     buttonText: "Go Pro",
@@ -67,7 +64,7 @@ export const PLAN_LIMITS = {
   free: {
     sites: 1,
     customDomain: false,
-    customTemplate: false,
+    premiumTemplate: false,
     analytics: false,
     payments: false,
     ai: true,
@@ -78,7 +75,7 @@ export const PLAN_LIMITS = {
   growth: {
     sites: 10,
     customDomain: true,
-    customTemplate: true,
+    premiumTemplate: true,
     analytics: false,
     payments: false,
     ai: true,
@@ -89,7 +86,7 @@ export const PLAN_LIMITS = {
   pro: {
     sites: 25,
     customDomain: true,
-    customTemplate: true,
+    premiumTemplate: true,
     analytics: true,
     payments: false,
     ai: true,

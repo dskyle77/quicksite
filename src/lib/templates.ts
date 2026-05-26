@@ -39,8 +39,9 @@ export type TemplateContent = {
     type: string;
     theme: string;
     canCustomize: boolean;
+    isPremium: boolean;
   };
-  contentConfig: any; 
+  contentConfig: any;
   starterContent?: (...args: any[]) => any;
 };
 
@@ -48,6 +49,11 @@ export type TemplateContent = {
 
 export const templatesRegistry: TemplateContent[] = [
   menuOne,
+  portfolio1,
+  templateBuilder,
+];
+
+export const premiumTemplates: TemplateContent[] = [
   portfolio1,
   templateBuilder,
 ];
@@ -65,7 +71,9 @@ export const getTemplateByType = (type: string) =>
 
 export const isValidTemplate = (type: string) => !!getTemplateByType(type);
 
-// New helper: buildStarterContent
+export const isPremiumTemplate = (type: string) =>
+  !!premiumTemplates.find((t) => t.config.type === type);
+
 export const buildStarterContent = (
   config: any,
   params: {
@@ -92,29 +100,6 @@ export const buildStarterContent = (
 
   return content;
 };
-// export const buildBuilderConfig = (config: {
-//   navbar?: string;
-//   hero?: string;
-//   footer?: string;
-//   sections?: Array<{
-//     id: string;
-//     type: string;
-//     variant?: string;
-//     enabled?: boolean;
-//     anchorName?: string;
-//   }>;
-// }) => ({
-//   navbar: "",
-//   hero: "",
-//   footer: "",
-//   sections: (config.sections ?? []).map((sec) => ({
-//     id: sec.id,
-//     type: sec.type,
-//     variant: "",
-//     enabled: sec.enabled ?? true,
-//     anchorName: sec.anchorName ?? sec.type,
-//   })),
-// });
 
 export const buildSchema = (
   config: any,
