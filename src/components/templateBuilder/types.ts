@@ -34,7 +34,7 @@ export type FooterVariantKey = "classic" | "centered" | "none" | "columns";
 export type SectionType =
   | "about"
   | "skills"
-  | "projects"
+  | "items"
   | "menu"
   | "experience"
   | "testimonials"
@@ -201,15 +201,6 @@ export interface SkillItem {
   desc?: string;
 }
 
-export interface ProjectItem {
-  title: string;
-  desc: string;
-  tags: string[];
-  btnLabel: string;
-  image: string;
-  imagePId?: string;
-  previewLink?: string;
-}
 export interface MenuItem{
   title: string;
   desc: string;

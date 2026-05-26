@@ -118,15 +118,11 @@ function ProfileTab({
 function SiteDefaultsTab({
   whatsappNumber,
   setWhatsappNumber,
-  defaultMessage,
-  setDefaultMessage,
   defaultAuthor,
   setDefaultAuthor,
 }: {
   whatsappNumber: string;
   setWhatsappNumber: (n: string) => void;
-  defaultMessage: string;
-  setDefaultMessage: (n: string) => void;
   defaultAuthor: string;
   setDefaultAuthor: (n: string) => void;
 }) {
@@ -148,26 +144,9 @@ function SiteDefaultsTab({
             <input
               type="text"
               value={whatsappNumber}
-              onChange={(e) => setWhatsappNumber("234" + e.target.value)}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
               placeholder="8012345678"
               title="Default Phone Number"
-              className="flex-1 bg-background border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
-            />
-          </div>
-          <p className="text-[11px] text-muted-foreground">
-            Pre-filled when you create new sites.
-          </p>
-        </div>
-        <div className="space-y-2">
-          <label className="text-xs font-semibold text-muted-foreground">
-            Default Message
-          </label>
-          <div className="flex gap-2">
-            <textarea
-              value={defaultMessage}
-              onChange={(e) => setDefaultMessage(e.target.value)}
-              placeholder="Hi, Id like to get started now"
-              title="Default whatsapp message"
               className="flex-1 bg-background border border-border rounded-xl px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/20"
             />
           </div>
@@ -295,9 +274,6 @@ export default function DashboardSettings() {
   const [whatsappNumber, setWhatsappNumber] = useState(
     profile?.whatsappNumber ?? "",
   );
-  const [defaultMessage, setDefaultMessage] = useState(
-    profile?.defaultMessage ?? "",
-  );
 
   const [defaultAuthor, setDefaultAuthor] = useState(
     profile?.defaultAuthor ?? "",
@@ -317,9 +293,14 @@ export default function DashboardSettings() {
     try {
       const updates: Record<string, string> = { displayName };
       if (activeTab === "site") {
-        updates.whatsappNumber = whatsappNumber.replace(/\D/g, "");
+        const cleanedWhatsapp = whatsappNumber.replace(/\D/g, "");
+        if (!cleanedWhatsapp) {
+          setError("WhatsApp number is required.");
+          setSaving(false);
+          return;
+        }
+        updates.whatsappNumber = "234" + cleanedWhatsapp;
         updates.defaultAuthor = defaultAuthor;
-        updates.defaultMessage = defaultMessage;
       }
       await updateProfile(user.uid, updates);
       setSaved(true);
@@ -403,8 +384,6 @@ export default function DashboardSettings() {
             <SiteDefaultsTab
               whatsappNumber={whatsappNumber}
               setWhatsappNumber={setWhatsappNumber}
-              defaultMessage={defaultMessage}
-              setDefaultMessage={setDefaultMessage}
               defaultAuthor={defaultAuthor}
               setDefaultAuthor={setDefaultAuthor}
             />

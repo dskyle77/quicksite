@@ -9,7 +9,7 @@ import { BuilderSidebar, SectionMenu } from "./BuilderSidebar";
 import { NavbarVariants } from "./variants/NavbarVariants";
 import { HeroVariants } from "./variants/HeroVariants";
 import { FooterVariants } from "./variants/FooterVariants";
-import { SectionVariants } from "./variants/sectionVariants/index";
+import { SectionVariants } from "./variants/sections/index";
 
 type TemplateBuilderProps = Omit<TemplateComponentProps, "onUpdate"> & {
   onUpdate: (path: string, value: any) => void;

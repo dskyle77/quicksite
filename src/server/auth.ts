@@ -1,5 +1,5 @@
 // /src/server/auth.ts
-
+import "server-only"
 import { headers } from "next/headers";
 import { adminAuth, adminDb } from "./firebase-admin";
 

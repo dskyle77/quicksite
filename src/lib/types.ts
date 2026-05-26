@@ -8,7 +8,6 @@ export interface UserProfile {
   email: string;
   photoURL?: string;
   whatsappNumber?: string;
-  defaultMessage?: string;
   defaultAuthor?: string;
   plan: "free" | "growth" | "pro";
   createdAt: Timestamp | null;

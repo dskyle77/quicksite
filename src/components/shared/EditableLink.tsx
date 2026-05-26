@@ -352,7 +352,7 @@ export default function EditableLinkButton({
 
   if (!isEditor) {
     // For anchor links, do not add target="_blank"
-    const isAnchor = linkConfig?.type === "anchor";
+    const isAnchor = linkConfig?.type === "anchor" || href.startsWith("#");
 
     // next/link cannot be reliably used for external links, so only use next/link for anchor and internal URLs (i.e., links starting with "/")
     const isInternal =

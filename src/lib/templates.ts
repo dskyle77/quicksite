@@ -47,8 +47,8 @@ export type TemplateContent = {
 /* ---------------- REGISTRY ---------------- */
 
 export const templatesRegistry: TemplateContent[] = [
-  portfolio1,
   menuOne,
+  portfolio1,
   templateBuilder,
 ];
 

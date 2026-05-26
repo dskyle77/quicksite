@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import "server-only"
+
 import { v2 as cloudinary } from "cloudinary";
 
 // ─── Configuration ────────────────────────────────────────────────────────────

@@ -37,7 +37,7 @@ export const PLANS: {
       "Up to 10 mini-sites",
       "Custom domain",
       "More templates",
-      "AI starter content (10/day)",
+      "AI starter content (5/day)",
       "Basic SEO",
       "Contact forms",
       "Remove Quicksite branding",
@@ -55,7 +55,7 @@ export const PLANS: {
       "Premium templates",
       "Analytics",
       "Sell products",
-      "AI starter content (25/day)",
+      "AI starter content (10/day)",
       "Advanced SEO",
       "Priority support",
     ],
@@ -112,3 +112,10 @@ export function canUseFeature(
 export function canCreateSite(plan: Plan, currentSites: number): boolean {
   return currentSites < PLAN_LIMITS[plan].sites;
 }
+
+
+export const AI_DAILY_LIMITS: Record<Plan, number> = {
+  free: 1,
+  growth: 5,
+  pro: 10,
+};

@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import "server-only"
 import { adminDb } from "@/server/firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import type {
   AdminUser,
   AdminSite,
   AdminDomain,
-  PricingConfig,
   OverviewStats,
 } from "@/screen/admin/adminTypes";
 import type { Site } from "@/lib/types";

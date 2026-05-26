@@ -1,6 +1,8 @@
+import "server-only"
+
 import { adminDb } from "./firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
-import { getUserPlan } from "./firestore";
+import { getUserPlan } from "./serverFirestore";
 import { canUseFeature, type Plan } from "@/lib/plans";
 
 /**

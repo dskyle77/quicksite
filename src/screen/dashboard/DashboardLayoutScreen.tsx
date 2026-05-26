@@ -18,6 +18,7 @@ import {
   LayoutDashboard,
   ShieldAlert,
   Globe,
+  Link2,
   BarChart2,
   Settings,
   LogOut,
@@ -48,7 +49,7 @@ export default function DashboardLayoutScreen({
   const sidebarLinks = () => [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: Globe, label: "My Sites", href: "/dashboard/sites" },
-    { icon: Globe, label: "Domains", href: "/dashboard/domains" },
+    { icon: Link2, label: "Domains", href: "/dashboard/domains" },
     { icon: BarChart2, label: "Analytics", href: "/dashboard/analytics" },
     { icon: Mail, label: "Messages", href: "/dashboard/messages" },
     { icon: Settings, label: "Settings", href: "/dashboard/settings" },

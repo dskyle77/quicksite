@@ -7,7 +7,8 @@ import Container from "@/components/shared/Container";
 import EditableLinkButton from "@/components/shared/EditableLink";
 import { LinkConfig } from "@/components/shared/EditableLink";
 
-type ProjectItem = {
+// Type for individual item
+export type ItemsItem = {
   title: string;
   desc: string;
   tags?: string[];
@@ -17,7 +18,14 @@ type ProjectItem = {
   projectBtnLink?: LinkConfig;
 };
 
-export const ProjectsSection = ({
+// Interface for the section data (content)
+export interface ItemsSectionContent {
+  heading?: string;
+  subheading?: string;
+  items: ItemsItem[];
+}
+
+export const ItemsSection = ({
   variant,
   isEditor,
   content,
@@ -26,15 +34,15 @@ export const ProjectsSection = ({
   anchorName,
   path,
 }: SectionProps) => {
-  const items: ProjectItem[] = content?.items || [];
+  const items: ItemsItem[] = content?.items || [];
   const isEven = position % 2 === 0;
 
   const sectionBg = isEven ? "var(--qs-bg)" : "var(--qs-bg-alt)";
   const cardBg = isEven ? "var(--qs-card-bg)" : "var(--qs-card-bg-alt)";
 
-  const update = (next: ProjectItem[]) => onUpdate("items", next);
+  const update = (next: ItemsItem[]) => onUpdate("items", next);
 
-  const updateOne = (i: number, changes: Partial<ProjectItem>) => {
+  const updateOne = (i: number, changes: Partial<ItemsItem>) => {
     const next = [...items];
     next[i] = { ...next[i], ...changes };
     update(next);
@@ -50,13 +58,13 @@ export const ProjectsSection = ({
     update([
       ...items,
       {
-        title: "New Project",
-        desc: "Project description...",
-        tags: ["React"],
+        title: "New Item",
+        desc: "Item description...",
+        tags: ["Tag"],
         image:
           "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
         imagePId: "",
-        btnLabel: "View Project",
+        btnLabel: "View Item",
         projectBtnLink: { type: "url", url: "" },
       },
     ]);
@@ -70,7 +78,7 @@ export const ProjectsSection = ({
         suppressContentEditableWarning
         onBlur={(e) => onUpdate("heading", e.currentTarget.textContent?.trim())}
       >
-        {content?.heading ?? "Projects"}
+        {content?.heading ?? "Items"}
       </h2>
 
       <p
@@ -81,7 +89,7 @@ export const ProjectsSection = ({
           onUpdate("subheading", e.currentTarget.textContent?.trim())
         }
       >
-        {content?.subheading ?? "Showcase of my recent work"}
+        {content?.subheading ?? "Showcase of my items"}
       </p>
     </div>
   );
@@ -210,7 +218,7 @@ export const ProjectsSection = ({
                   <div className="mt-7">
                     <EditableLinkButton
                       isEditor={isEditor}
-                      label={p.btnLabel ?? "View Project"}
+                      label={p.btnLabel ?? "View Item"}
                       linkConfig={p.projectBtnLink}
                       onLabelChange={(v) => updateOne(i, { btnLabel: v })}
                       onLinkChange={(cfg) =>
@@ -231,7 +239,7 @@ export const ProjectsSection = ({
 
           {isEditor && (
             <div className="mt-12 flex justify-center">
-              <AddButton onClick={add}>Add Project</AddButton>
+              <AddButton onClick={add}>Add Item</AddButton>
             </div>
           )}
         </Container>
@@ -320,7 +328,7 @@ export const ProjectsSection = ({
                 <div className="mt-7">
                   <EditableLinkButton
                     isEditor={isEditor}
-                    label={p.btnLabel ?? "View Project"}
+                    label={p.btnLabel ?? "View Item"}
                     linkConfig={p.projectBtnLink}
                     onLabelChange={(v) => updateOne(i, { btnLabel: v })}
                     onLinkChange={(cfg) =>
@@ -341,10 +349,13 @@ export const ProjectsSection = ({
 
         {isEditor && (
           <div className="mt-12 flex justify-center">
-            <AddButton onClick={add}>Add Project</AddButton>
+            <AddButton onClick={add}>Add Item</AddButton>
           </div>
         )}
       </Container>
     </section>
   );
 };
+
+export type ItemsSectionVariant = "grid" | "list";
+export const ItemsVariantList: ItemsSectionVariant[] = ["grid", "list"];

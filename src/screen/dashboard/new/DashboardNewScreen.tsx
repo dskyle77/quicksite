@@ -31,7 +31,6 @@ export default function CreateSitePage() {
 
   const paramsName = searchParams.get("name");
   const paramsSlug = searchParams.get("slug");
-  const defaultMessage = userProfile?.defaultMessage;
   const whatsappNumber = userProfile?.whatsappNumber;
 
   const [loading, setLoading] = useState(false);
@@ -42,6 +41,7 @@ export default function CreateSitePage() {
     type: selectedTemplateType,
     whatsappNumber: whatsappNumber || "",
     generateWithAI: false,
+    image: null as File | null, // ← Added
   });
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,29 +83,25 @@ export default function CreateSitePage() {
 
     setLoading(true);
 
-    console.log({
-      name: normalizedName,
-      slug: normalizedSlug,
-      type: formData.type,
-      description: formData.description,
-      generateWithAI: formData.generateWithAI,
-      defaultMessage,
-      whatsappNumber: formData.whatsappNumber,
-    });
-
     try {
+      const formDataToSend = new FormData();
+
+      formDataToSend.append("name", normalizedName);
+      formDataToSend.append("slug", normalizedSlug);
+      formDataToSend.append("type", formData.type);
+      formDataToSend.append("description", formData.description);
+      formDataToSend.append("generateWithAI", String(formData.generateWithAI));
+      formDataToSend.append("whatsappNumber", formData.whatsappNumber);
+
+      // Append image if exists
+      if (formData.image) {
+        formDataToSend.append("image", formData.image);
+      }
+
       const res = await authFetch("/api/sites", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: normalizedName,
-          slug: normalizedSlug,
-          type: formData.type,
-          description: formData.description,
-          generateWithAI: formData.generateWithAI,
-          defaultMessage,
-          whatsappNumber: formData.whatsappNumber,
-        }),
+        body: formDataToSend,
+        // Do NOT set Content-Type header → browser will set multipart/form-data automatically
       });
 
       const data = await res.json();
@@ -114,7 +110,7 @@ export default function CreateSitePage() {
         throw new Error(data.error || "Failed to create site.");
       }
 
-      toast.success("Site created!");
+      toast.success("Site created successfully!");
       router.push(`/editor/${data.slug}`);
     } catch (error: unknown) {
       console.error(error);
@@ -136,6 +132,7 @@ export default function CreateSitePage() {
           Start with a production-ready template.
         </p>
       </div>
+
       <form
         onSubmit={handleCreate}
         className="flex flex-col gap-6 md:grid md:grid-cols-3 md:gap-8"

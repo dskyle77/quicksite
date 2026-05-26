@@ -1,14 +1,32 @@
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/server/auth";
-import { getMessagesForUser, submitMessage } from "@/server/messages";
-// Assume you have serverDeleteMessage function in server/firestore
-import { serverDeleteMessage } from "@/server/messages";
+import {
+  getMessagesForUser,
+  submitMessage,
+  serverDeleteMessage,
+} from "@/server/messages";
+import { rateLimits, withRateLimit } from "@/server/rateLimit";
+import { getClientIP } from "@/server/ip";
 
 export async function GET() {
   try {
     const user = await getUserFromSession();
     if (!user) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
+    const { success, reset } = await withRateLimit(
+      rateLimits.features.messages,
+      user.uid,
+    );
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        {
+          status: 429,
+          headers: { "X-RateLimit-Reset": reset?.toString?.() ?? "" },
+        },
+      );
     }
 
     const messages = await getMessagesForUser(user.uid);
@@ -34,6 +52,21 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  const ip = await getClientIP();
+
+  const { success, reset } = await withRateLimit(
+    rateLimits.features.messages,
+    ip,
+  );
+  if (!success) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      {
+        status: 429,
+        headers: { "X-RateLimit-Reset": reset?.toString?.() ?? "" },
+      },
+    );
+  }
   try {
     const body = await req.json();
     const {
@@ -53,13 +86,22 @@ export async function POST(req: Request) {
     // Limit for message length
     const MESSAGE_MAX_LENGTH = 2000;
 
-    if (!resolvedBody || typeof resolvedBody !== "string" || resolvedBody.trim().length === 0) {
-      return NextResponse.json({ error: "Message is required." }, { status: 400 });
+    if (
+      !resolvedBody ||
+      typeof resolvedBody !== "string" ||
+      resolvedBody.trim().length === 0
+    ) {
+      return NextResponse.json(
+        { error: "Message is required." },
+        { status: 400 },
+      );
     }
     if (resolvedBody.length > MESSAGE_MAX_LENGTH) {
       return NextResponse.json(
-        { error: `Message must be no more than ${MESSAGE_MAX_LENGTH} characters.` },
-        { status: 400 }
+        {
+          error: `Message must be no more than ${MESSAGE_MAX_LENGTH} characters.`,
+        },
+        { status: 400 },
       );
     }
 
@@ -94,7 +136,6 @@ export async function POST(req: Request) {
   }
 }
 
-// DELETE /api/messages?id=msgId
 export async function DELETE(req: Request) {
   try {
     const user = await getUserFromSession();
@@ -105,7 +146,10 @@ export async function DELETE(req: Request) {
     const { searchParams } = new URL(req.url);
     const id = searchParams.get("id");
     if (!id) {
-      return NextResponse.json({ error: "Message ID is required." }, { status: 400 });
+      return NextResponse.json(
+        { error: "Message ID is required." },
+        { status: 400 },
+      );
     }
 
     await serverDeleteMessage(user.uid, id);

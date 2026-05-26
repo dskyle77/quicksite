@@ -29,6 +29,52 @@ import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { canUseFeature } from "@/lib/plans";
 
+// Custom Confirm Dialog Modal
+function ConfirmDialog({
+  open,
+  title,
+  description,
+  confirmText = "Confirm",
+  cancelText = "Cancel",
+  onCancel,
+  onConfirm,
+}: {
+  open: boolean;
+  title: string;
+  description?: string;
+  confirmText?: string;
+  cancelText?: string;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
+      <div className="bg-white rounded-2xl p-7 shadow-lg w-[90vw] max-w-sm border border-slate-200 flex flex-col items-stretch">
+        <h2 className="font-bold text-lg mb-2">{title}</h2>
+        {description && (
+          <p className="text-sm text-slate-600 mb-5">{description}</p>
+        )}
+        <div className="flex justify-end gap-2 mt-2">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wide transition-all"
+          >
+            {cancelText}
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs uppercase tracking-wide transition-all"
+          >
+            {confirmText}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function DashboardDomainsScreen() {
   const { user } = useAuth();
   const { profile } = useProfileStore();
@@ -54,6 +100,13 @@ export default function DashboardDomainsScreen() {
   // Management States
   const [managedDomains, setManagedDomains] = useState<any[]>([]);
   const [unlinkingDomain, setUnlinkingDomain] = useState<string | null>(null);
+
+  // Custom Confirm Dialog State
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    domain: string | null;
+    siteId: string | null;
+  }>({ open: false, domain: null, siteId: null });
 
   // Auto-select site from ?site= query param
   useEffect(() => {
@@ -114,22 +167,8 @@ export default function DashboardDomainsScreen() {
     setStatus("verifying");
 
     try {
-      // Step A: Verify DNS
-      const verifyRes = await authFetch("/api/domains/verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ domain: cleanDomain }),
-      });
-      const verification = await verifyRes.json();
-      setFoundRecords(verification.found || []);
-
-      if (!verification.isValid) {
-        setStatus("invalid");
-        throw new Error("DNS mismatch. Point your domain to our IP first.");
-      }
-
-      // Step B: Register with Vercel & Firestore
-      setStatus("valid");
+      setIsSubmitting(true);
+      setStatus("verifying");
       const res = await authFetch("/api/domains/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -141,11 +180,18 @@ export default function DashboardDomainsScreen() {
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Registration failed");
 
+      // Optionally, handle DNS/data returned by API
+
+      if (!res.ok || data?.isValid === false) {
+        setStatus("invalid");
+        throw new Error(data.error || "Registration failed");
+      }
+      setFoundRecords(data.found || []);
+
+      setStatus("idle");
       toast.success("Domain connected successfully!");
       setDomainInput("");
-      setStatus("idle");
     } catch (error: any) {
       toast.error(error?.message || "Failed to connect domain.");
     } finally {
@@ -186,14 +232,24 @@ export default function DashboardDomainsScreen() {
   // Action: Unlink (delete) a domain entirely
   const handleUnlink = async (domain: string, siteId: string) => {
     if (!canUseDomains) return;
-    if (
-      !confirm(
-        `Are you sure you want to unlink "${domain}"? This cannot be undone.`,
-      )
-    )
-      return;
 
-    setUnlinkingDomain(domain);
+    // Instead of confirm, show custom dialog
+    setConfirmDialog({
+      open: true,
+      domain,
+      siteId,
+    });
+  };
+
+  // When user confirms in custom dialog
+  const handleUnlinkConfirm = async () => {
+    if (!canUseDomains || !confirmDialog.domain || !confirmDialog.siteId) {
+      setConfirmDialog({ open: false, domain: null, siteId: null });
+      return;
+    }
+
+    setUnlinkingDomain(confirmDialog.domain);
+    setConfirmDialog({ open: false, domain: null, siteId: null });
     try {
       const token = await user?.getIdToken();
       const res = await fetch("/api/domains/delete", {
@@ -202,13 +258,16 @@ export default function DashboardDomainsScreen() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ domain, siteId }),
+        body: JSON.stringify({
+          domain: confirmDialog.domain,
+          siteId: confirmDialog.siteId,
+        }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Unlink failed");
 
-      toast.success(`${domain} has been unlinked.`);
+      toast.success(`${confirmDialog.domain} has been unlinked.`);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -486,6 +545,22 @@ export default function DashboardDomainsScreen() {
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirmDialog.open}
+        title="Unlink Domain"
+        description={
+          confirmDialog.domain
+            ? `Are you sure you want to unlink "${confirmDialog.domain}"? This cannot be undone.`
+            : undefined
+        }
+        confirmText="Unlink"
+        cancelText="Cancel"
+        onCancel={() =>
+          setConfirmDialog({ open: false, domain: null, siteId: null })
+        }
+        onConfirm={handleUnlinkConfirm}
+      />
     </div>
   );
 }

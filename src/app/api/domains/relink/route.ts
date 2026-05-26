@@ -2,7 +2,9 @@
 import { NextResponse } from "next/server";
 import { adminDb } from "@/server/firebase-admin";
 import { getUserFromSession } from "@/server/auth";
-import { getUserPlan } from "@/server/firestore";
+import { getUserPlan } from "@/server/serverFirestore";
+
+import { withRateLimit, rateLimits } from "@/server/rateLimit";
 
 export async function POST(req: Request) {
   try {
@@ -12,12 +14,26 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
+    const { success, reset } = await withRateLimit(
+      rateLimits.domains.relink,
+      user.uid,
+    );
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests. Please try again later." },
+        {
+          status: 429,
+          headers: { "X-RateLimit-Reset": reset?.toString?.() ?? "" },
+        },
+      );
+    }
+
     const { domain, newSiteId } = await req.json();
 
     if (!domain || !newSiteId) {
       return NextResponse.json(
         { error: "Missing parameters" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -29,7 +45,7 @@ export async function POST(req: Request) {
           error:
             "Custom domains are not available on the free plan. Please upgrade your subscription.",
         },
-        { status: 403 }
+        { status: 403 },
       );
     }
 
@@ -40,7 +56,7 @@ export async function POST(req: Request) {
     if (!newSiteSnap.exists || newSiteSnap.data()?.uid !== user.uid) {
       return NextResponse.json(
         { error: "Unauthorized or site not found" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 

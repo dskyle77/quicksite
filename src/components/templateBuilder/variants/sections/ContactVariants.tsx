@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SectionProps } from "../../types";
 import EditableLinkButton from "@/components/shared/EditableLink";
-import { useState, type FormEvent } from "react";
+import { useState, type SubmitEvent } from "react";
 import Container from "@/components/shared/Container";
 import useFormSubmit from "@/hooks/useFormSubmit";
 
@@ -201,7 +200,7 @@ export const ContactSection = ({
       setSubmitError(null);
     };
 
-    const handleSubmit = async (e: FormEvent) => {
+    const handleSubmit = async (e: SubmitEvent) => {
       e.preventDefault();
       if (isEditor) return;
 

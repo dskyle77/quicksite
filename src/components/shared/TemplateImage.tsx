@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 import { useRef, useState, useEffect } from "react";
@@ -145,26 +146,19 @@ export default function TemplateImage({
 
   if (effectiveSource) {
     showImage = (
-      <div
-        className="relative w-full h-full"
-        style={{ minHeight: 120, minWidth: 120 }}
-      >
-        <NextImage
-          src={effectiveSource}
-          alt={alt || ""}
-          className={[
-            "object-cover w-full h-full rounded-2xl",
-            isEditor ? "hover:brightness-75" : "",
-            uploading ? "opacity-50 grayscale" : "",
-          ]
-            .filter(Boolean)
-            .join(" ")}
-          fill
-          sizes="100vw"
-          priority
-          style={{ objectFit: "cover", borderRadius: "1rem", display: "block" }}
-        />
-      </div>
+      <img
+        alt={alt || ""}
+        src={effectiveSource}
+        className={[
+          "object-cover w-full h-full rounded-2xl",
+          isEditor ? "hover:brightness-75" : "",
+          uploading ? "opacity-50 grayscale" : "",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        loading="eager"
+        style={{ display: "block" }}
+      />
     );
   } else if (isEditor) {
     showImage = (

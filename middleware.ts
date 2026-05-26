@@ -1,5 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
-import { generalApiLimiter } from "@/lib/rateLimit";
+import { withRateLimit, rateLimits } from "@/server/rateLimit";
 
 const ROOT_DOMAIN = "quicksiteio.vercel.app";
 const SHORT_DOMAIN = "qsio.vercel.app";
@@ -14,7 +14,7 @@ export async function middleware(req: NextRequest) {
   if (pathname.startsWith("/api")) {
     const forwarded = req.headers.get("x-forwarded-for");
     const ip = forwarded ? forwarded.split(",")[0] : "127.0.0.1";
-    const { success, reset } = await generalApiLimiter.limit(ip);
+    const { success, reset } = await withRateLimit(rateLimits.api.general, ip);
 
     if (!success) {
       return NextResponse.json(

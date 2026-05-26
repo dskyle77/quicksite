@@ -10,7 +10,6 @@ export const SkillsSection = ({
   onUpdate,
   position,
   anchorName,
-  path
 }: SectionProps) => {
   // Use even/odd position to set section background
   const isEven = position % 2 === 0;
@@ -184,10 +183,12 @@ export const SkillsSection = ({
             {tags.map((tag: string, i: number) => (
               <div key={i} className="group relative">
                 <span
-                  className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium
-                border transition-all duration-200
-                hover:scale-[1.05] hover:shadow-md active:scale-95
-                backdrop-blur-sm"
+                  className={[
+                    "inline-flex items-center rounded-full px-4 py-2 text-sm font-medium",
+                    "border transition-all duration-200",
+                    "hover:scale-[1.05] hover:shadow-md active:scale-95",
+                    "backdrop-blur-sm",
+                  ].join(" ")}
                   style={{
                     background:
                       i % 2 === 0 ? "var(--qs-bg-alt)" : "var(--qs-bg)",
@@ -420,6 +421,9 @@ export const SkillsSection = ({
   );
 };
 
-
-export type SkillsSectionVariants = "grid" | "tags" | "icons-list"
-export const SkillsVariantList: SkillsSectionVariants[] = ["grid", "tags", "icons-list"];
+export type SkillsSectionVariants = "grid" | "tags" | "icons-list";
+export const SkillsVariantList: SkillsSectionVariants[] = [
+  "grid",
+  "tags",
+  "icons-list",
+];

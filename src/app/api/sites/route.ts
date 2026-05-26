@@ -1,13 +1,143 @@
 // src/app/api/sites/route.ts
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/server/auth";
-import { serverCreateSite, getUserPlan } from "@/server/firestore";
+import { serverCreateSite, getUserPlan } from "@/server/serverFirestore";
 import { generateSiteContentWithAI } from "@/server/ai-content";
-import { getTemplateByType } from "@/lib/templates";
-import { buildSchema, buildStarterContent } from "@/lib/templates";
-
-import { AI_DAILY_LIMITS, getAiRateLimiter } from "@/lib/rateLimit";
+import {
+  getTemplateByType,
+  buildSchema,
+  buildStarterContent,
+} from "@/lib/templates";
+import { uploadBuffer } from "@/server/cloudinary";
+import { AI_DAILY_LIMITS } from "@/lib/plans";
+import {
+  AI_HOURLY_LIMITS,
+  withRateLimit,
+  rateLimits,
+} from "@/server/rateLimit";
 import { CUSTOM_TEMPLATE_TYPE, canUseFeature, type Plan } from "@/lib/plans";
+
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+function parseFormFields(formData: FormData) {
+  const getString = (key: string) => {
+    const value = formData.get(key);
+    return typeof value === "string" ? value : undefined;
+  };
+
+  const generateWithAI = (() => {
+    const val = formData.get("generateWithAI");
+    if (val === "on" || val === "true") return true;
+    if (val === "false" || val === null) return false;
+    return Boolean(val);
+  })();
+
+  return {
+    name: getString("name"),
+    slug: getString("slug"),
+    type: getString("type"),
+    whatsappNumber: getString("whatsappNumber"),
+    description: getString("description"),
+    generateWithAI,
+    image: formData.get("image") as File | null,
+  };
+}
+
+async function uploadOgImage(image: File, uid: string, slug: string) {
+  const bytes = await image.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  const uploadResult = await uploadBuffer(buffer, {
+    folder: `quicksite/users/${uid}/${slug}/config`,
+    publicId: `ogImage`,
+    allowedFormats: ["jpg", "png", "webp", "jpeg"],
+    maxBytes: 5 * 1024 * 1024,
+    transformation: [{ width: 1200, height: 1200, crop: "limit" }],
+  });
+
+  return uploadResult.secureUrl;
+}
+
+async function checkAiRateLimits(plan: Plan, uid: string) {
+  const dailyResult = await withRateLimit(rateLimits.ai.daily[plan], uid);
+  if (!dailyResult.success) {
+    return {
+      allowed: false,
+      error: `Daily AI limit reached (${AI_DAILY_LIMITS[plan]}/day). Try again tomorrow.`,
+      reset: dailyResult.reset,
+    };
+  }
+
+  const hourlyResult = await withRateLimit(rateLimits.ai.hourly[plan], uid);
+  if (!hourlyResult.success) {
+    return {
+      allowed: false,
+      error: `Hourly AI limit reached (${AI_HOURLY_LIMITS[plan]}/hour). Try again later.`,
+      reset: hourlyResult.reset,
+    };
+  }
+
+  return { allowed: true };
+}
+
+async function resolveContent(
+  generateWithAI: boolean,
+  description: string | undefined,
+  plan: Plan,
+  uid: string,
+  templateEntry: ReturnType<typeof getTemplateByType>,
+  normalizedName: string,
+  whatsappNumber: string | undefined,
+) {
+  const defaultTheme = templateEntry!.config.theme ?? "warm";
+  const schemaBase = buildSchema(templateEntry!.contentConfig, {
+    selectedTitle: normalizedName,
+    whatsappNumber,
+    defaultImage:
+      "https://image-source-sk.vercel.app/projects/default-image.jpg",
+  });
+
+  if (generateWithAI && description) {
+    if (!canUseFeature(plan, "ai")) {
+      return {
+        error: "AI content generation is available on Growth and Pro plans.",
+        status: 403 as const,
+      };
+    }
+
+    const rateCheck = await checkAiRateLimits(plan, uid);
+    if (!rateCheck.allowed) {
+      return {
+        error: rateCheck.error!,
+        status: 429 as const,
+        reset: rateCheck.reset,
+      };
+    }
+
+    try {
+      const aiResult = await generateSiteContentWithAI({
+        selectedTitle: normalizedName,
+        description,
+        schemaBase,
+        defaultThemeId: defaultTheme,
+      });
+      return { content: aiResult.content, themeId: aiResult.themeId };
+    } catch (error) {
+      console.error("AI Generation failed, falling back to default:", error);
+    }
+  }
+
+  // Fallback to starter content
+  return {
+    content: buildStarterContent(templateEntry!.contentConfig, {
+      selectedTitle: normalizedName,
+      whatsappNumber,
+    }),
+    themeId: defaultTheme,
+  };
+}
+
+// ─── Route Handler ───────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
   try {
@@ -16,16 +146,16 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
-    const body = await req.json();
+    const formData = await req.formData();
     const {
       name,
       slug,
       type,
-      defaultMessage,
       whatsappNumber,
       description,
       generateWithAI,
-    } = body;
+      image,
+    } = parseFormFields(formData);
 
     if (!name || !slug || !type) {
       return NextResponse.json(
@@ -39,9 +169,6 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
-
-    const normalizedName = (name as string).trim();
-    const normalizedSlug = (slug as string).trim();
 
     const templateEntry = getTemplateByType(type);
     if (!templateEntry) {
@@ -66,70 +193,35 @@ export async function POST(req: Request) {
       );
     }
 
-    const defaultImage =
-      "https://image-source-sk.vercel.app/projects/default-image.jpg";
+    const normalizedName = name.trim();
+    const normalizedSlug = slug.trim();
 
-    let finalContent = null;
-    let siteTheme = templateEntry.config.theme ?? "warm";
-    const schemaBase = buildSchema(templateEntry.contentConfig, {
-      selectedTitle: normalizedName,
-      defaultMessage,
+    const imageUrl = image
+      ? await uploadOgImage(image, user.uid, normalizedSlug)
+      : undefined;
+
+    const contentResult = await resolveContent(
+      generateWithAI,
+      description,
+      plan,
+      user.uid,
+      templateEntry,
+      normalizedName,
       whatsappNumber,
-      defaultImage,
-    });
+    );
 
-    // 1. Try to generate with AI if requested
-    if (generateWithAI === true && description) {
-      if (!canUseFeature(plan, "ai")) {
-        return NextResponse.json(
-          {
-            error:
-              "AI content generation is available on Growth and Pro plans.",
-          },
-          { status: 403 },
-        );
-      }
-
-      const limiter = getAiRateLimiter(plan);
-      const { success, reset } = await limiter.limit(user.uid);
-
-      if (!success) {
-        const dailyCap = AI_DAILY_LIMITS[plan];
-        return NextResponse.json(
-          {
-            error: `Daily AI limit reached (${dailyCap}/day). Try again tomorrow.`,
-          },
-          {
-            status: 429,
-            headers: { "X-RateLimit-Reset": reset.toString() },
-          },
-        );
-      }
-      try {
-        const aiResult = await generateSiteContentWithAI({
-          selectedTitle: normalizedName,
-          description,
-          schemaBase,
-          defaultThemeId: siteTheme,
-        });
-        finalContent = aiResult.content;
-        siteTheme = aiResult.themeId;
-      } catch (error) {
-        console.error("AI Generation failed, falling back to default:", error);
-        finalContent = null;
-      }
+    if ("error" in contentResult) {
+      return NextResponse.json(
+        { error: contentResult.error },
+        {
+          status: contentResult.status,
+          headers: contentResult.reset
+            ? { "X-RateLimit-Reset": contentResult.reset.toString() }
+            : undefined,
+        },
+      );
     }
 
-    // 2. Fallback: If AI failed or wasn't requested, use the standard template starter
-    if (!finalContent) {
-      finalContent = buildStarterContent(templateEntry.contentConfig, {
-        selectedTitle: normalizedName,
-        defaultMessage,
-        whatsappNumber,
-      });
-    }
-
-    // 3. Create the site in Firestore
     const siteId = await serverCreateSite(
       user.uid,
       (user.plan ?? "free") as Plan,
@@ -137,10 +229,11 @@ export async function POST(req: Request) {
         slug: normalizedSlug,
         type,
         name: normalizedName,
-        theme: siteTheme,
+        theme: contentResult.themeId,
         whatsappNumber,
         status: "draft",
-        content: finalContent,
+        content: contentResult.content,
+        ogImage: imageUrl,
       },
     );
 
@@ -151,8 +244,6 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Server error.";
-
-    // Check for known plan error indicator
     const isPlanError =
       typeof message === "string" &&
       (message.toLowerCase().includes("plan limit") ||

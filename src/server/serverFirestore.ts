@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // src/server/firestore.ts
-
+import "server-only";
 import { adminDb } from "./firebase-admin";
 import { FieldValue } from "firebase-admin/firestore";
 import { getSiteLimit } from "@/lib/plans";
@@ -196,7 +196,6 @@ export async function serverDeleteSite(
   // Delete the site doc itself
   batch.delete(siteRef);
 
-  // Update siteCount for user
   batch.update(userRef, {
     siteCount: FieldValue.increment(-1),
     updatedAt: FieldValue.serverTimestamp(),

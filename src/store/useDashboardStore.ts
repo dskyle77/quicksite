@@ -26,6 +26,10 @@ interface DashboardState {
   sitesError: string | null;
   ui: UIState;
 
+  // Loading states for write operations
+  actionLoading: boolean;
+  lastAction: "remove" | "toggleStatus" | null;
+
   fetchSites: (uid: string) => Promise<void>;
 
   removeSite: (siteId: string, token: string) => Promise<void>;
@@ -89,13 +93,15 @@ const initialUI: UIState = {
 
 // ── Store ─────────────────────────────────────────────────────────────────────
 
-export const useDashboardStore = create<DashboardState>((set, get) => ({
+export const useDashboardStore = create<DashboardState>((set) => ({
   sites: [],
   siteLimit: 0,
   stats: initialStats,
   sitesLoading: false,
   sitesError: null,
   ui: initialUI,
+  actionLoading: false,
+  lastAction: null,
 
   // ── Fetch sites (read — still direct Firestore, read-only is fine) ──────────
 
@@ -120,29 +126,39 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   // ── Remove site ─────────────────────────────────────────────────────────────
 
   removeSite: async (slug, token) => {
-    await apiFetch(`/api/sites/${slug}`, "DELETE", token);
+    set({ actionLoading: true, lastAction: "remove" });
+    try {
+      await apiFetch(`/api/sites/${slug}`, "DELETE", token);
 
-    set((state) => {
-      const sites = state.sites.filter((s) => s.id !== slug);
-      return {
-        sites,
-        stats: calcStats(sites, state.siteLimit),
-        ui: { ...state.ui, deleteConfirmId: null },
-      };
-    });
+      set((state) => {
+        const sites = state.sites.filter((s) => s.id !== slug);
+        return {
+          sites,
+          stats: calcStats(sites, state.siteLimit),
+          ui: { ...state.ui, deleteConfirmId: null },
+        };
+      });
+    } finally {
+      set({ actionLoading: false, lastAction: null });
+    }
   },
 
   // ── Toggle status ───────────────────────────────────────────────────────────
 
   toggleSiteStatus: async (siteId, token) => {
-    const res = await apiFetch(`/api/sites/${siteId}/status`, "PATCH", token);
-    const { status: nextStatus } = await res.json();
+    set({ actionLoading: true, lastAction: "toggleStatus" });
+    try {
+      const res = await apiFetch(`/api/sites/${siteId}/status`, "PATCH", token);
+      const { status: nextStatus } = await res.json();
 
-    set((state) => ({
-      sites: state.sites.map((s) =>
-        s.id === siteId ? { ...s, status: nextStatus } : s,
-      ),
-    }));
+      set((state) => ({
+        sites: state.sites.map((s) =>
+          s.id === siteId ? { ...s, status: nextStatus } : s,
+        ),
+      }));
+    } finally {
+      set({ actionLoading: false, lastAction: null });
+    }
   },
 
   // ── UI ──────────────────────────────────────────────────────────────────────
@@ -166,5 +182,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
       sitesLoading: false,
       sitesError: null,
       ui: initialUI,
+      actionLoading: false,
+      lastAction: null,
     }),
 }));

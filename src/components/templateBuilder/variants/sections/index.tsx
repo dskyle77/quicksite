@@ -1,7 +1,7 @@
 import { SectionVariantRegistry } from "../../types";
 import { AboutSection } from "./AboutVariants";
 import { SkillsSection } from "./SkillsVariants";
-import { ProjectsSection } from "./ProjectsVariants";
+import { ItemsSection } from "./ItemsVariants";
 import { TextSection } from "./TextSection";
 import { ExperienceSection } from "./ExperienceVariants";
 import { TestimonialsSection } from "./TestimonialsVariants";
@@ -10,13 +10,11 @@ import { FeaturesSection } from "./FeaturesVariants";
 import { PricingSection } from "./PricingVariants";
 import { FaqSection } from "./FaqVariants";
 import { CtaSection } from "./CtaVariants";
-import { MenuSection } from "./MenuVariants";
 
 export const SectionVariants: Partial<SectionVariantRegistry> = {
   about: AboutSection,
   skills: SkillsSection,
-  projects: ProjectsSection,
-  menu: MenuSection,
+  items: ItemsSection,
   experience: ExperienceSection,
   testimonials: TestimonialsSection,
   contact: ContactSection,

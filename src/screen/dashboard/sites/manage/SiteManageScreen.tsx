@@ -25,7 +25,8 @@ export default function SiteManageScreen() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
   const { user } = useAuth();
-  const { sites, toggleSiteStatus, removeSite } = useDashboardStore();
+  const { sites, toggleSiteStatus, removeSite } =
+    useDashboardStore();
   const [toggling, setToggling] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -226,6 +227,7 @@ export default function SiteManageScreen() {
         ) : (
           <div className="flex gap-3">
             <button
+              disabled={deleting}
               onClick={() => setConfirmDelete(false)}
               className="flex-1 h-10 rounded-lg border border-border text-sm font-medium hover:bg-muted transition"
             >

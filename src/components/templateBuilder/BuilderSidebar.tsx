@@ -40,7 +40,7 @@ const Select = <T extends string>({
       className="w-full rounded-lg border px-3 py-2 text-sm bg-white outline-blue-400 focus:outline-blue-500 focus:outline-4 disabled:bg-gray-100 disabled:text-gray-400"
       style={{ outlineOffset: "2px" }}
     >
-      {options.map((o) => (
+      {options?.map((o) => (
         <option key={o} value={o}>
           {o}
         </option>
@@ -427,15 +427,16 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
             </div>
 
             <div className="space-y-3">
-              {config.sections.map((section, index) => (
-                <SectionMenu
-                  key={section.id}
-                  config={config}
-                  section={section}
-                  index={index}
-                  onChange={onChange}
-                />
-              ))}
+              {config.sections &&
+                config.sections.map((section, index) => (
+                  <SectionMenu
+                    key={section.id}
+                    config={config}
+                    section={section}
+                    index={index}
+                    onChange={onChange}
+                  />
+                ))}
             </div>
           </section>
         </div>

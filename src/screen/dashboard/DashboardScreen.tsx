@@ -217,13 +217,18 @@ function SitesSection({
 
 // ─────────── COMPONENT: QuickActionsSection ──────────────
 function QuickActionsSection() {
-
   const QUICK_ACTIONS = [
     {
       label: "Browse Templates",
       sub: "Find the perfect design",
       href: "/templates",
       color: "bg-primary/10 text-primary",
+    },
+    {
+      label: "See Messages",
+      sub: "View all your notifications and messages",
+      href: "/dashboard/messages",
+      color: "bg-blue-100 text-blue-600",
     },
     {
       label: "Connect Domain",

@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import "server-only"
 import Groq from "groq-sdk";
 import { variantOptions } from "@/components/templateBuilder/contentBlocks";
 import { getThemeOptionsForAI, isValidThemeId } from "@/lib/themes";

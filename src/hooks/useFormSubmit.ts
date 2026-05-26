@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // Define the useFormSubmit hook here, calling /api/messages
 export default function useFormSubmit() {
@@ -119,7 +120,7 @@ export default function useFormSubmit() {
       setFormData({ name: "", email: "", message: "" });
       setSubmitSuccess(true);
     } catch (res: any) {
-      const msg = res.error
+      const msg = res.error;
       setSubmitError(msg);
     } finally {
       setSubmitting(false);

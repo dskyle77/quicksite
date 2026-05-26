@@ -5,9 +5,11 @@
 
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/server/auth";
-import { serverUpdateSite, serverDeleteSite } from "@/server/firestore";
+import { serverUpdateSite, serverDeleteSite } from "@/server/serverFirestore";
 import { uploadSiteImages } from "@/server/cloudinary";
 import { batchUpdateByPath } from "@/lib/helpers";
+
+import { withRateLimit, rateLimits } from "@/server/rateLimit";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -30,6 +32,20 @@ export async function PATCH(req: Request, { params }: RouteContext) {
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+    }
+
+    const rateLimitResult = await withRateLimit(
+      rateLimits.sites.edit,
+      user.uid,
+    );
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          error: "Too many edit attempts. Please wait before trying again.",
+          reset: rateLimitResult.reset,
+        },
+        { status: 429 },
+      );
     }
 
     const { id: slug } = await params;
@@ -83,7 +99,11 @@ export async function PATCH(req: Request, { params }: RouteContext) {
     // Patch content with new image URLs at those paths
     // Defensive: Only attempt patch if content is present
     let newContent = content;
-    if (content !== undefined && imagesWithUrl && Object.keys(imagesWithUrl).length > 0) {
+    if (
+      content !== undefined &&
+      imagesWithUrl &&
+      Object.keys(imagesWithUrl).length > 0
+    ) {
       const contentClone = JSON.parse(JSON.stringify(content));
       newContent = batchUpdateByPath(contentClone, imagesWithUrl);
     }
@@ -128,6 +148,20 @@ export async function DELETE(_req: Request, { params }: RouteContext) {
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
+    const rateLimitResult = await withRateLimit(
+      rateLimits.sites.delete,
+      user.uid,
+    );
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          error: "Too many delete requests. Please wait and try again later.",
+          reset: rateLimitResult.reset,
+        },
+        { status: 429 },
+      );
+    }
+
     const { id: slug } = await params;
     if (!slug) {
       return NextResponse.json(
@@ -147,7 +181,14 @@ export async function DELETE(_req: Request, { params }: RouteContext) {
         : message === "Site not found."
           ? 404
           : 500;
-    console.error("[DELETE] ERROR:", message, "status:", status, "Detail:", err);
+    console.error(
+      "[DELETE] ERROR:",
+      message,
+      "status:",
+      status,
+      "Detail:",
+      err,
+    );
     return NextResponse.json({ error: message }, { status });
   }
 }

@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { LinkConfig } from "@/components/shared/EditableLink";
 import { SchemaParams } from "@/components/templateBuilder/types";
-import { ExperienceSectionVariant } from "@/components/templateBuilder/variants/sectionVariants/ExperienceVariants";
-import { SkillsSectionVariants } from "@/components/templateBuilder/variants/sectionVariants/SkillsVariants";
+import { ExperienceSectionVariant } from "@/components/templateBuilder/variants/sections/ExperienceVariants";
+import {
+  ItemsSectionContent,
+  ItemsSectionVariant,
+} from "@/components/templateBuilder/variants/sections/ItemsVariants";
+import { SkillsSectionVariants } from "@/components/templateBuilder/variants/sections/SkillsVariants";
+import { makeCtaLink, makeWhatsappLink } from "@/components/shared/helpers";
 
 export const portfolioConfig = {
   navbar: "none",
@@ -22,9 +27,9 @@ export const portfolioConfig = {
       enabled: true,
     },
     {
-      id: "pr_",
-      type: "projects",
-      variant: "card-grid",
+      id: "i_",
+      type: "items",
+      variant: "grid" as ItemsSectionVariant,
       enabled: true,
     },
     {
@@ -45,7 +50,6 @@ export const portfolioConfig = {
 const starterContent = ({
   selectedTitle = "Alex Morgan",
   whatsappNumber,
-  defaultImage,
 }: SchemaParams) => ({
   builderConfig: portfolioConfig,
 
@@ -54,26 +58,21 @@ const starterContent = ({
     type: "background",
     badge: "Available for Freelance",
     image1:
-      defaultImage ||
       "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
     image1PId: "",
     title: "Hi, I'm Alex Morgan",
     desc: "Full-Stack Developer crafting exceptional digital experiences with clean code and thoughtful design.",
     primaryButton: "Get In Touch",
-    ...(whatsappNumber
-      ? {
-          primaryButtonLink: {
-            type: "whatsapp",
-            whatsappNumber,
-            message: "Hi Alex, I'd like to discuss a project.",
-          } as LinkConfig,
-        }
-      : {}),
+    primaryButtonLink: makeWhatsappLink(
+      whatsappNumber,
+      "Hi Alex, I'd like to discuss a project.",
+    ) as LinkConfig,
+
     secondaryButton: "View My Work",
-    secondaryButtonLink: {
+    secondaryButtonLink: makeCtaLink({
       type: "anchor",
       anchorId: "projects",
-    } as LinkConfig,
+    }) as LinkConfig,
   },
 
   // ABOUT
@@ -84,7 +83,6 @@ const starterContent = ({
     desc2:
       "When I'm not coding, you'll find me exploring new technologies, contributing to open source, or enjoying a good cup of coffee.",
     image1:
-      defaultImage ||
       "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
     image1PId: "",
     stat1Value: "25+",
@@ -122,7 +120,7 @@ const starterContent = ({
   },
 
   // PROJECTS
-  pr_projects: {
+  i_items: {
     heading: "Featured Projects",
     subheading: "A selection of work I'm proud of.",
     items: [
@@ -131,10 +129,12 @@ const starterContent = ({
         desc: "A full-stack online store with real-time inventory, payment integration, and admin dashboard.",
         tags: ["Next.js", "Stripe", "PostgreSQL", "Tailwind"],
         image:
-          defaultImage ||
           "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
         imagePId: "",
-        previewLink: "https://example.com",
+        projectBtnLink: makeWhatsappLink(
+          whatsappNumber,
+          "Hi, I want to learn more about your E-Commerce Platform project!",
+        ),
         btnLabel: "View Project",
       },
       {
@@ -142,14 +142,16 @@ const starterContent = ({
         desc: "Collaborative productivity app with real-time updates, drag-and-drop, and team workspaces.",
         tags: ["React", "Node.js", "Socket.io", "MongoDB"],
         image:
-          defaultImage ||
           "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
         imagePId: "",
-        previewLink: "",
+        projectBtnLink: makeWhatsappLink(
+          whatsappNumber,
+          "Hi, I'm interested in the TaskFlow project management app!",
+        ),
         btnLabel: "View Project",
       },
     ],
-  },
+  } as ItemsSectionContent,
 
   // EXPERIENCE
   ex_experience: {
@@ -179,15 +181,11 @@ const starterContent = ({
     phone: whatsappNumber,
     location: "Lagos, Nigeria",
     primaryButton: "Send a Message",
-    ...(whatsappNumber
-      ? {
-          primaryButtonLink: {
-            type: "whatsapp",
-            whatsappNumber,
-            message: "Hi Alex, let's discuss a project.",
-          },
-        }
-      : {}),
+    primaryButtonLink: makeCtaLink({
+      type: "whatsapp",
+      phone: whatsappNumber,
+      message: "Hello, I'm reaching out regarding your portfolio!",
+    }),
     secondaryButton: "Schedule a Call",
     secondaryButtonLink: {},
   },
@@ -198,15 +196,18 @@ const starterContent = ({
     socials: [
       {
         label: "GitHub",
-        linkConfig: { type: "url", url: "https://github.com/" },
+        linkConfig: makeCtaLink({ type: "url", url: "https://github.com/" }),
       },
       {
         label: "LinkedIn",
-        linkConfig: { type: "url", url: "https://www.linkedin.com/" },
+        linkConfig: makeCtaLink({
+          type: "url",
+          url: "https://www.linkedin.com/",
+        }),
       },
       {
         label: "Twitter",
-        linkConfig: { type: "url", url: "https://twitter.com/" },
+        linkConfig: makeCtaLink({ type: "url", url: "https://twitter.com/" }),
       },
     ],
   },

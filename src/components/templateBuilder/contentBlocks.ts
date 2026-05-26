@@ -5,28 +5,19 @@ import {
   HeroContent,
   AboutContent,
   SkillItem,
-  ProjectItem,
   TextContent,
   ExperienceItem,
   TestimonialItem,
   ContactContent,
   FooterContent,
-  MenuItem,
 } from "./types";
+import { ItemsItem, ItemsVariantList } from "./variants/sections/ItemsVariants";
 import { HeroVariantList } from "./variants/HeroVariants";
-import { ExperienceVariantList } from "./variants/sectionVariants/ExperienceVariants";
-import { SkillsVariantList } from "./variants/sectionVariants/SkillsVariants";
+import { ExperienceVariantList } from "./variants/sections/ExperienceVariants";
+import { SkillsVariantList } from "./variants/sections/SkillsVariants";
 
+import { makeWhatsappLink, year, img } from "../shared/helpers";
 // ─── Shared Helpers ───────────────────────────────────────────────────────────
-
-export const makeWhatsappLink = (phone?: string) =>
-  phone ? { type: "whatsapp", phone, message: "" } : {};
-
-const DEFAULT_IMAGE =
-  "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg";
-
-const img = (override?: string) => override ?? DEFAULT_IMAGE;
-const year = () => new Date().getFullYear();
 
 // ─── NAVBAR ───────────────────────────────────────────────────────────────────
 
@@ -167,7 +158,7 @@ const skillsStarterContent = () => ({
 
 // ─── PROJECTS ─────────────────────────────────────────────────────────────────
 
-const projectsSchema = ({ defaultImage }: SchemaParams) => ({
+const itemsSchema = ({ defaultImage }: SchemaParams) => ({
   heading: "",
   subheading: "",
   items: [
@@ -187,10 +178,10 @@ const projectsSchema = ({ defaultImage }: SchemaParams) => ({
       imagePId: "",
       btnLabel: "",
     },
-  ] as ProjectItem[],
+  ] as ItemsItem[],
 });
 
-const projectsStarterContent = ({ defaultImage }: SchemaParams) => ({
+const itemsStarterContent = ({ defaultImage }: SchemaParams) => ({
   heading: "Featured Projects",
   subheading: "A selection of work I'm proud of.",
   items: [
@@ -200,7 +191,7 @@ const projectsStarterContent = ({ defaultImage }: SchemaParams) => ({
       tags: ["Next.js", "Stripe", "PostgreSQL"],
       image: img(defaultImage),
       imagePId: "",
-      previewLink: "",
+      projectBtnLink: {},
       btnLabel: "View Project",
     },
     {
@@ -209,74 +200,12 @@ const projectsStarterContent = ({ defaultImage }: SchemaParams) => ({
       tags: ["React", "Node.js", "WebSockets"],
       image: img(defaultImage),
       imagePId: "",
-      previewLink: "",
+      projectBtnLink: {},
       btnLabel: "View Project",
     },
-  ] as ProjectItem[],
+  ] as ItemsItem[],
 });
-// ─── MENU ────────────────────────────────────────────────────────────────────
 
-const menuSchema = ({ defaultImage }: SchemaParams) => ({
-  heading: "",
-  subheading: "",
-  items: [
-    {
-      title: "",
-      desc: "",
-      price: "",
-      tags: [],
-      image: img(defaultImage),
-      imagePId: "",
-      btnLabel: "",
-    },
-    {
-      title: "",
-      desc: "",
-      price: "",
-      tags: [],
-      image: img(defaultImage),
-      imagePId: "",
-      btnLabel: "",
-    },
-  ] as MenuItem[],
-});
-const menuStarterContent = ({ defaultImage }: SchemaParams) => ({
-  heading: "Our Menu",
-  subheading: "Fresh meals made daily. Order instantly on WhatsApp.",
-
-  items: [
-    {
-      title: "Chicken Shawarma",
-      desc: "Juicy chicken wrapped with fresh veggies and sauce.",
-      price: "₦4,500",
-      tags: ["Best Seller", "Spicy"],
-      image: img(defaultImage),
-      imagePId: "",
-      btnLabel: "Order Now",
-      menuBtnLink: { type: "url", url: "" },
-    },
-    {
-      title: "Jollof Rice Combo",
-      desc: "Classic Nigerian jollof rice served with chicken.",
-      price: "₦3,000",
-      tags: ["Popular"],
-      image: img(defaultImage),
-      imagePId: "",
-      btnLabel: "Order Now",
-      menuBtnLink: { type: "url", url: "" },
-    },
-    {
-      title: "Fried Plantain & Egg",
-      desc: "Simple, fast, and delicious breakfast option.",
-      price: "₦2,000",
-      tags: ["Breakfast"],
-      image: img(defaultImage),
-      imagePId: "",
-      btnLabel: "Order Now",
-      menuBtnLink: { type: "url", url: "" },
-    },
-  ] as MenuItem[],
-});
 // ---- TEXT --------------------------------------------------------------------
 const textSchema = (): TextContent => ({
   label: "",
@@ -532,8 +461,7 @@ export const starterMap: Record<string, any> = {
   hero: heroStarterContent,
   about: aboutStarterContent,
   skills: skillsStarterContent,
-  projects: projectsStarterContent,
-  menu: menuStarterContent,
+  projects: itemsStarterContent,
   text: textStarterContent,
   experience: experienceStarterContent,
   testimonials: testimonialsStarterContent,
@@ -551,8 +479,7 @@ export const schemaMap: Record<string, any> = {
   hero: heroSchema,
   about: aboutSchema,
   skills: skillsSchema,
-  projects: projectsSchema,
-  menu: menuSchema,
+  items: itemsSchema,
   text: textSchema,
   experience: experienceSchema,
   testimonials: testimonialsSchema,
@@ -570,8 +497,7 @@ export const variantOptions: Record<string, string[]> = {
   hero: HeroVariantList,
   about: ["split", "card-stats", "centered"],
   skills: SkillsVariantList,
-  projects: ["list", "card-grid"],
-  menu: ["list", "grid"],
+  items: ItemsVariantList,
   text: ["card", "minimal", "minimal-left", "default"],
   experience: ExperienceVariantList,
   testimonials: ["grid", "carousel", "list"],
