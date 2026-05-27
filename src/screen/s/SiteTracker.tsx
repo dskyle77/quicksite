@@ -16,7 +16,7 @@ export default function SiteTracker() {
 
     const trackVisit = async () => {
       try {
-        await fetch("/api/analytics/visit", {
+        await fetch("/api/analytics/track", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ slug }),

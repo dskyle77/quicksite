@@ -100,16 +100,25 @@ function SiteCard({ site }: { site: Site }) {
     <div className="group relative bg-card border border-border rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-primary/5 hover:border-primary/30 transition-all duration-300">
       
       {/* ── Top Decorative Header ── */}
-      <div className="h-20 bg-linear-to-br from-muted/50 to-muted flex items-center px-5 relative overflow-hidden">
+      <div className="h-24 bg-linear-to-br from-muted/50 to-muted flex items-center px-5 relative overflow-hidden">
         {/* Subtle background pattern (CSS-only) */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
              style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '24px 24px' }} />
         
-        <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300">
+        {site?.ogImage ? (
+          <img
+            src={site.ogImage}
+            alt={site.name + " cover"}
+            className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
+            style={{ zIndex: 0 }}
+          />
+        ) : null}
+
+        <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300 relative z-10">
           <span className="text-lg font-bold text-primary">{initial}</span>
         </div>
 
-        <div className="absolute top-4 right-4">
+        <div className="absolute top-4 right-4 z-10">
           <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
             site.status === "published"
               ? "bg-emerald-50 text-emerald-600 border-emerald-200"

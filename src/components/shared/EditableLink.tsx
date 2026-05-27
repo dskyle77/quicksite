@@ -343,10 +343,11 @@ export default function EditableLinkButton({
 
     if (linkConfig.type !== "whatsapp") return;
 
-    fetch("api/analytics/whatsapp-click", {
+    fetch("/api/analytics/whatsapp-click", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ slug }),
+      keepalive: true,
     });
   };
 
