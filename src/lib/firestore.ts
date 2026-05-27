@@ -92,6 +92,11 @@ export async function checkIsAdmin(uid: string): Promise<boolean> {
   const snap = await getDoc(doc(db, "users", uid));
   return !!snap.data()?.isAdmin;
 }
+export async function checkBusinessProflie(uid: string): Promise<boolean> {
+  if (!uid) return false;
+  const snap = await getDoc(doc(db, "users", uid));
+  return !!snap.data()?.hasBusinessProfile;
+}
 
 // ── Sites (read-only) ─────────────────────────────────────────────────────────
 

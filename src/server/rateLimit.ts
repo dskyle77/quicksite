@@ -1,4 +1,4 @@
-import "server-only"
+import "server-only";
 
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
@@ -11,14 +11,20 @@ const redis = Redis.fromEnv();
 /*                                  HELPERS                                   */
 /* -------------------------------------------------------------------------- */
 
+// rateLimit.ts
 export async function withRateLimit(limiter: Ratelimit, identifier: string) {
-  const result = await limiter.limit(identifier);
-
-  return {
-    success: result.success,
-    response: result,
-    reset: result.reset ?? null,
-  };
+  try {
+    const result = await limiter.limit(identifier);
+    return {
+      success: result.success,
+      response: result,
+      reset: result.reset,
+    };
+  } catch (err) {
+    console.error("[rateLimit] Redis unreachable, failing open:", err);
+    // Fail open — allow the request through rather than returning 500
+    return { success: true, response: null, reset: null };
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -204,7 +210,7 @@ export const featureRateLimits = {
 export const sitesRateLimits = {
   create: new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(5, "1 h"), // Max 5 sites per hour
+    limiter: Ratelimit.slidingWindow(10, "1 h"),
     analytics: true,
     prefix: "sites_create",
   }),

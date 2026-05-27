@@ -20,6 +20,7 @@ import {
   Globe,
   Link2,
   BarChart2,
+  Building2,
   Settings,
   LogOut,
   Plus,
@@ -49,6 +50,7 @@ export default function DashboardLayoutScreen({
   const sidebarLinks = () => [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: Globe, label: "My Sites", href: "/dashboard/sites" },
+    { icon: Building2, label: "Business Profile", href: "/dashboard/profile" },
     { icon: Link2, label: "Domains", href: "/dashboard/domains" },
     { icon: BarChart2, label: "Analytics", href: "/dashboard/analytics" },
     { icon: Mail, label: "Messages", href: "/dashboard/messages" },
@@ -67,9 +69,15 @@ export default function DashboardLayoutScreen({
         router.push("/login");
       } else if (!user.emailVerified) {
         router.push("/verify-email");
+      } else if (
+        profile &&
+        !profile.hasBusinessProfile &&
+        pathname !== "/onboarding"
+      ) {
+        router.push("/onboarding");
       }
     }
-  }, [user, loading, router]);
+  }, [user, loading, profile, pathname, router]);
 
   // ───────────────────────────────────────────────────────────
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { useAuth } from "@/lib/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { checkIsAdmin } from "@/lib/firestore";
 
 import AdminSidebar from "@/screen/admin/AdminSidebar";

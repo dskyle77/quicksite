@@ -19,7 +19,12 @@ export async function middleware(req: NextRequest) {
     if (!success) {
       return NextResponse.json(
         { error: "Too many requests. Please try again later." },
-        { status: 429, headers: { "X-RateLimit-Reset": reset.toString() } },
+        {
+          status: 429,
+          headers: {
+            "X-RateLimit-Reset": reset ? reset.toString() : "",
+          },
+        },
       );
     }
     return NextResponse.next();

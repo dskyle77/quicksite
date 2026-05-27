@@ -2,7 +2,7 @@
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/server/auth";
 import { serverCreateSite, getUserPlan } from "@/server/serverFirestore";
-import { generateSiteContentWithAI } from "@/server/ai-content";
+import { generateSiteContentWithAI } from "@/server/ai/generateSiteContent";
 import {
   isPremiumTemplate,
   getTemplateByType,

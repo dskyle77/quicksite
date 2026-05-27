@@ -1,4 +1,3 @@
-// src/features/home/TestimonialsSection.tsx
 import { Star } from "lucide-react";
 
 const TESTIMONIALS = [
@@ -7,63 +6,84 @@ const TESTIMONIALS = [
     name: "Amaka Okafor",
     business: "Amaka's Kitchen — Lagos",
     quote:
-      "I built my restaurant site in 20 minutes during lunch break. Orders started coming in the same day!",
+      "I created my business page in less than 20 minutes. Customers now find us online and order directly on WhatsApp.",
   },
   {
     initials: "TB",
     name: "Tunde Bakare",
     business: "TB Cuts Barbershop — Ibadan",
     quote:
-      "My customers can now book appointments online. MakeSite changed how I run my business completely.",
+      "Quicksite helped my barbershop look professional online. Clients now book appointments without stress.",
   },
   {
     initials: "CE",
     name: "Chiamaka Eze",
     business: "ChiChi Fashion House — Abuja",
     quote:
-      "I'm not a tech person at all, but this was so easy. My boutique looks like a million-naira brand now.",
+      "I’m not a tech person, but setting everything up was easy. My business finally has an online presence that feels premium.",
   },
 ];
 
 export default function TestimonialsSection() {
   return (
-    <section className="py-24 border-t border-border/60 bg-background">
+    <section
+      aria-labelledby="testimonials-heading"
+      className="border-t border-border/60 bg-background py-24"
+    >
       <div className="container mx-auto px-4">
-        <div className="max-w-2xl mb-14">
-          <div className="inline-flex items-center border border-border px-2.5 py-0.5 text-xs rounded-full mb-4 font-medium bg-muted/50">
+        {/* Section heading */}
+        <header className="mb-14 max-w-2xl">
+          <aside className="mb-4 inline-flex items-center rounded-full border border-border bg-muted/50 px-2.5 py-0.5 text-xs font-medium">
             Loved across Nigeria
-          </div>
-          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-balance">
-            Real businesses. <span className="text-primary">Real results.</span>
-          </h2>
-        </div>
+          </aside>
 
-        <div className="grid md:grid-cols-3 gap-5">
-          {TESTIMONIALS.map((t, i) => (
-            <div
+          <h2
+            id="testimonials-heading"
+            className="text-4xl font-bold tracking-tight text-balance sm:text-5xl"
+          >
+            Real businesses. <span className="text-primary">Real growth.</span>
+          </h2>
+        </header>
+
+        {/* Testimonials grid */}
+        <div className="grid gap-5 md:grid-cols-3">
+          {TESTIMONIALS.map((testimonial, i) => (
+            <article
               key={i}
-              className="rounded-2xl bg-card border border-border p-7 hover:shadow-xl transition-all duration-300 flex flex-col justify-between"
+              className="flex flex-col justify-between rounded-2xl border border-border bg-card p-7 transition-all duration-300 hover:shadow-xl"
             >
               <div>
-                <div className="flex gap-0.5 text-secondary mb-5">
+                {/* Rating */}
+                <div
+                  aria-label="5 star rating"
+                  className="mb-5 flex gap-0.5 text-secondary"
+                >
                   {[...Array(5)].map((_, j) => (
                     <Star key={j} className="h-4 w-4 fill-current" />
                   ))}
                 </div>
-                <p className="text-lg leading-relaxed mb-6 text-balance">
-                  &quot;{t.quote}&quot;
-                </p>
+
+                {/* Quote */}
+                <blockquote className="mb-6 text-lg leading-relaxed text-balance">
+                  “{testimonial.quote}”
+                </blockquote>
               </div>
-              <div className="flex items-center gap-3 pt-5 border-t border-border">
-                <div className="h-11 w-11 rounded-full bg-primary grid place-items-center text-sm font-bold text-primary-foreground shrink-0">
-                  {t.initials}
+
+              {/* Author */}
+              <footer className="flex items-center gap-3 border-t border-border pt-5">
+                <div className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                  {testimonial.initials}
                 </div>
+
                 <div>
-                  <p className="font-semibold text-sm">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.business}</p>
+                  <p className="text-sm font-semibold">{testimonial.name}</p>
+
+                  <p className="text-xs text-muted-foreground">
+                    {testimonial.business}
+                  </p>
                 </div>
-              </div>
-            </div>
+              </footer>
+            </article>
           ))}
         </div>
       </div>

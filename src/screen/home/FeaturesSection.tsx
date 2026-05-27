@@ -1,34 +1,34 @@
 // src/features/home/FeaturesSection.tsx
-import { LayoutTemplate, Palette, Rocket, Wallet } from "lucide-react";
+import { Sparkles, MessageCircle, MapPin, Smartphone } from "lucide-react";
 
 const FEATURES = [
   {
     id: "01",
-    icon: LayoutTemplate,
-    title: "Pick a Template",
+    icon: Sparkles,
+    title: "AI-Powered Profile",
     description:
-      "Choose from beautiful designs made for Nigerian businesses — restaurants, salons, vendors, and more.",
+      "Onboarding automatically generates your SEO content, descriptions, and keywords for maximum visibility.",
   },
   {
     id: "02",
-    icon: Palette,
-    title: "Customize Your Brand",
+    icon: MessageCircle,
+    title: "WhatsApp Leads",
     description:
-      "Change colors, upload your logo, and add your story. No design skills required, ever.",
+      "Turn visitors into customers instantly with a conversion engine built directly for WhatsApp business.",
   },
   {
     id: "03",
-    icon: Rocket,
-    title: "Go Live Instantly",
+    icon: MapPin,
+    title: "Local Discovery",
     description:
-      "Hit publish and your site is online. It's that fast.",
+      "Appear in our state-based directory and on Google search, making it easy for local customers to find you.",
   },
   {
     id: "04",
-    icon: Wallet,
-    title: "Accept Payments",
+    icon: Smartphone,
+    title: "Mobile-First UI",
     description:
-      "Connect Paystack or Flutterwave to start collecting orders directly through your website.",
+      "Optimized for low-end devices and Nigerian internet speeds. Fast, lightweight, and professional.",
   },
 ];
 
@@ -41,11 +41,11 @@ export default function FeaturesSection() {
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mb-14">
           <div className="inline-flex items-center border border-border px-2.5 py-0.5 text-xs rounded-full mb-4 font-medium bg-muted/50">
-            Why MakeSite
+            Why Quicksite
           </div>
           <h2 className="text-4xl sm:text-5xl font-bold tracking-tight text-balance">
             Everything you need to{" "}
-            <span className="text-primary">go online fast.</span>
+            <span className="text-primary">grow your brand.</span>
           </h2>
         </div>
 

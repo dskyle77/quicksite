@@ -5,7 +5,7 @@ import Link from "next/link";
 import { Loader2, Save, ArrowLeft, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
-import { useAuth } from "@/lib/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { getAllThemes } from "@/lib/themes";
 import { useSiteEditorStore } from "@/store/useSiteEditorStore";
 import EditorScreen from "@/screen/editor/EditorScreen";

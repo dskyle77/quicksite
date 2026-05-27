@@ -3,18 +3,18 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-
-import DashboardLayoutScreen from "@/screen/dashboard/DashboardLayoutScreen";
 import { checkBusinessProflie } from "@/lib/firestore";
 
-export default function DashboardLayout({
+export default function EditorLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [hasBusinessProfile, setHasBusinessProfile] = useState<boolean | null>(null);
+  const [hasBusinessProfile, setHasBusinessProfile] = useState<boolean | null>(
+    null,
+  );
 
   useEffect(() => {
     async function checkProfile() {
@@ -42,5 +42,5 @@ export default function DashboardLayout({
   // Prevent UI flicker while status is unknown
   if (hasBusinessProfile === null) return null;
 
-  return <DashboardLayoutScreen>{children}</DashboardLayoutScreen>;
+  return <>{children}</>;
 }

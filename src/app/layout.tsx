@@ -24,17 +24,18 @@ const SITE_URL = "https://quicksiteio.vercel.app";
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: `${SITE_NAME} — Your business online in minutes`,
+    default: `${SITE_NAME} — Turn your WhatsApp business into a brand`,
     template: `%s`,
   },
   description:
-    "Build a professional website for your Nigerian business in minutes. No coding needed, mobile-friendly, and SEO-optimized.",
+    "Quicksite is the easiest way for Nigerian SMEs to go online. Get an SEO-optimized business page, WhatsApp lead system, and discoverable listing in minutes.",
   keywords: [
-    "website builder Nigeria",
-    "e-commerce Nigeria",
-    "small business tools",
-    "create a website Lagos",
-    "Nigerian SMEs",
+    "WhatsApp business Nigeria",
+    "business directory Nigeria",
+    "website builder Lagos",
+    "Nigerian small business",
+    "get discovered on Google Nigeria",
+    "Quicksite Nigeria",
   ],
   authors: [{ name: SITE_NAME }],
   creator: SITE_NAME,
@@ -51,9 +52,9 @@ export const metadata: Metadata = {
     locale: "en_NG",
     url: SITE_URL,
     siteName: SITE_NAME,
-    title: `${SITE_NAME} — Website Builder for Nigerians`,
+    title: `${SITE_NAME} — Turn your WhatsApp business into a brand`,
     description:
-      "Launch your business online today with the easiest website builder in Nigeria.",
+      "The discovery platform for Nigerian small businesses. Get found on Google and receive leads on WhatsApp.",
     images: [
       {
         url: "/og-image.png",
@@ -65,8 +66,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: `${SITE_NAME} | Nigerian Website Builder`,
-    description: "Build your professional business website in minutes.",
+    title: `${SITE_NAME} | Nigerian Business Discovery`,
+    description: "Launch your professional brand on the web in minutes.",
     images: ["/og-image.png"],
   },
   robots: {

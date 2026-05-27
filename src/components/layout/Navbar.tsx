@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 
 const NAV_LINKS = [
-  { label: "Features", href: "/" },
+  { label: "Businesses", href: "/biz" },
   { label: "Templates", href: "/templates" },
   { label: "Pricing", href: "/pricing" },
   { label: "Support", href: "/support" },

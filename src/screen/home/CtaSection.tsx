@@ -2,6 +2,8 @@
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
+const SITE_STANDARD_NAME = process.env.NEXT_PUBLIC_SITE_STANDARD_NAME
+
 export default function CtaSection() {
   return (
     <section className="py-24">
@@ -17,7 +19,7 @@ export default function CtaSection() {
               Your business deserves to be online.
             </h2>
             <p className="text-muted-foreground text-lg mb-8 max-w-xl mx-auto">
-              Join 12,400+ Nigerian businesses growing with MakeSite. Free
+              Join 12,400+ Nigerian businesses growing with {SITE_STANDARD_NAME}. Free
               forever — no card needed.
             </p>
             <Link href="/signup">

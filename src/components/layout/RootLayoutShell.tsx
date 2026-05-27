@@ -10,6 +10,7 @@ import Footer from "./Footer";
 const MARKETING_PATHS = [
   "/",
   "/pricing",
+  "/biz",
   "/templates",
   "/support",
   "/terms",
