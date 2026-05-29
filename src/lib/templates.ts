@@ -54,7 +54,6 @@ export const templatesRegistry: TemplateContent[] = [
 ];
 
 export const premiumTemplates: TemplateContent[] = [
-  portfolio1,
   templateBuilder,
 ];
 

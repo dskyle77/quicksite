@@ -58,7 +58,7 @@ export default function SignupScreen() {
     setLoading(true);
     try {
       await signUp(form.name, form.email, form.password);
-      router.push("/onboarding");
+      router.push("/dashboard/new");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Sign up failed.");
     } finally {
@@ -70,7 +70,7 @@ export default function SignupScreen() {
     setGoogleLoading(true);
     try {
       await signInWithGoogle();
-      router.push("/onboarding");
+      router.push("/dashboard/new");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Google sign in failed.");
     } finally {

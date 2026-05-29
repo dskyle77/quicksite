@@ -14,7 +14,6 @@ export const TestimonialsSection = ({
   onUpdate,
   position,
   anchorName,
-  path
 }: SectionProps) => {
   const items: Testimonial[] = content?.items ?? [];
 
@@ -94,11 +93,13 @@ export const TestimonialsSection = ({
                   </div>
                 )}
 
+                {/* Decorative quote mark, never gets into the quote's value */}
                 <div
                   className="text-6xl leading-none mb-5 opacity-30"
                   style={{ color: "var(--qs-primary)" }}
+                  aria-hidden="true"
                 >
-                  ”
+                  &rdquo;
                 </div>
 
                 <p
@@ -225,11 +226,13 @@ export const TestimonialsSection = ({
                   </div>
                 )}
 
+                {/* Decorative quote mark, never gets into the quote's value */}
                 <div
                   className="text-5xl mb-6 opacity-30"
                   style={{ color: "var(--qs-primary)" }}
+                  aria-hidden="true"
                 >
-                  ”
+                  &rdquo;
                 </div>
 
                 <p
@@ -376,6 +379,7 @@ export const TestimonialsSection = ({
                 </div>
 
                 <div className="flex-1 flex flex-col items-center @md:items-start">
+                  {/* Remove decorative quotes from the value */}
                   <p
                     className="text-lg @md:text-xl italic leading-relaxed text-center @md:text-left"
                     style={{ color: "var(--qs-text)" }}
@@ -388,7 +392,7 @@ export const TestimonialsSection = ({
                       )
                     }
                   >
-                    “{item.quote}”
+                    {item.quote}
                   </p>
 
                   <div className="mt-6 flex flex-col items-center @md:items-start">

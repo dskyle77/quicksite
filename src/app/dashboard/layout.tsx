@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 import DashboardLayoutScreen from "@/screen/dashboard/DashboardLayoutScreen";
-import { checkBusinessProflie } from "@/lib/firestore";
+import { Zap } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -14,33 +14,27 @@ export default function DashboardLayout({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [hasBusinessProfile, setHasBusinessProfile] = useState<boolean | null>(null);
 
   useEffect(() => {
-    async function checkProfile() {
-      if (loading) return;
+    if (loading) return;
 
-      if (!user?.uid) {
-        router.replace("/login");
-        return;
-      }
-      try {
-        const result = await checkBusinessProflie(user.uid);
-        if (!result) {
-          router.replace("/onboarding");
-        } else {
-          setHasBusinessProfile(true);
-        }
-      } catch (err) {
-        // fallback: block access (redirect or show error)
-        router.replace("/onboarding");
-      }
+    if (!user?.uid) {
+      router.replace("/login");
+      return;
     }
-    checkProfile();
   }, [user, loading, router]);
 
-  // Prevent UI flicker while status is unknown
-  if (hasBusinessProfile === null) return null;
+  if (loading || typeof user === "undefined")
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="h-8 w-8 rounded-xl bg-primary grid place-items-center animate-pulse">
+            <Zap className="h-4 w-4 text-white fill-white" />
+          </div>
+          <p className="text-sm text-muted-foreground">Loading…</p>
+        </div>
+      </div>
+    );
 
   return <DashboardLayoutScreen>{children}</DashboardLayoutScreen>;
 }

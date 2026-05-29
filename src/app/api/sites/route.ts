@@ -9,7 +9,7 @@ import {
   buildSchema,
   buildStarterContent,
 } from "@/lib/templates";
-import { uploadBuffer } from "@/server/cloudinary";
+import { uploadOgImage } from "@/server/cloudinary";
 import { AI_DAILY_LIMITS } from "@/lib/plans";
 import {
   AI_HOURLY_LIMITS,
@@ -44,20 +44,7 @@ function parseFormFields(formData: FormData) {
   };
 }
 
-async function uploadOgImage(image: File, uid: string, slug: string) {
-  const bytes = await image.arrayBuffer();
-  const buffer = Buffer.from(bytes);
 
-  const uploadResult = await uploadBuffer(buffer, {
-    folder: `quicksite/users/${uid}/${slug}/config`,
-    publicId: `ogImage`,
-    allowedFormats: ["jpg", "png", "webp", "jpeg"],
-    maxBytes: 5 * 1024 * 1024,
-    transformation: [{ width: 1200, height: 630, crop: "fill", gravity: "auto" }],
-  });
-
-  return uploadResult.secureUrl;
-}
 
 async function checkAiRateLimits(plan: Plan, uid: string) {
   const dailyResult = await withRateLimit(rateLimits.ai.daily[plan], uid);

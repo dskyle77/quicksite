@@ -169,7 +169,20 @@ export async function uploadBuffer(
     stream.end(buffer);
   });
 }
+export async function uploadOgImage(image: File, uid: string, slug: string) {
+  const bytes = await image.arrayBuffer();
+  const buffer = Buffer.from(bytes);
 
+  const uploadResult = await uploadBuffer(buffer, {
+    folder: `quicksite/users/${uid}/${slug}/config`,
+    publicId: `ogImage`,
+    allowedFormats: ["jpg", "png", "webp", "jpeg"],
+    maxBytes: 5 * 1024 * 1024,
+    transformation: [{ width: 1200, height: 630, crop: "fill", gravity: "auto" }],
+  });
+
+  return uploadResult.secureUrl;
+}
 /**
  * Delete an image from Cloudinary by its public ID.
  *

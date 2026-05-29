@@ -28,7 +28,7 @@ interface DashboardState {
 
   // Loading states for write operations
   actionLoading: boolean;
-  lastAction: "remove" | "toggleStatus" | null;
+  lastAction: "remove" | "toggleStatus" | "update" | null;
 
   fetchSites: (uid: string) => Promise<void>;
 
@@ -122,7 +122,6 @@ export const useDashboardStore = create<DashboardState>((set) => ({
       set({ sitesError: (e as Error).message, sitesLoading: false });
     }
   },
-
   // ── Remove site ─────────────────────────────────────────────────────────────
 
   removeSite: async (slug, token) => {

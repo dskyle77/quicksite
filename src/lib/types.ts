@@ -13,7 +13,6 @@ export interface UserProfile {
   createdAt: Timestamp | null;
   updatedAt: Timestamp | null;
   isAdmin?: boolean;
-  hasBusinessProfile?: boolean;
   businessSlug?: string;
 }
 

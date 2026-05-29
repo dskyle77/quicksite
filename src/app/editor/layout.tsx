@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useRouter } from "next/navigation";
-import { checkBusinessProflie } from "@/lib/firestore";
+import { Loader2 } from "lucide-react";
 
 export default function EditorLayout({
   children,
@@ -12,9 +12,6 @@ export default function EditorLayout({
 }) {
   const { user, loading } = useAuth();
   const router = useRouter();
-  const [hasBusinessProfile, setHasBusinessProfile] = useState<boolean | null>(
-    null,
-  );
 
   useEffect(() => {
     async function checkProfile() {
@@ -24,23 +21,26 @@ export default function EditorLayout({
         router.replace("/login");
         return;
       }
-      try {
-        const result = await checkBusinessProflie(user.uid);
-        if (!result) {
-          router.replace("/onboarding");
-        } else {
-          setHasBusinessProfile(true);
-        }
-      } catch (err) {
-        // fallback: block access (redirect or show error)
-        router.replace("/onboarding");
-      }
     }
     checkProfile();
   }, [user, loading, router]);
 
-  // Prevent UI flicker while status is unknown
-  if (hasBusinessProfile === null) return null;
+  // Show loader2 while status is unknown
+  if (loading) {
+    return (
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Loader2 />
+      </div>
+    );
+  }
 
   return <>{children}</>;
 }

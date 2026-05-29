@@ -40,10 +40,7 @@ export default function PricingScreen() {
   const router = useRouter();
 
   const handleUpgrade = async (plan: Plan) => {
-    toast.info(
-      "Payments are not available right now. Please check back later.",
-    );
-    return;
+
 
     if (!user) {
       router.push("/signup");

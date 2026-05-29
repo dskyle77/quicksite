@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 // src/screen/dashboard/sites/DashboardSiteScreen.tsx
@@ -12,6 +13,7 @@ import {
   Trash2,
   Loader2,
   X,
+  Zap
 } from "lucide-react";
 import { useDashboardStore } from "@/store/useDashboardStore";
 import { useProfileStore } from "@/store/useProfileStore";
@@ -97,10 +99,10 @@ function SiteCard({ site }: { site: Site }) {
   const initial = site.name.charAt(0).toUpperCase();
 
   return (
-    <div className="group relative bg-card border border-border rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-primary/5 hover:border-primary/30 transition-all duration-300">
+    <div className="group relative bg-card border border-border/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:shadow-primary/5 hover:border-primary/30 transition-all duration-500 flex flex-col h-full">
       
       {/* ── Top Decorative Header ── */}
-      <div className="h-24 bg-linear-to-br from-muted/50 to-muted flex items-center px-5 relative overflow-hidden">
+      <div className="h-32 bg-muted/30 flex items-center px-6 relative overflow-hidden shrink-0">
         {/* Subtle background pattern (CSS-only) */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none" 
              style={{ backgroundImage: `radial-gradient(circle at 2px 2px, currentColor 1px, transparent 0)`, backgroundSize: '24px 24px' }} />
@@ -109,42 +111,43 @@ function SiteCard({ site }: { site: Site }) {
           <img
             src={site.ogImage}
             alt={site.name + " cover"}
-            className="absolute inset-0 w-full h-full object-cover opacity-30 pointer-events-none"
+            className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-40 transition-opacity duration-700 pointer-events-none"
             style={{ zIndex: 0 }}
           />
         ) : null}
 
-        <div className="w-10 h-10 rounded-xl bg-background border border-border flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300 relative z-10">
-          <span className="text-lg font-bold text-primary">{initial}</span>
+        <div className="w-12 h-12 rounded-2xl bg-card border border-border/50 flex items-center justify-center shadow-md group-hover:scale-110 transition-transform duration-500 relative z-10">
+          <Globe className="h-6 w-6 text-primary" />
         </div>
 
         <div className="absolute top-4 right-4 z-10">
-          <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${
+          <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm ${
             site.status === "published"
-              ? "bg-emerald-50 text-emerald-600 border-emerald-200"
-              : "bg-orange-50 text-orange-600 border-orange-200"
+              ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
+              : "bg-orange-500/10 text-orange-600 border-orange-500/20"
           }`}>
-            <span className={`w-1.5 h-1.5 rounded-full ${site.status === "published" ? "bg-emerald-500" : "bg-orange-500"}`} />
+            <span className={`w-1.5 h-1.5 rounded-full ${site.status === "published" ? "bg-emerald-500 animate-pulse" : "bg-orange-500"}`} />
             {site.status}
           </span>
         </div>
       </div>
 
-      <div className="p-5">
+      <div className="p-6 flex-1 flex flex-col">
         {/* ── Title & URL ── */}
-        <div className="mb-4">
-          <h3 className="font-bold text-lg text-foreground truncate group-hover:text-primary transition-colors">
+        <div className="mb-6">
+          <h3 className="font-black text-xl text-foreground truncate group-hover:text-primary transition-colors tracking-tight">
             {site.name}
           </h3>
           
-          <div className="flex flex-col gap-1 mt-1">
+          <div className="flex flex-col gap-1.5 mt-2">
             <a
               href={`https://${SITE_SHORT_NAME}${DOMAIN_NAME}/${site.slug}`}
               target="_blank"
               rel="noreferrer"
-              className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 transition-colors w-fit"
+              className="text-[11px] font-bold text-muted-foreground hover:text-primary flex items-center gap-1.5 transition-colors w-fit"
             >
-              {SITE_SHORT_NAME}{DOMAIN_NAME}/{site.slug} 
+              <span className="opacity-50 italic">{SITE_SHORT_NAME}{DOMAIN_NAME}/</span>
+              <span className="text-primary/80">{site.slug}</span>
               <ExternalLink className="h-3 w-3 opacity-50" />
             </a>
 
@@ -153,7 +156,7 @@ function SiteCard({ site }: { site: Site }) {
                 href={`https://${site.customDomain}`}
                 target="_blank"
                 rel="noreferrer"
-                className="text-xs text-emerald-600 font-medium hover:underline flex items-center gap-1 w-fit"
+                className="text-[11px] text-emerald-600 font-black hover:underline flex items-center gap-1.5 w-fit uppercase tracking-tighter"
               >
                 {site.customDomain} <ExternalLink className="h-3 w-3" />
               </a>
@@ -162,26 +165,26 @@ function SiteCard({ site }: { site: Site }) {
         </div>
 
         {/* ── Stats Grid ── */}
-        <div className="grid grid-cols-2 gap-4 py-4 border-t border-border/60">
-          <div>
-            <p className="text-[10px] uppercase tracking-tight text-muted-foreground font-semibold">Total Visits</p>
-            <p className="text-lg font-bold text-foreground">{site.visits?.toLocaleString()}</p>
+        <div className="grid grid-cols-2 gap-4 py-4 border-y border-border/50 mb-6">
+          <div className="space-y-0.5">
+            <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-black">Total Visits</p>
+            <p className="text-xl font-black text-foreground tabular-nums tracking-tighter">{site.visits?.toLocaleString()}</p>
           </div>
-          <div>
-            <p className="text-[10px] uppercase tracking-tight text-muted-foreground font-semibold">WA Clicks</p>
-            <p className="text-lg font-bold text-foreground">{site.whatsappClicks?.toLocaleString()}</p>
+          <div className="space-y-0.5">
+            <p className="text-[9px] uppercase tracking-widest text-muted-foreground font-black">WA Clicks</p>
+            <p className="text-xl font-black text-foreground tabular-nums tracking-tighter">{site.whatsappClicks?.toLocaleString()}</p>
           </div>
         </div>
 
         {/* ── Actions ── */}
-        <div className="flex items-center gap-2 pt-2">
-          <Link href={`/editor/${site.slug}`} className="flex-1">
-            <button className="w-full py-2 rounded-xl bg-secondary/50 text-secondary-foreground hover:bg-secondary transition-colors text-sm font-semibold">
+        <div className="flex items-center gap-3 mt-auto">
+          <Link href={`/editor/${site.id}`} className="flex-1">
+            <button className="w-full py-2.5 rounded-xl bg-muted text-foreground hover:bg-muted/80 transition-all text-xs font-bold border border-transparent hover:border-border/50 cursor-pointer">
               Edit
             </button>
           </Link>
-          <Link href={`/dashboard/sites/${site.slug}`} className="flex-1">
-            <button className="w-full py-2 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm shadow-primary/20 transition-all text-sm font-semibold">
+          <Link href={`/dashboard/sites/${site.id}`} className="flex-1">
+            <button className="w-full py-2.5 rounded-xl bg-primary text-primary-foreground hover:shadow-lg hover:shadow-primary/30 transition-all text-xs font-bold cursor-pointer">
               Manage
             </button>
           </Link>
@@ -207,12 +210,14 @@ export default function DashboardSiteScreen() {
 
   if (!user) {
     return (
-      <div className="flex flex-col items-center justify-center py-32">
-        <Globe className="h-10 w-10 text-muted-foreground/20 mb-4" />
-        <h2 className="font-bold text-xl mb-2">
+      <div className="flex flex-col items-center justify-center py-32 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <div className="h-20 w-20 rounded-3xl bg-muted grid place-items-center mb-6">
+          <Globe className="h-10 w-10 text-muted-foreground/20" />
+        </div>
+        <h2 className="font-black text-2xl mb-3 tracking-tight">
           Please log in to manage sites
         </h2>
-        <p className="text-muted-foreground max-w-sm text-center">
+        <p className="text-muted-foreground max-w-sm text-center text-sm font-medium">
           You need to be signed in to create, manage, publish, or delete your
           sites.
         </p>
@@ -231,7 +236,7 @@ export default function DashboardSiteScreen() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 pb-10 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
       {siteToDelete && (
         <DeleteModal
           site={siteToDelete}
@@ -239,13 +244,13 @@ export default function DashboardSiteScreen() {
         />
       )}
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+        <div className="relative flex-1 max-w-md group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <input
             type="text"
-            placeholder="Search sites..."
-            className="w-full bg-card border border-border rounded-xl py-2 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition"
+            placeholder="Search your sites..."
+            className="w-full bg-card border border-border/50 rounded-2xl py-3.5 pl-11 pr-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/50 transition-all shadow-sm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             autoComplete="off"
@@ -254,46 +259,64 @@ export default function DashboardSiteScreen() {
             aria-label="Search sites"
           />
         </div>
+        
+        <Link
+          href="/dashboard/new"
+          className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-2xl h-12 px-6 text-sm font-black shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 cursor-pointer"
+        >
+          <Plus className="h-5 w-5" />
+          Create New Site
+        </Link>
       </div>
 
       {sitesLoading ? (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        <div className="flex flex-col items-center justify-center py-32 gap-4">
+           <div className="relative">
+              <div className="h-14 w-14 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <Zap className="h-5 w-5 text-primary animate-pulse" />
+              </div>
+            </div>
+          <p className="text-sm font-bold text-muted-foreground animate-pulse">Loading your sites...</p>
         </div>
       ) : filtered.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {filtered.map((site) => (
             <SiteCard key={site.id} site={site} />
           ))}
         </div>
       ) : (
-        <div className="bg-card border border-border rounded-2xl p-20 flex flex-col items-center justify-center text-center gap-4">
-          <div className="h-16 w-16 rounded-2xl bg-muted grid place-items-center mb-2">
-            <Globe className="h-8 w-8 text-muted-foreground/40" />
+        <div className="bg-card border border-border/50 rounded-[2.5rem] p-20 flex flex-col items-center justify-center text-center gap-8 shadow-inner relative overflow-hidden group">
+          <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 bg-primary/5 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-1000" />
+          
+          <div className="h-24 w-24 rounded-3xl bg-muted/50 flex items-center justify-center relative">
+             <Globe className="h-10 w-10 text-muted-foreground/30" />
           </div>
-          <div>
-            <h2 className="font-bold text-xl">
-              {searchQuery ? "No sites found" : "No sites yet"}
+          
+          <div className="space-y-3 max-w-sm">
+            <h2 className="font-black text-2xl tracking-tight">
+              {searchQuery ? "No sites found" : "Your digital empire starts here"}
             </h2>
-            <p className="text-sm text-muted-foreground max-w-xs mx-auto mt-2">
+            <p className="text-sm text-muted-foreground font-medium leading-relaxed">
               {searchQuery
-                ? `No sites match "${searchQuery}"`
-                : "Create your first site and go live in minutes."}
+                ? `We couldn't find any sites matching "${searchQuery}". Try a different term or clear the search.`
+                : "You haven't created any sites yet. Build your first one in less than 2 minutes."}
             </p>
           </div>
+          
           {searchQuery ? (
             <button
               onClick={() => setSearchQuery("")}
-              className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full h-11 px-8 text-sm font-semibold hover:opacity-90 transition mt-2 cursor-pointer"
+              className="inline-flex items-center gap-2 bg-muted text-foreground rounded-2xl h-12 px-8 text-sm font-black hover:bg-muted/80 transition-all cursor-pointer border border-border/50 shadow-sm"
             >
               Clear Search
             </button>
           ) : (
             <Link
               href="/dashboard/new"
-              className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full h-11 px-8 text-sm font-semibold hover:opacity-90 transition mt-2 cursor-pointer"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-2xl h-12 px-10 text-sm font-black shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 cursor-pointer"
             >
-              <Plus className="h-4 w-4" /> Create Your First Site
+              <Plus className="h-5 w-5" /> Get Started Now
             </Link>
           )}
         </div>

@@ -5,9 +5,9 @@ const FEATURES = [
   {
     id: "01",
     icon: Sparkles,
-    title: "AI-Powered Profile",
+    title: "AI-Powered Minisites",
     description:
-      "Onboarding automatically generates your SEO content, descriptions, and keywords for maximum visibility.",
+      "Onboarding automatically creates your site, business info, and persuasive descriptions with AI — no skills needed.",
   },
   {
     id: "02",
@@ -19,9 +19,9 @@ const FEATURES = [
   {
     id: "03",
     icon: MapPin,
-    title: "Local Discovery",
+    title: "SEO & Google Discovery",
     description:
-      "Appear in our state-based directory and on Google search, making it easy for local customers to find you.",
+      "Your minisite is structured to appear on Google and other search engines, making your business easy to discover online.",
   },
   {
     id: "04",

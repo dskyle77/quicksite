@@ -50,7 +50,6 @@ export default function DashboardLayoutScreen({
   const sidebarLinks = () => [
     { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
     { icon: Globe, label: "My Sites", href: "/dashboard/sites" },
-    { icon: Building2, label: "Business Profile", href: "/dashboard/profile" },
     { icon: Link2, label: "Domains", href: "/dashboard/domains" },
     { icon: BarChart2, label: "Analytics", href: "/dashboard/analytics" },
     { icon: Mail, label: "Messages", href: "/dashboard/messages" },
@@ -69,12 +68,6 @@ export default function DashboardLayoutScreen({
         router.push("/login");
       } else if (!user.emailVerified) {
         router.push("/verify-email");
-      } else if (
-        profile &&
-        !profile.hasBusinessProfile &&
-        pathname !== "/onboarding"
-      ) {
-        router.push("/onboarding");
       }
     }
   }, [user, loading, profile, pathname, router]);
@@ -113,85 +106,115 @@ export default function DashboardLayoutScreen({
   const pageTitle = pathname.split("/").filter(Boolean).pop() ?? "dashboard";
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#050505] flex overflow-hidden">
       {/* ── Sidebar ──────────────────────────────────────────────────── */}
       <aside
-        className={`fixed lg:sticky top-0 h-screen z-40 flex flex-col w-64 bg-sidebar border-r border-sidebar-border transition-transform duration-300 shrink-0 ${
+        className={`fixed lg:sticky top-0 h-screen z-40 flex flex-col w-64 bg-card dark:bg-[#0A0A0A] border-r border-border/50 transition-all duration-300 ease-in-out shrink-0 shadow-sm ${
           ui.sidebarOpen
             ? "translate-x-0"
             : "-translate-x-full lg:translate-x-0"
         }`}
       >
-        <div className="p-5 border-b border-sidebar-border">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="h-9 w-9 rounded-xl bg-primary grid place-items-center">
+        <div className="p-6 border-b border-border/50">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="h-10 w-10 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 group-hover:scale-105 transition-transform duration-300">
               <Zap className="h-5 w-5 text-white fill-white" />
             </div>
-            <div>
-              <p className="font-bold text-base text-sidebar-foreground">
+            <div className="flex flex-col">
+              <p className="font-bold text-lg text-foreground tracking-tight">
                 {SITE_STANDARD_NAME}
               </p>
-              <p className="text-[10px] text-muted-foreground">{DOMAIN_NAME}</p>
+              <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">
+                {DOMAIN_NAME}
+              </p>
             </div>
           </Link>
         </div>
 
-        <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          {sidebarLinks().map(({ icon: Icon, label, href }) => (
-            <Link key={label} href={href} onClick={() => setSidebarOpen(false)}>
-              <div
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all cursor-pointer ${
-                  pathname === href
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent"
-                }`}
+        <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto no-scrollbar">
+          <div className="mb-4 px-2">
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Main Menu</p>
+          </div>
+          {sidebarLinks().map(({ icon: Icon, label, href }) => {
+            const isActive =
+              href === "/dashboard"
+                ? pathname === "/dashboard"
+                : pathname.startsWith(href) && href !== "/dashboard";
+
+            return (
+              <Link
+                key={label}
+                href={href}
+                onClick={() => setSidebarOpen(false)}
               >
-                <Icon className="h-4 w-4" />
-                {label}
-              </div>
-            </Link>
-          ))}
+                <div
+                  className={`group w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-[1.02]"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  }`}
+                >
+                  <Icon className={`h-4.5 w-4.5 transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`} />
+                  {label}
+                </div>
+              </Link>
+            );
+          })}
+          
           {profile?.isAdmin === true && (
-            <Link href="/admin" onClick={() => setSidebarOpen(false)}>
-              <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 transition-all cursor-pointer">
-                <ShieldAlert className="h-4 w-4" />
-                Admin Panel
+            <>
+              <div className="mt-8 mb-4 px-2">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Admin</p>
               </div>
-            </Link>
+              <Link href="/admin" onClick={() => setSidebarOpen(false)}>
+                <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-all cursor-pointer">
+                  <ShieldAlert className="h-4.5 w-4.5" />
+                  Admin Panel
+                </div>
+              </Link>
+            </>
           )}
         </nav>
 
-        <div className="p-4 border-t border-sidebar-border space-y-4">
+        <div className="p-4 border-t border-border/50 space-y-4">
           {profile?.plan === "free" && (
-            <div className="bg-primary/10 rounded-xl p-4">
-              <p className="text-xs font-semibold mb-1">Free Plan</p>
-              <p className="text-[11px] text-muted-foreground mb-3">
-                Upgrade to remove branding.
+            <div className="relative overflow-hidden bg-primary/5 dark:bg-primary/10 rounded-2xl p-4 border border-primary/10 group">
+              <div className="absolute top-0 right-0 -mr-4 -mt-4 h-16 w-16 bg-primary/10 rounded-full blur-2xl group-hover:scale-150 transition-transform duration-500" />
+              <p className="text-xs font-bold mb-1 relative z-10">Free Plan</p>
+              <p className="text-[11px] text-muted-foreground mb-4 relative z-10 leading-relaxed">
+                Unlock all features and remove branding.
               </p>
               <Link href="/pricing">
-                <button className="w-full bg-primary text-primary-foreground rounded-lg text-xs font-semibold py-2 hover:opacity-90 transition cursor-pointer">
+                <button className="w-full bg-primary text-primary-foreground rounded-xl text-xs font-bold py-2.5 shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5 transition-all duration-300 cursor-pointer relative z-10">
                   Upgrade Now
                 </button>
               </Link>
             </div>
           )}
 
-          <div className="flex items-center gap-3">
-            <div className="h-9 w-9 rounded-full bg-primary grid place-items-center text-xs font-bold text-white shrink-0">
-              {initials}
+          <div className="flex items-center gap-3 px-2 py-1">
+            <div className="h-10 w-10 rounded-xl bg-muted border border-border/50 flex items-center justify-center text-xs font-bold text-foreground shrink-0 shadow-sm overflow-hidden">
+               {user.photoURL ? (
+                 <img src={user.photoURL} alt={initials} className="h-full w-full object-cover" />
+               ) : (
+                 <div className="bg-primary/10 text-primary w-full h-full flex items-center justify-center">
+                   {initials}
+                 </div>
+               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold truncate">
+              <p className="text-sm font-bold truncate text-foreground leading-tight">
                 {user.displayName ?? "My Account"}
               </p>
-              <p className="text-[11px] text-muted-foreground truncate">
-                {user.email}
+              <p className="text-[10px] font-medium text-muted-foreground truncate uppercase tracking-tighter">
+                {profile?.plan || "Free"} Account
               </p>
             </div>
             <button
               onClick={handleLogout}
               disabled={loggingOut}
-              className="text-muted-foreground hover:text-destructive transition disabled:opacity-50 cursor-pointer"
+              title="Logout"
+              className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-lg transition-colors disabled:opacity-50 cursor-pointer"
             >
               <LogOut className="h-4 w-4" />
             </button>
@@ -202,38 +225,40 @@ export default function DashboardLayoutScreen({
       {/* Mobile overlay */}
       {ui.sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/40 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 lg:hidden animate-in fade-in duration-300"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* ── Main ─────────────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur border-b border-border px-5 py-3 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+      <div className="flex-1 flex flex-col min-w-0 relative h-screen overflow-hidden">
+        <header className="sticky top-0 z-20 bg-background/80 dark:bg-[#050505]/80 backdrop-blur-md border-b border-border/50 px-6 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
             <button
-              className="lg:hidden text-muted-foreground hover:text-foreground"
+              className="lg:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
               onClick={() => setSidebarOpen(true)}
             >
               <Menu className="h-5 w-5" />
             </button>
-            <div>
-              <h1 className="font-bold text-lg leading-tight capitalize">
+            <div className="space-y-0.5">
+              <h1 className="font-extrabold text-xl tracking-tight capitalize text-foreground">
                 {pageTitle}
               </h1>
-              <p className="text-xs text-muted-foreground hidden sm:block">
-                Welcome, {firstName} 👋
-              </p>
+              <div className="flex items-center gap-2 text-[11px] font-medium text-muted-foreground">
+                <span className="opacity-70">Dashboard</span>
+                <span className="opacity-40">/</span>
+                <span className="text-primary capitalize">{pageTitle}</span>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {mounted && (
               <button
                 onClick={() =>
                   setTheme(resolvedTheme === "dark" ? "light" : "dark")
                 }
-                className="text-muted-foreground hover:text-foreground p-2"
+                className="h-10 w-10 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-300 border border-transparent hover:border-border/50"
               >
                 {resolvedTheme === "dark" ? (
                   <Sun className="h-5 w-5" />
@@ -245,15 +270,19 @@ export default function DashboardLayoutScreen({
 
             <Link
               href="/dashboard/new"
-              className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-full h-9 px-4 text-sm font-semibold hover:opacity-90 transition cursor-pointer"
+              className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-xl h-10 px-5 text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer"
             >
-              <Plus className="h-4 w-4" />
-              <span className="hidden sm:inline">New Site</span>
+              <Plus className="h-4.5 w-4.5" />
+              <span className="hidden sm:inline">Create Site</span>
             </Link>
           </div>
         </header>
 
-        <main className="flex-1 p-5 sm:p-7 overflow-y-auto">{children}</main>
+        <main className="flex-1 p-6 sm:p-8 overflow-y-auto no-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+          <div className="max-w-7xl mx-auto w-full">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );
