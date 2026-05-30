@@ -1,9 +1,14 @@
+// src/lib/templates.ts
+// UPDATED — add eventSite, digitalStore, portfolioTwo to registry
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// @/lib/templates.ts
 
 import templateBuilder from "@/components/siteTemplates/templateBuilder";
 import portfolio1 from "@/components/siteTemplates/portfolioOne";
+import portfolioTwo from "@/components/siteTemplates/portfolioTwo";
 import menuOne from "@/components/siteTemplates/menuOne";
+import eventSite from "@/components/siteTemplates/eventSite";
+import digitalStore from "@/components/siteTemplates/digitalStore";
 import {
   schemaMap,
   starterMap,
@@ -49,18 +54,19 @@ export type TemplateContent = {
 
 export const templatesRegistry: TemplateContent[] = [
   menuOne,
+  eventSite,
+  digitalStore,
   portfolio1,
+  portfolioTwo,
   templateBuilder,
 ];
 
-export const premiumTemplates: TemplateContent[] = [
-  templateBuilder,
-];
+export const premiumTemplates: TemplateContent[] = [templateBuilder];
 
 export const templatesCategories = Array.from(
   new Set(
     templatesRegistry
-      .map((t: any) => t.category)
+      .map((t: any) => t.meta?.category)
       .filter((category) => !!category),
   ),
 );

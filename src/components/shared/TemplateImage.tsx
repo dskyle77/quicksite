@@ -61,22 +61,14 @@ export default function TemplateImage({
   };
 
   // ───────────── Helper Logic for Image Source ─────────────
-  let effectiveSource: string | undefined;
-  if (isEditor) {
-    if (imageFile instanceof File && previewUrl) {
-      effectiveSource = previewUrl;
-    } else {
-      effectiveSource = source;
-    }
-  } else {
-    effectiveSource = source;
-  }
+  // Prioritize the local file preview URL if it exists, regardless of the isEditor state
+  const effectiveSource = (imageFile instanceof File && previewUrl) ? previewUrl : source;
 
   // ───────────── BACKGROUND VARIANT ─────────────
   if (variant === "background") {
     return (
       <div className="relative w-full overflow-hidden min-h-[600px] flex items-center">
-        {effectiveSource && (
+        ={effectiveSource && (
           <div className="absolute inset-0 z-0 w-full h-full">
             <NextImage
               src={effectiveSource}
@@ -176,11 +168,12 @@ export default function TemplateImage({
 
   return (
     <div
-      className="relative flex items-center justify-center min-h-[120px] rounded-2xl overflow-hidden bg-(--qs-bg-alt) cursor-pointer"
+      className="relative flex items-center justify-center min-h-[120px] rounded-2xl overflow-hidden bg-(--qs-bg-alt)"
       onClick={handleUploadClick}
       tabIndex={isEditor ? 0 : -1}
       style={{
         pointerEvents: isEditor && !uploading ? "auto" : "none",
+        cursor: isEditor && !uploading ? "pointer" : "default",
         opacity: uploading ? 0.7 : 1,
       }}
     >

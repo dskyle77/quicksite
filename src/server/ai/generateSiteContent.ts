@@ -1,3 +1,6 @@
+// src/server/ai/generateSiteContent.ts
+// UPDATED — now accepts whatsappMessages context so AI can reference them in copy
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import "server-only";
 import Groq from "groq-sdk";
@@ -33,6 +36,7 @@ export async function generateSiteContentWithAI({
   3. Fill every empty string with specific, credible copy grounded in the business description — except "theme". Do not use lorem ipsum, generic filler, or placeholder names (John Doe, Jane Doe, John Smith, "A satisfied customer", etc.).which must be a theme id from the SITE THEME list below. Do not use lorem ipsum or generic filler.
   4. Keep all "image" and "imagePId" field values exactly as they appear in the schema — never modify image URLs or generate fake imagePId values.
   5. Return ONLY valid JSON. No markdown, no code fences, no commentary.
+  6. For ALL whatsapp linkConfig objects (those with "type": "whatsapp"), keep the "phone" field exactly as it is in the schema. You may update the "message" field with a natural, conversational WhatsApp message relevant to the context. Messages must be short (under 200 chars), warm, and feel like a real customer sent them.
   
   ARRAY EXPANSION (important):
   - Arrays in the schema are minimum templates showing the required object shape — not fixed-length constraints.
@@ -79,9 +83,11 @@ export async function generateSiteContentWithAI({
   | Agency / studio                | about, features, projects, testimonials, contact               | skills, pricing                      |
   | Coach / consultant / professional | about, text, features, experience, testimonials, contact     | projects, skills                     |
   | SaaS / app / digital product   | features, pricing, faq, testimonials, cta, contact             | skills, projects, experience         |
+  | Events                         | text, features, pricing, testimonials, faq, contact            | skills, experience                   |
+  | Digital store                  | text, items (products), features, testimonials, faq, contact   | skills, experience                   |
   
   Variant hints:
-  - hero: "split" or "centered" for visual brands (food, fashion); "minimalist" for consultants; "background" for general local businesses.
+  - hero: "split" or "centered" for visual brands (food, fashion); "minimalist" for consultants; "background" for general local businesses and events.
   - contact: "form" or "split" when booking/inquiries matter; "minimal" for simple WhatsApp-first pages.
   - projects: "card-grid" for visuals; "list" for services/menus.
   
@@ -99,12 +105,23 @@ export async function generateSiteContentWithAI({
   - Eco / wellness / health            → forest, mint, ocean
   - High-end / luxury services         → luxury, mono, dark, espresso
   - Playful / bold creative brands     → cyberpunk, vaporwave, brutalist, coral
+  - Events                             → midnight, sunset, luxury, vaporwave, cyberpunk
+  - Digital store / info products      → dark, ocean, midnight, slate
   - Default local SMB when unsure      → warm or light
   
   NAVBAR:
   - navbar.links must only point to enabled sections (type "anchor", anchor = that section's anchorName, href "").
   - Keep only 3–5 useful links; remove irrelevant defaults (e.g. GitHub links).
   - navbar.ctaButton: one strong WhatsApp-oriented label matching the business.
+  
+  WHATSAPP MESSAGES (important):
+  - For every linkConfig with "type": "whatsapp" in the output, write a natural, specific message in the "message" field.
+  - Messages should feel like a real customer typed them. Keep them under 200 characters.
+  - Use the business name and context. E.g. for a food business: "Hi! I saw your jollof rice and I'd like to place an order."
+  - For event tickets: "Hi! I'd like to buy a ticket for [event name]. What options are available?"
+  - For digital products: "Hi! I'd like to purchase [product name]. Please send payment details."
+  - For portfolios: "Hi! I saw your portfolio and I'd love to discuss a project."
+  - Never use generic messages like "Hello" or "I am interested" alone.
   
   Every enabled section must read as one cohesive site for "${selectedTitle}" — not disconnected templates. Hero, about, section headings, pricing, FAQ, and CTAs must all reflect the same business voice and offering.
   `;

@@ -1,8 +1,11 @@
 // src/app/api/sites/route.ts
+// UPDATED — AI-generated WhatsApp messages injected into site content on creation
+
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/server/auth";
 import { serverCreateSite, getUserPlan } from "@/server/serverFirestore";
 import { generateSiteContentWithAI } from "@/server/ai/generateSiteContent";
+import { generateWhatsappMessages } from "@/server/ai/generateWhatsappMessages";
 import {
   isPremiumTemplate,
   getTemplateByType,
@@ -17,6 +20,7 @@ import {
   rateLimits,
 } from "@/server/rateLimit";
 import { canUseFeature, type Plan } from "@/lib/plans";
+import { injectWhatsappMessages } from "@/lib/whatsappMessageInjector";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -43,8 +47,6 @@ function parseFormFields(formData: FormData) {
     image: formData.get("image") as File | null,
   };
 }
-
-
 
 async function checkAiRateLimits(plan: Plan, uid: string) {
   const dailyResult = await withRateLimit(rateLimits.ai.daily[plan], uid);
@@ -76,6 +78,7 @@ async function resolveContent(
   templateEntry: ReturnType<typeof getTemplateByType>,
   normalizedName: string,
   whatsappNumber: string | undefined,
+  templateType: string,
 ) {
   const defaultTheme = templateEntry!.config.theme ?? "warm";
   const schemaBase = buildSchema(templateEntry!.contentConfig, {
@@ -84,6 +87,19 @@ async function resolveContent(
     defaultImage:
       "https://image-source-sk.vercel.app/projects/default-image.jpg",
   });
+
+  // Generate AI WhatsApp messages (always, regardless of AI content toggle)
+  let waMessages = null;
+  try {
+    waMessages = await generateWhatsappMessages({
+      businessName: normalizedName,
+      businessType: description || templateType,
+      description: description || normalizedName,
+      templateType,
+    });
+  } catch (err) {
+    console.warn("[sites/route] WhatsApp message generation failed:", err);
+  }
 
   if (generateWithAI && description) {
     if (!canUseFeature(plan, "ai")) {
@@ -109,8 +125,14 @@ async function resolveContent(
         schemaBase,
         defaultThemeId: defaultTheme,
       });
+
+      // Inject AI-generated WhatsApp messages into the content
+      const contentWithMessages = waMessages
+        ? injectWhatsappMessages(aiResult.content, waMessages, whatsappNumber || "")
+        : aiResult.content;
+
       return {
-        content: aiResult.content,
+        content: contentWithMessages,
         themeId: aiResult.themeId,
         description: aiResult.description,
         tags: aiResult.tags,
@@ -121,11 +143,20 @@ async function resolveContent(
   }
 
   // Fallback to starter content
+  const starterContent = templateEntry?.starterContent
+    ? templateEntry.starterContent({ selectedTitle: normalizedName, whatsappNumber })
+    : buildStarterContent(templateEntry!.contentConfig, {
+        selectedTitle: normalizedName,
+        whatsappNumber,
+      });
+
+  // Inject AI WhatsApp messages into starter content too
+  const contentWithMessages = waMessages
+    ? injectWhatsappMessages(starterContent, waMessages, whatsappNumber || "")
+    : starterContent;
+
   return {
-    content: buildStarterContent(templateEntry!.contentConfig, {
-      selectedTitle: normalizedName,
-      whatsappNumber,
-    }),
+    content: contentWithMessages,
     themeId: defaultTheme,
   };
 }
@@ -198,6 +229,7 @@ export async function POST(req: Request) {
       templateEntry,
       normalizedName,
       whatsappNumber,
+      type,
     );
 
     if ("error" in contentResult) {

@@ -4,8 +4,9 @@ import { SectionProps } from "../../types";
 import TemplateImage from "@/components/shared/TemplateImage";
 import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
 import Container from "@/components/shared/Container";
-import EditableLinkButton from "@/components/shared/EditableLink";
-import { LinkConfig } from "@/components/shared/EditableLink";
+import EditableLinkButton, {
+  LinkConfig,
+} from "@/components/shared/EditableLink";
 
 // Type for individual item
 export type ItemsItem = {
@@ -15,6 +16,7 @@ export type ItemsItem = {
   image?: string;
   imagePId?: string;
   btnLabel?: string;
+  btnMessage?: string;
   projectBtnLink?: LinkConfig;
 };
 
@@ -65,34 +67,11 @@ export const ItemsSection = ({
           "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
         imagePId: "",
         btnLabel: "View Item",
+        btnMessage: "",
         projectBtnLink: { type: "url", url: "" },
       },
     ]);
   };
-
-  const Header = () => (
-    <div className="text-center mb-14">
-      <h2
-        className="text-4xl @md:text-5xl font-black tracking-tight"
-        contentEditable={isEditor}
-        suppressContentEditableWarning
-        onBlur={(e) => onUpdate("heading", e.currentTarget.textContent?.trim())}
-      >
-        {content?.heading ?? "Items"}
-      </h2>
-
-      <p
-        className="mt-5 max-w-2xl mx-auto text-lg opacity-70"
-        contentEditable={isEditor}
-        suppressContentEditableWarning
-        onBlur={(e) =>
-          onUpdate("subheading", e.currentTarget.textContent?.trim())
-        }
-      >
-        {content?.subheading ?? "Showcase of my items"}
-      </p>
-    </div>
-  );
 
   const addTag = (i: number) => {
     updateOne(i, {
@@ -112,6 +91,101 @@ export const ItemsSection = ({
     updateOne(i, { tags: next });
   };
 
+  const Header = () => (
+    <div className="mb-14 text-center">
+      <h2
+        className="text-4xl font-black tracking-tight @md:text-5xl"
+        contentEditable={isEditor}
+        suppressContentEditableWarning
+        onBlur={(e) =>
+          onUpdate("heading", e.currentTarget.textContent?.trim() || "")
+        }
+      >
+        {content?.heading ?? "Items"}
+      </h2>
+
+      <p
+        className="mx-auto mt-5 max-w-2xl text-lg opacity-70"
+        contentEditable={isEditor}
+        suppressContentEditableWarning
+        onBlur={(e) =>
+          onUpdate("subheading", e.currentTarget.textContent?.trim() || "")
+        }
+      >
+        {content?.subheading ?? "Showcase of my items"}
+      </p>
+    </div>
+  );
+
+  const renderTags = (p: ItemsItem, i: number) => {
+    if (!p.tags?.length) return null;
+
+    return (
+      <div className="mt-5 flex flex-wrap items-center gap-2">
+        {p.tags.map((t, j) => (
+          <div key={j} className="flex items-center gap-1">
+            <span
+              className="rounded-full border px-3 py-1 text-xs outline-none"
+              contentEditable={isEditor}
+              suppressContentEditableWarning
+              style={{
+                background: "var(--qs-bg)",
+                border: "1px solid var(--qs-border)",
+              }}
+              onBlur={(e) =>
+                updateTag(i, j, e.currentTarget.textContent?.trim() || t)
+              }
+            >
+              {t}
+            </span>
+
+            {isEditor && (
+              <button
+                onClick={() => removeTag(i, j)}
+                className="flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white"
+              >
+                ×
+              </button>
+            )}
+          </div>
+        ))}
+
+        {isEditor && (
+          <button
+            onClick={() => addTag(i)}
+            className="rounded-full border border-dashed px-3 py-1 text-xs opacity-70 transition hover:opacity-100"
+          >
+            + Add
+          </button>
+        )}
+      </div>
+    );
+  };
+
+  const renderLinkButton = (p: ItemsItem, i: number) => {
+    // Generate a message based on the item title (for WhatsApp or similar)
+    const autoMessage = p.title
+      ? `Hi, I want to know more about "${p.title}"`
+      : "Hi, I want to know more about this item";
+
+    return (
+      <EditableLinkButton
+        isEditor={isEditor}
+        label={p.btnLabel ?? "View Item"}
+        linkConfig={p.projectBtnLink}
+        onLabelChange={(v) => updateOne(i, { btnLabel: v })}
+        onLinkChange={(cfg) => updateOne(i, { projectBtnLink: cfg })}
+        className="rounded-lg px-4 py-2 font-semibold transition-transform hover:scale-[1.02]"
+        messageOverride={autoMessage}
+        style={{
+          background: "var(--qs-primary)",
+          color: "var(--qs-primary-fg)",
+          marginTop: 0,
+        }}
+      />
+    );
+  };
+
   // ───────────────────────── LIST ─────────────────────────
   if (variant === "list") {
     return (
@@ -123,19 +197,19 @@ export const ItemsSection = ({
             {items.map((p, i) => (
               <div
                 key={i}
-                className="relative grid @md:grid-cols-2 gap-10 p-8 rounded-3xl border transition"
+                className="relative grid gap-10 rounded-3xl border p-8 transition @md:grid-cols-2"
                 style={{
                   background: cardBg,
                   border: "1px solid var(--qs-border)",
                 }}
               >
                 {isEditor && (
-                  <div className="absolute top-4 right-4">
+                  <div className="absolute right-4 top-4">
                     <Xbutton onClick={() => remove(i)} color="red" />
                   </div>
                 )}
 
-                <div className="rounded-2xl overflow-hidden">
+                <div className="overflow-hidden rounded-2xl">
                   <TemplateImage
                     source={p.image}
                     path={path + `.items.${i}.image`}
@@ -150,7 +224,7 @@ export const ItemsSection = ({
                     suppressContentEditableWarning
                     onBlur={(e) =>
                       updateOne(i, {
-                        title: e.currentTarget.textContent?.trim(),
+                        title: e.currentTarget.textContent?.trim() || p.title,
                       })
                     }
                   >
@@ -158,80 +232,21 @@ export const ItemsSection = ({
                   </h3>
 
                   <p
-                    className="mt-4 opacity-70 leading-7"
+                    className="mt-4 leading-7 opacity-70"
                     contentEditable={isEditor}
                     suppressContentEditableWarning
                     onBlur={(e) =>
                       updateOne(i, {
-                        desc: e.currentTarget.textContent?.trim(),
+                        desc: e.currentTarget.textContent?.trim() || p.desc,
                       })
                     }
                   >
                     {p.desc}
                   </p>
 
-                  {!!p.tags?.length && (
-                    <div className="mt-5 flex flex-wrap gap-2 items-center">
-                      {p.tags.map((t, j) => (
-                        <div key={j} className="flex items-center gap-1">
-                          <span
-                            className="px-3 py-1 text-xs rounded-full border outline-none"
-                            contentEditable={isEditor}
-                            suppressContentEditableWarning
-                            style={{
-                              background: "var(--qs-bg)",
-                              border: "1px solid var(--qs-border)",
-                            }}
-                            onBlur={(e) =>
-                              updateTag(
-                                i,
-                                j,
-                                e.currentTarget.textContent?.trim() || t,
-                              )
-                            }
-                          >
-                            {t}
-                          </span>
+                  {renderTags(p, i)}
 
-                          {isEditor && (
-                            <button
-                              onClick={() => removeTag(i, j)}
-                              className="w-5 h-5 text-xs rounded-full bg-red-500 text-white flex items-center justify-center"
-                            >
-                              ×
-                            </button>
-                          )}
-                        </div>
-                      ))}
-
-                      {isEditor && (
-                        <button
-                          onClick={() => addTag(i)}
-                          className="px-3 py-1 text-xs rounded-full border border-dashed opacity-70 hover:opacity-100 transition"
-                        >
-                          + Add
-                        </button>
-                      )}
-                    </div>
-                  )}
-
-                  <div className="mt-7">
-                    <EditableLinkButton
-                      isEditor={isEditor}
-                      label={p.btnLabel ?? "View Item"}
-                      linkConfig={p.projectBtnLink}
-                      onLabelChange={(v) => updateOne(i, { btnLabel: v })}
-                      onLinkChange={(cfg) =>
-                        updateOne(i, { projectBtnLink: cfg })
-                      }
-                      className="rounded-lg px-4 py-2 font-semibold transition-transform hover:scale-[1.02]"
-                      style={{
-                        background: "var(--qs-primary)",
-                        color: "var(--qs-primary-fg)",
-                        marginTop: 0,
-                      }}
-                    />
-                  </div>
+                  <div className="mt-7">{renderLinkButton(p, i)}</div>
                 </div>
               </div>
             ))}
@@ -253,18 +268,18 @@ export const ItemsSection = ({
       <Container className="py-24">
         <Header />
 
-        <div className="grid @md:grid-cols-2 @xl:grid-cols-3 gap-8">
+        <div className="grid gap-8 @md:grid-cols-2 @xl:grid-cols-3">
           {items.map((p, i) => (
             <div
               key={i}
-              className="relative rounded-3xl border overflow-hidden hover:-translate-y-1 transition"
+              className="relative overflow-hidden rounded-3xl border transition hover:-translate-y-1"
               style={{
                 background: cardBg,
                 border: "1px solid var(--qs-border)",
               }}
             >
               {isEditor && (
-                <div className="absolute top-3 right-3 z-10">
+                <div className="absolute right-3 top-3 z-10">
                   <Xbutton onClick={() => remove(i)} color="red" />
                 </div>
               )}
@@ -275,73 +290,29 @@ export const ItemsSection = ({
                 path={path + `.items.${i}.image`}
               />
 
-              <div className="p-6 flex flex-col h-full">
-                <h3 className="text-xl font-bold">{p.title}</h3>
+              <div className="flex h-full flex-col p-6">
+                <h3
+                  className="text-xl font-bold"
+                  contentEditable={isEditor}
+                  suppressContentEditableWarning={true}
+                  onBlur={e => isEditor && updateOne(i, { title: e.currentTarget.textContent || "" })}
+                >
+                  {p.title}
+                </h3>
 
-                <p className="mt-3 text-sm opacity-70">{p.desc}</p>
+                <p
+                  className="mt-3 text-sm opacity-70"
+                  contentEditable={isEditor}
+                  suppressContentEditableWarning={true}
+                  onBlur={e => isEditor && updateOne(i, { desc: e.currentTarget.textContent || "" })}
+                >
+                  {p.desc}
+                </p>
+           
 
-                {!!p.tags?.length && (
-                  <div className="mt-5 flex flex-wrap gap-2 items-center">
-                    {p.tags.map((t, j) => (
-                      <div key={j} className="flex items-center gap-1">
-                        <span
-                          className="px-3 py-1 text-xs rounded-full border outline-none"
-                          contentEditable={isEditor}
-                          suppressContentEditableWarning
-                          style={{
-                            background: "var(--qs-bg)",
-                            border: "1px solid var(--qs-border)",
-                          }}
-                          onBlur={(e) =>
-                            updateTag(
-                              i,
-                              j,
-                              e.currentTarget.textContent?.trim() || t,
-                            )
-                          }
-                        >
-                          {t}
-                        </span>
+                {renderTags(p, i)}
 
-                        {isEditor && (
-                          <button
-                            onClick={() => removeTag(i, j)}
-                            className="w-5 h-5 text-xs rounded-full bg-red-500 text-white flex items-center justify-center"
-                          >
-                            ×
-                          </button>
-                        )}
-                      </div>
-                    ))}
-
-                    {isEditor && (
-                      <button
-                        onClick={() => addTag(i)}
-                        className="px-3 py-1 text-xs rounded-full border border-dashed opacity-70 hover:opacity-100 transition"
-                      >
-                        + Add
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                <div className="mt-7">
-                  <EditableLinkButton
-                    isEditor={isEditor}
-                    label={p.btnLabel ?? "View Item"}
-                    linkConfig={p.projectBtnLink}
-                    onLabelChange={(v) => updateOne(i, { btnLabel: v })}
-                    onLinkChange={(cfg) =>
-                      updateOne(i, { projectBtnLink: cfg })
-                    }
-                    className="rounded-lg px-4 py-2 font-semibold transition-transform hover:scale-[1.02]"
-                    style={{
-                      background: "var(--qs-primary)",
-                      color: "var(--qs-primary-fg)",
-                      marginTop: 0,
-                    }}
-                  />
-                </div>
+                <div className="mt-7">{renderLinkButton(p, i)}</div>
               </div>
             </div>
           ))}

@@ -299,19 +299,45 @@ function LinkConfigMenu({
 }
 
 // ─── CtaLink (default export) ─────────────────────────────────────────────────
-
+/**
+ * Editable link button used throughout the site builder.
+ *
+ * In editor mode:
+ * - Label becomes editable.
+ * - Link settings can be configured.
+ *
+ * In preview/live mode:
+ * - Renders as a normal link.
+ * - Tracks WhatsApp click analytics.
+ */
 export interface EditableLinkButtonProps {
+  /** Enables editing controls. */
   isEditor: boolean;
+
+  /** Visible button text. */
   label: string;
+
+  /** Current link configuration. */
   linkConfig?: LinkConfig;
+
+  /** Called when the label changes. */
   onLabelChange: (label: string) => void;
+
+  /** Called when link settings change. */
   onLinkChange: (cfg: LinkConfig) => void;
+
+  /** Optional CSS classes. */
   className?: string;
+
+  /** Optional inline styles. */
   style?: React.CSSProperties;
+
+  /** Locked WhatsApp message supplied externally. */
   messageOverride?: string;
+
+  /** Hides the link preview label. */
   noPreview?: boolean;
 }
-
 export default function EditableLinkButton({
   isEditor,
   label,
