@@ -11,13 +11,13 @@ interface EditorScreenProps {
   data: Site;
   onChange: (updated: Site) => void;
   slugs: Record<string, any>;
-  canEdit: boolean
+  canEdit: boolean;
 }
 
 export default function EditorScreen({
   data,
   onChange,
-  canEdit
+  canEdit,
 }: EditorScreenProps) {
   const templateEntry = getTemplateByType(data.type);
   const theme = getTheme(data.theme);
@@ -42,10 +42,12 @@ export default function EditorScreen({
     <div className={`w-full h-full ${theme.className}`}>
       <style>{theme.css}</style>
       <Template
-        isEditor={canEdit}
+        isPreview={!canEdit}
+        isEditor={true}
         content={data.content}
         onUpdate={handleUpdate}
         canCustomize={canCustomize}
+        hasNavbar={true}
       />
     </div>
   );

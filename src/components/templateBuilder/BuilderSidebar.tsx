@@ -104,6 +104,7 @@ export const SectionMenu: React.FC<{
     if (target < 0 || target >= arr.length) return;
     [arr[idx], arr[target]] = [arr[target], arr[idx]];
     onChange({ ...config, sections: arr });
+    setTimeout(scrollTo)
   };
 
   const variants = variantOptions[section.type] as readonly SectionVariantKey[];
@@ -275,7 +276,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
       <aside
         className={[
           "fixed left-0 top-16 z-50",
-          "h-[calc(100vh-4rem)] w-72 max-w-[min(18rem,85vw)]",
+          "h-[calc(100vh-4rem)] w-full",
           "overflow-y-auto overflow-x-hidden border-r border-stone-200 bg-[#faf9f7]",
           "transform transition-transform duration-200 ease-out",
           "md:static md:top-auto md:z-auto md:h-full md:max-w-none md:shrink-0",

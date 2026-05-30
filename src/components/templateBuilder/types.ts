@@ -7,6 +7,7 @@ import { TemplateComponentProps } from "@/lib/templates";
 
 import React from "react";
 import { LinkConfig } from "../shared/EditableLink";
+import { HeroVariantKey } from "./variants/HeroVariants";
 
 // ─── Shared Component Interface ───────────────────────────────────────────────
 
@@ -22,12 +23,6 @@ export type SectionProps = TemplateComponentProps & {
 // Extend these as you add new variants to the variant files.
 
 export type NavbarVariantKey = "classic" | "minimal";
-export type HeroVariantKey =
-  | "background" 
-  | "split" 
-  | "minimalist" 
-  | "centered"
-  | "none"
 
 export type FooterVariantKey = "classic" | "centered" | "none" | "columns";
 
@@ -51,6 +46,7 @@ export type SectionVariantKey =
   | "default"
   | "split"
   | "grid"
+  | "grid-small"
   | "list"
   | "card"
   | "carousel"

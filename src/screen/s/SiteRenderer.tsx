@@ -48,6 +48,8 @@ export default function SiteRenderer() {
         canCustomize={false}
         content={site?.content || {}}
         isCustomDomain={isCustomDomain}
+        isPreview={true}
+        hasNavbar={false}
       />
       <SiteTracker />
     </div>

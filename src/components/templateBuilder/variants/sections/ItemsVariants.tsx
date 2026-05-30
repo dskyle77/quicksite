@@ -121,11 +121,11 @@ export const ItemsSection = ({
     if (!p.tags?.length) return null;
 
     return (
-      <div className="mt-5 flex flex-wrap items-center gap-2">
+      <div className="mt-3 flex flex-wrap items-center gap-2">
         {p.tags.map((t, j) => (
           <div key={j} className="flex items-center gap-1">
             <span
-              className="rounded-full border px-3 py-1 text-xs outline-none"
+              className="rounded-full border px-2 py-1 text-xs outline-none"
               contentEditable={isEditor}
               suppressContentEditableWarning
               style={{
@@ -263,6 +263,77 @@ export const ItemsSection = ({
   }
 
   // ───────────────────────── GRID ─────────────────────────
+  if (variant === "grid-small") {
+    return (
+      <section id={anchorName} style={{ background: sectionBg }}>
+        <Container className="py-24">
+          <Header />
+
+          <div className="grid gap-8 @sm:grid-cols-2 @md:grid-cols-3 @xl:grid-cols-4">
+            {items.map((p, i) => (
+              <div
+                key={i}
+                className="relative overflow-hidden rounded-2xl border transition hover:-translate-y-1"
+                style={{
+                  background: cardBg,
+                  border: "1px solid var(--qs-border)",
+                }}
+              >
+                {isEditor && (
+                  <div className="absolute right-3 top-3 z-10">
+                    <Xbutton onClick={() => remove(i)} color="red" />
+                  </div>
+                )}
+
+                <TemplateImage
+                  source={p.image}
+                  isEditor={isEditor}
+                  path={path + `.items.${i}.image`}
+                />
+
+                <div className="flex h-full flex-col p-6">
+                  <h3
+                    className="text-xl font-bold"
+                    contentEditable={isEditor}
+                    suppressContentEditableWarning={true}
+                    onBlur={(e) =>
+                      isEditor &&
+                      updateOne(i, { title: e.currentTarget.textContent || "" })
+                    }
+                  >
+                    {p.title}
+                  </h3>
+
+                  <p
+                    className="mt-3 text-sm opacity-70"
+                    contentEditable={isEditor}
+                    suppressContentEditableWarning={true}
+                    onBlur={(e) =>
+                      isEditor &&
+                      updateOne(i, { desc: e.currentTarget.textContent || "" })
+                    }
+                  >
+                    {p.desc}
+                  </p>
+
+                  {renderTags(p, i)}
+
+                  <div className="mt-7">{renderLinkButton(p, i)}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {isEditor && (
+            <div className="mt-12 flex justify-center">
+              <AddButton onClick={add}>Add Item</AddButton>
+            </div>
+          )}
+        </Container>
+      </section>
+    );
+  }
+  // ───────────────────────── GRID ─────────────────────────
   return (
     <section id={anchorName} style={{ background: sectionBg }}>
       <Container className="py-24">
@@ -295,7 +366,10 @@ export const ItemsSection = ({
                   className="text-xl font-bold"
                   contentEditable={isEditor}
                   suppressContentEditableWarning={true}
-                  onBlur={e => isEditor && updateOne(i, { title: e.currentTarget.textContent || "" })}
+                  onBlur={(e) =>
+                    isEditor &&
+                    updateOne(i, { title: e.currentTarget.textContent || "" })
+                  }
                 >
                   {p.title}
                 </h3>
@@ -304,11 +378,13 @@ export const ItemsSection = ({
                   className="mt-3 text-sm opacity-70"
                   contentEditable={isEditor}
                   suppressContentEditableWarning={true}
-                  onBlur={e => isEditor && updateOne(i, { desc: e.currentTarget.textContent || "" })}
+                  onBlur={(e) =>
+                    isEditor &&
+                    updateOne(i, { desc: e.currentTarget.textContent || "" })
+                  }
                 >
                   {p.desc}
                 </p>
-           
 
                 {renderTags(p, i)}
 
@@ -328,5 +404,9 @@ export const ItemsSection = ({
   );
 };
 
-export type ItemsSectionVariant = "grid" | "list";
-export const ItemsVariantList: ItemsSectionVariant[] = ["grid", "list"];
+export type ItemsSectionVariant = "grid" | "list" | "grid-small";
+export const ItemsVariantList: ItemsSectionVariant[] = [
+  "grid",
+  "list",
+  "grid-small",
+];

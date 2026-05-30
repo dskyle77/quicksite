@@ -62,13 +62,9 @@ export default function TemplatesPreview({ type }: { type: string }) {
 
   const templateData = templateEntry?.starterContent
     ? templateEntry.starterContent(starterContentArgs)
-    : buildStarterContent(
-        templateEntry.contentConfig,
-        starterContentArgs,
-      );
+    : buildStarterContent(templateEntry.contentConfig, starterContentArgs);
 
-
-      console.log(templateData)
+  console.log(templateData);
 
   let useTemplateHref = `/dashboard/new?template=${encodeURIComponent(type)}`;
   const useQueryParams: string[] = [];
@@ -130,6 +126,8 @@ export default function TemplatesPreview({ type }: { type: string }) {
             isEditor={false}
             canCustomize={false}
             content={templateData}
+            isPreview={true}
+            hasNavbar={true}
           />
         </main>
       </SiteProvider>

@@ -21,6 +21,7 @@ export interface TemplateProps {
   canCustomize: boolean;
   onUpdate?: (path: string, value: any) => void;
   isCustomDomain?: boolean;
+  hasNavbar: boolean
 }
 
 export interface TemplateComponentProps {

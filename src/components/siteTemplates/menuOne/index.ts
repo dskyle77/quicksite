@@ -5,13 +5,13 @@ import { TemplateContent } from "@/lib/templates";
 
 export const menuOneConfig = {
   navbar: "none",
-  hero: "split",
+  hero: "background",
   footer: "none",
   sections: [
     {
       id: "tx_",
       type: "text",
-      variant: "minimal",
+      variant: "card",
       enabled: true,
     },
     {
@@ -60,7 +60,7 @@ const starterContent = ({
     }) as LinkConfig,
   },
 
-  t_text: {
+  tx_text: {
     label: "About Us",
     title: `Why People Love ${selectedTitle}`,
     desc: "We prepare tasty meals using fresh ingredients and deliver quickly so you can enjoy every bite without stress.",
@@ -115,7 +115,7 @@ const starterContent = ({
     ],
   },
 
-  t_testimonials: {
+  ts_testimonials: {
     heading: "Customer Reviews",
     subheading: "People love our meals ❤️",
     items: [

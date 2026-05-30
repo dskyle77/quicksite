@@ -6,7 +6,7 @@ import { TemplateContent } from "@/lib/templates";
 
 export const eventSiteConfig = {
   navbar: "classic",
-  hero: "background",
+  hero: "gradient",
   footer: "classic",
   sections: [
     {
@@ -87,7 +87,7 @@ const starterContent = ({
     secondaryButtonLink: makeCtaLink({ type: "anchor", anchorId: "about" }),
   },
 
-  t_text: {
+  tx_text: {
     label: "About The Event",
     title: `Why You Can't Miss ${selectedTitle}`,
     desc: "This is a once-in-a-season experience designed to inspire, connect, and entertain. Whether you're coming for networking, fun, or learning — there's something here for you.",

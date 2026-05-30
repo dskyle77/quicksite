@@ -12,7 +12,7 @@ export const digitalStoreConfig = {
     {
       id: "tx_",
       type: "text",
-      variant: "minimal",
+      variant: "card",
       enabled: true,
     },
     {
@@ -84,7 +84,7 @@ const starterContent = ({
     ),
   },
 
-  t_text: {
+  tx_text: {
     label: "What We Offer",
     title: "High-Quality Digital Products, Delivered Instantly",
     desc: "No waiting, no shipping, no logistics. Pay, and receive your file immediately via WhatsApp or email. All products are created by experts and ready to use.",
@@ -247,7 +247,7 @@ const digitalStore: TemplateContent = {
   },
   config: {
     type: "digital-store",
-    theme: "dark",
+    theme: "midnight",
     canCustomize: false,
     isPremium: false,
   },

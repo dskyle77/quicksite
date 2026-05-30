@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { TemplateComponentProps } from "@/lib/templates";
 import { BuilderConfig, SectionVariantKey, SectionConfig } from "./types";
@@ -14,6 +14,8 @@ import { SectionVariants } from "./variants/sections/index";
 type TemplateBuilderProps = Omit<TemplateComponentProps, "onUpdate"> & {
   onUpdate: (path: string, value: any) => void;
   customize: boolean;
+  isPreview: boolean;
+  hasNavbar: boolean;
 };
 
 type SectionWithMenuProps = {
@@ -106,7 +108,10 @@ export default function TemplateBuilder({
   onUpdate,
   slugs,
   customize,
+  isPreview,
+  hasNavbar
 }: TemplateBuilderProps) {
+  const isEditMode = isEditor && !isPreview
   // The config constant always points to the up-to-date config object.
   const config: BuilderConfig = content.builderConfig || {};
 
@@ -117,6 +122,10 @@ export default function TemplateBuilder({
       window.matchMedia("(min-width: 768px)").matches,
   );
 
+  // Dynamic Sidebar Width States (Min: 280px, Max: 600px)
+  const [sidebarWidth, setSidebarWidth] = useState(340);
+  const isResizingRef = useRef(false);
+
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
     const onChange = () => {
@@ -125,6 +134,39 @@ export default function TemplateBuilder({
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
   }, []);
+
+  // Window-level event handling for fluid mouse movements during resize
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isResizingRef.current) return;
+      // Calculate delta width from viewport left edge
+      const newWidth = Math.max(280, Math.min(e.clientX, 600));
+      setSidebarWidth(newWidth);
+    };
+
+    const handleMouseUp = () => {
+      isResizingRef.current = false;
+      document.body.style.cursor = "default";
+      document.body.style.userSelect = "auto";
+    };
+
+    if (sidebarOpen && customize && isEditor) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [sidebarOpen, customize, isEditor]);
+
+  const startResizing = (e: React.MouseEvent) => {
+    e.preventDefault();
+    isResizingRef.current = true;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none"; // Stop textual selections during movement
+  };
 
   // If not customizing, config is static. Otherwise we allow interactive update.
   const [internalConfig, setInternalConfig] = useState<BuilderConfig>(config);
@@ -164,19 +206,32 @@ export default function TemplateBuilder({
 
   return (
     <div
-      className="relative flex min-h-0 w-full"
+      className="relative flex flex-1 min-h-0 w-full overflow-hidden"
+      style={{ height: hasNavbar ? `calc(100vh - 64px)` : "100vh" }}
     >
       {customize && isEditor && sidebarOpen && (
-        <BuilderSidebar
-          config={internalConfig}
-          onChange={handleConfigChange}
-          open={sidebarOpen}
-          onClose={onClose}
-        />
+        <>
+          {/* Explicit width containment wrapping the Custom Sidebar */}
+          <div style={{ width: sidebarWidth, minWidth: sidebarWidth, flexShrink: 0 }} className="h-full relative">
+            <BuilderSidebar
+              config={internalConfig}
+              onChange={handleConfigChange}
+              open={sidebarOpen}
+              onClose={onClose}
+            />
+          </div>
+
+          {/* Interactive Drag Handle Overlay Line */}
+          <div
+            onMouseDown={startResizing}
+            className="w-1.5 h-full bg-gray-200 hover:bg-indigo-500 cursor-col-resize transition-colors duration-150 absolute top-0 z-50 select-none"
+            style={{ left: sidebarWidth - 3 }}
+          />
+        </>
       )}
 
       <div
-        className={`min-w-0 flex-1 w-full ${customize && isEditor ? "bg-gray-100 p-2" : ""}`}
+        className={`min-w-0 flex-1 w-full ${customize && isEditor ? "bg-gray-100 " : ""}`}
         style={{
           height: "100%",
           overflowY: "auto",
@@ -184,7 +239,7 @@ export default function TemplateBuilder({
       >
         {customize && isEditor && !sidebarOpen && (
           <button
-            className="fixed top-20 left-4 z-30 bg-white border rounded-full shadow-md px-4 py-2 text-xs font-semibold flex items-center gap-2 hover:bg-gray-50 transition"
+            className="fixed top-32 left-4 z-30 bg-white border rounded-full shadow-md px-4 py-2 text-xs font-semibold flex items-center gap-2 hover:bg-gray-50 transition"
             style={{
               boxShadow: "0 2px 10px 0 rgba(0,0,0,0.08)",
             }}
@@ -207,26 +262,20 @@ export default function TemplateBuilder({
                 <line x1="8" x2="20" y1="17" y2="17" strokeLinecap="round" />
               </svg>
             </span>
-            Open Sidebar
+            <span className="md:inline hidden">Open Sidebar</span>
           </button>
         )}
 
-        <div
-          className={`@container w-full ${
-            customize && isEditor
-              ? "max-w-7xl mx-auto shadow-2xl bg-white min-h-full"
-              : ""
-          }`}
-        >
+        <div className={`@container w-full`}>
           <Navbar
-            isEditor={isEditor}
+            isEditor={isEditMode}
             content={content.navbar || {}}
             onUpdate={makeHandleUpdates("navbar")}
             slugs={slugs}
           />
 
           <Hero
-            isEditor={isEditor}
+            isEditor={isEditMode}
             content={content.hero || {}}
             onUpdate={makeHandleUpdates("hero")}
             slugs={slugs}
@@ -235,10 +284,10 @@ export default function TemplateBuilder({
           <main>
             {enabledSections.map((sec, i) => (
               <SectionWithMenu
-                key={i}
+                key={sec.id + sec.type}
                 sec={sec}
                 content={content}
-                isEditor={isEditor}
+                isEditor={isEditMode}
                 slugs={slugs}
                 makeHandleUpdates={makeHandleUpdates}
                 onConfigChange={handleConfigChange}
@@ -249,7 +298,7 @@ export default function TemplateBuilder({
           </main>
 
           <Footer
-            isEditor={isEditor}
+            isEditor={isEditMode}
             content={content.footer || {}}
             onUpdate={makeHandleUpdates("footer")}
             slugs={slugs}

@@ -10,7 +10,9 @@ export default function Template({
   content,
   onUpdate,
   canCustomize,
-}: TemplateProps) {
+  isPreview,
+  hasNavbar
+}: TemplateProps & { isPreview: boolean }) {
   const handleUpdate = (path: string, value: any) => {
     if (onUpdate) onUpdate(path, value);
   };
@@ -27,11 +29,13 @@ export default function Template({
       }}
     >
       <TemplateBuilder
+        isPreview={isPreview}
         isEditor={isEditor}
         content={content}
         onUpdate={handleUpdate}
         slugs={slugs}
         customize={canCustomize}
+        hasNavbar={hasNavbar}
       />
     </div>
   );
