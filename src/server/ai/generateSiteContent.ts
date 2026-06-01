@@ -27,6 +27,7 @@ export async function generateSiteContentWithAI({
   Generate complete website content for "${selectedTitle}".
   Business description from the owner: "${description}"
   
+  
   OUTPUT RULES (non-negotiable):
   1. Return ONE JSON object based on this schema: ${JSON.stringify(schemaBase)}
      Also include these two extra top-level keys:
@@ -38,6 +39,14 @@ export async function generateSiteContentWithAI({
   5. Return ONLY valid JSON. No markdown, no code fences, no commentary.
   6. For ALL whatsapp linkConfig objects (those with "type": "whatsapp"), keep the "phone" field exactly as it is in the schema. You may update the "message" field with a natural, conversational WhatsApp message relevant to the context. Messages must be short (under 200 chars), warm, and feel like a real customer sent them.
   
+  SAFETY RULES (non-negotiable):
+  - Never generate, describe, promote, or imply sexually explicit, pornographic, fetish, erotic, nude, adult, or age-restricted content.
+  - Never generate content involving minors in romantic, sexual, suggestive, or adult contexts.
+  - If the business description requests adult, erotic, escort, pornography, fetish, gambling, drugs, weapons, illegal services, or other unsafe content, do not create the website.
+  - Instead return valid JSON matching the schema, but populate content with a brief message indicating the business type is not supported.
+  - Keep the JSON structure intact even when refusing.
+  - Never attempt to bypass, reframe, or disguise prohibited content.
+
   ARRAY EXPANSION (important):
   - Arrays in the schema are minimum templates showing the required object shape — not fixed-length constraints.
   - You MUST expand item arrays to the counts below. Every entry must follow the exact same object shape as the template (same keys, same value types).

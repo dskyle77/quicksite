@@ -1,6 +1,7 @@
 // src/features/templates/TemplateCard.tsx
 import Link from "next/link";
-import { Eye, ArrowRight } from "lucide-react";
+import { Eye, ArrowRight, Sparkles } from "lucide-react";
+import Image from "next/image";
 
 interface TemplateCardProps {
   type: string;
@@ -15,73 +16,98 @@ interface TemplateCardProps {
 }
 
 export function TemplateCard({
+  type,
   title,
   description,
   previewHref,
   useHref,
   delay = 0,
-  isPremium
+  isPremium,
+  image,
+  category
 }: TemplateCardProps) {
   return (
     <div
-      className="group rounded-xl bg-card border border-border shadow-xs hover:shadow-md hover:border-primary/30 transition-all duration-200 flex flex-col relative overflow-hidden"
+      className="group rounded-2xl bg-card border border-border shadow-sm hover:shadow-xl hover:border-primary/50 transition-all duration-300 flex flex-col overflow-hidden relative h-full"
       style={{ animationDelay: `${delay}ms` }}
     >
-      {/* Premium badge */}
+      {/* Premium Badge */}
       {isPremium && (
-        <div className="absolute right-2 top-2 z-20">
-          <span className="inline-flex items-center gap-0.5 px-1.5 py-0.2 bg-yellow-400 text-yellow-900 font-bold text-[10px] rounded-sm shadow-xs border border-yellow-500">
-            <svg viewBox="0 0 16 16" fill="currentColor" className="w-3 h-3">
-              <path d="M8 1l2.1 4.3L15 6l-3.5 3.6L12 15l-4-2.2L4 15l.6-5.4L1 6l4.9-.7L8 1z" />
-            </svg>
+        <div className="absolute top-3 right-3 z-30">
+          <div className="flex items-center gap-1 bg-linear-to-r from-amber-500 to-yellow-500 text-white text-[10px] font-bold px-3 py-1 rounded-full shadow-lg">
+            <Sparkles className="w-3.5 h-3.5" />
             PREMIUM
-          </span>
+          </div>
         </div>
       )}
 
-      {/* Stylized compact header block */}
-      <div className="relative flex items-center justify-center h-20 bg-linear-to-br from-primary/10 to-muted/40 transition-all">
-        <div className="flex items-center justify-center w-full h-full">
-          <span className="uppercase text-2xl font-black tracking-widest text-primary/80 drop-shadow-xs select-none">
-            {title[0]}
-          </span>
-        </div>
-        {/* Hover overlay */}
-        <div className="absolute inset-0 bg-foreground/5 group-hover:bg-foreground/10 transition-all duration-200 grid place-items-center opacity-0 group-hover:opacity-100 z-10">
-          <Link
-            href={previewHref}
-            className="flex items-center gap-1.5 bg-secondary text-secondary-foreground hover:bg-secondary/90 h-7 px-3 rounded-md text-xs font-medium cursor-pointer shadow-xs"
-          >
-            <Eye className="w-3.5 h-3.5" /> Preview
-          </Link>
-        </div>
+      {/* Image / Visual Header */}
+      <div className="relative h-48 overflow-hidden bg-linear-to-br from-muted to-card">
+        {image ? (
+          <Image
+            src={image}
+            alt={title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="flex items-center justify-center w-full h-full bg-linear-to-br from-primary/10 via-primary/5 to-transparent">
+            <span className="text-[120px] font-black text-primary/10 select-none tracking-tighter">
+              {title[0]}
+            </span>
+          </div>
+        )}
+
+        {/* Hover Overlay */}
+        {type !== "custom" && (
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+            <Link
+              href={previewHref}
+              className="flex items-center gap-2 bg-white text-black hover:bg-white/90 px-5 py-2.5 rounded-xl font-medium text-sm shadow-lg"
+            >
+              <Eye className="w-4 h-4" />
+              Live Preview
+            </Link>
+          </div>
+        )}
       </div>
 
-      <div className="p-3.5 flex flex-col flex-1">
-        <h3 className="font-bold text-sm mb-0.5 text-foreground tracking-tight line-clamp-1">{title}</h3>
-        <p className="text-xs text-muted-foreground mb-3 flex-1 line-clamp-2 leading-relaxed">
+      <div className="p-5 flex-1 flex flex-col">
+        <div className="mb-3">
+          <span className="text-xs font-medium px-2.5 py-1 bg-muted rounded-md text-muted-foreground">
+            {category}
+          </span>
+        </div>
+
+        <h3 className="font-semibold text-lg leading-tight mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+          {title}
+        </h3>
+
+        <p className="text-sm text-muted-foreground line-clamp-3 flex-1">
           {description}
         </p>
-        
-        <div className="flex gap-1.5 mt-auto">
-          <Link
-            href={previewHref}
-            className="flex-1 flex items-center justify-center gap-1 border border-input bg-background hover:bg-muted h-7.5 rounded-md text-xs font-medium cursor-pointer transition"
-          >
-            <Eye className="w-3.5 h-3.5" /> Preview
-          </Link>
+
+        <div className="flex gap-3 mt-6">
+          {type !== "custom" && (
+            <Link
+              href={previewHref}
+              className="flex-1 border border-input hover:bg-muted py-2.5 rounded-xl text-sm font-medium text-center transition"
+            >
+              Preview
+            </Link>
+          )}
           <Link
             href={useHref}
-            className={`flex-1 flex items-center justify-center gap-1 bg-primary text-primary-foreground hover:opacity-95 h-7.5 rounded-md text-xs font-medium cursor-pointer transition ${
-              isPremium ? "relative" : ""
+            className={`${
+              type !== "custom" ? "flex-1" : "w-full"
+            } py-2.5 rounded-xl text-sm font-medium text-center transition flex items-center justify-center gap-2 ${
+              isPremium
+                ? "bg-linear-to-r from-amber-500 to-yellow-500 text-white hover:brightness-110"
+                : "bg-primary hover:bg-primary/90 text-primary-foreground"
             }`}
           >
-            Use Template <ArrowRight className="w-3.5 h-3.5" />
-            {isPremium && (
-              <span className="absolute -top-2 right-1 text-amber-500 font-bold text-[10px] pointer-events-none">
-                ★
-              </span>
-            )}
+            Use Template
+            <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
       </div>

@@ -124,25 +124,25 @@ export const warmTheme = makeTheme({
   `,
 });
 
-// 4. Deep Ocean (Vibrant oceanic glowing theme)
+// 4. Ocean (Bright and fresh oceanic theme)
 export const oceanTheme = makeTheme({
   name: "Ocean Blue",
-  description: "Abyssal blue paired with Bioluminescent Cyan",
+  description: "Bright turquoise over crisp white with vivid tropical highlights",
   font: "'Plus Jakarta Sans', sans-serif",
-  preview: { bg: "#020813", primary: "#06b6d4", text: "#e0f2fe" },
+  preview: { bg: "#f0faff", primary: "#06b6d4", text: "#075985" },
   colors: `
-    --qs-bg: #020813;
-    --qs-bg-alt: #071329;
-    --qs-card-bg: #0b1932;
-    --qs-card-bg-alt: #0f2447;
+    --qs-bg: #f0faff;
+    --qs-bg-alt: #e0f2fe;
+    --qs-card-bg: #ffffff;
+    --qs-card-bg-alt: #e0f2fe;
     --qs-primary: #06b6d4;
-    --qs-primary-fg: #020813;
-    --qs-secondary: #3b82f6;
-    --qs-secondary-fg: #ffffff;
-    --qs-text: #e0f2fe;
+    --qs-primary-fg: #ffffff;
+    --qs-secondary: #38bdf8;
+    --qs-secondary-fg: #075985;
+    --qs-text: #075985;
     --qs-text-muted: #38bdf8;
-    --qs-border: #132f5c;
-    --qs-shadow: rgba(6, 182, 214, 0.15);
+    --qs-border: #bae6fd;
+    --qs-shadow: rgba(6, 182, 214, 0.10);
   `,
 });
 

@@ -300,27 +300,6 @@ export const TestimonialsSection = ({
             </div>
           )}
         </Container>
-        <style jsx>{`
-          /* Custom, extra-thin scrollbar for the carousel */
-          .custom-scrollbar {
-            scrollbar-width: thin;
-            scrollbar-color: var(--qs-primary) var(--qs-bg-alt);
-          }
-          .custom-scrollbar::-webkit-scrollbar {
-            height: 4px;
-            background: var(--qs-bg-alt);
-            border-radius: 2px;
-          }
-          .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: var(--qs-primary);
-            border-radius: 2px;
-          }
-          .custom-scrollbar::-webkit-scrollbar-button {
-            display: none;
-            width: 0;
-            height: 0;
-          }
-        `}</style>
       </section>
     );
   }

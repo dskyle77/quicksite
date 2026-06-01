@@ -354,8 +354,9 @@ export default function EditableLinkButton({
 
   const href = buildHref(linkConfig, messageOverride);
 
-  const { slugs } = useSiteContext();
+  const { slugs, site } = useSiteContext();
   const slug = slugs?.slug;
+  const whatsappNumber = site?.whatsappNumber || ""
 
   const handleClick = (e?: React.MouseEvent<HTMLAnchorElement>) => {
     // If there is no linkConfig, prevent navigation and do nothing
@@ -497,7 +498,7 @@ export default function EditableLinkButton({
           }}
         >
           {linkConfig.type === "whatsapp"
-            ? `wa.me/${linkConfig.phone ?? ""}`
+            ? `wa.me/${linkConfig.phone ?? whatsappNumber}`
             : linkConfig.type === "anchor"
               ? `#${linkConfig.anchorId ?? ""}`
               : (linkConfig.url ?? "")}

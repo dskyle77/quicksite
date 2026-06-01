@@ -3,7 +3,7 @@
 export type Plan = "free" | "growth" | "pro";
 
 /** Fully dynamic custom template builder */
-export const CUSTOM_TEMPLATE_TYPE = "template-builder";
+export const CUSTOM_TEMPLATE_TYPE = "custom";
 
 export const PLANS: {
   name: string;
@@ -31,7 +31,7 @@ export const PLANS: {
   {
     name: "Growth",
     plan: "growth",
-    price: 2000,
+    price: 1000,
     description: "Build your brand and grow your online presence",
     features: [
       "Up to 10 mini-sites",
@@ -47,7 +47,7 @@ export const PLANS: {
   {
     name: "Pro",
     plan: "pro",
-    price: 5000,
+    price: 3000,
     description: "Advanced tools for creators and businesses",
     features: [
       "Up to 25 mini-sites",

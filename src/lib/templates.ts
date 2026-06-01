@@ -3,12 +3,13 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import templateBuilder from "@/components/siteTemplates/templateBuilder";
+import templateBuilder from "@/components/siteTemplates/custom";
 import portfolio1 from "@/components/siteTemplates/portfolioOne";
 import portfolioTwo from "@/components/siteTemplates/portfolioTwo";
 import menuOne from "@/components/siteTemplates/menuOne";
 import eventSite from "@/components/siteTemplates/eventSite";
 import digitalStore from "@/components/siteTemplates/digitalStore";
+import landingPage from "@/components/siteTemplates/landingPage";
 import {
   schemaMap,
   starterMap,
@@ -54,6 +55,7 @@ export type TemplateContent = {
 /* ---------------- REGISTRY ---------------- */
 
 export const templatesRegistry: TemplateContent[] = [
+  landingPage,
   menuOne,
   eventSite,
   digitalStore,

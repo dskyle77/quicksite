@@ -266,10 +266,10 @@ function SiteCard({ site }: { site: any }) {
         </Link>
         <div className="w-px h-4 bg-border/50 mx-1" />
         <Link
-          href={`/dashboard/analytics?site=${site.id}`}
+          href={`/dashboard/sites/${site.slug}`}
           className="flex-1 flex items-center justify-center gap-2 py-2 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-white dark:hover:bg-black rounded-lg transition-all"
         >
-          Analytics
+          Manage Site
         </Link>
       </div>
     </div>
@@ -294,7 +294,7 @@ function SitesSection({
         </div>
         <Link
           href="/dashboard/sites"
-          className="h-9 px-4 flex items-center gap-2 bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary rounded-xl text-xs font-bold transition-all"
+          className="w-30 md:w-auto h-9 px-4 flex items-center gap-2 bg-muted hover:bg-primary/10 text-muted-foreground hover:text-primary rounded-xl text-xs font-bold transition-all"
         >
           View all <ChevronRight className="h-4 w-4" />
         </Link>
@@ -350,7 +350,7 @@ function SitesSection({
               href="/dashboard/new"
               className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-xl h-12 px-4 text-sm shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-1 active:translate-y-0 transition-all duration-300 cursor-pointer"
             >
-             <Plus className="h-5 w-5" />  Get Started Now
+              <Plus className="h-5 w-5" /> Get Started Now
             </Link>
           </div>
         )}

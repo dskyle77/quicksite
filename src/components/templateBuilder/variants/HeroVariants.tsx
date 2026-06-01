@@ -198,7 +198,6 @@ const MinimalistVariant = ({
     className="relative flex min-h-[80vh] flex-col items-center justify-center px-4 @sm:px-6 text-center py-16 @md:py-24"
     style={{ background: "var(--qs-bg, #fff)" }}
   >
-    
     <div
       className="absolute inset-0 -z-10 opacity-20"
       style={{
@@ -253,7 +252,7 @@ const CenteredVariant = ({
   onUpdate,
 }: TemplateComponentProps) => (
   <section
-    className="relative flex min-h-[75vh] flex-col items-center justify-center px-4 @sm:px-6 text-center py-16 @md:py-24"
+    className="relative flex min-h-[80vh] flex-col items-center justify-center px-4 @sm:px-6 text-center py-16 @md:py-24"
     style={{ background: "var(--qs-bg, #fff)" }}
   >
     {content?.badge && (
@@ -322,7 +321,6 @@ const CenteredVariant = ({
 );
 
 // ─── 5. Gradient ─────────────────────────────────────────────────────────────
-
 const GradientVariant = ({
   isEditor,
   content,
@@ -336,26 +334,36 @@ const GradientVariant = ({
   });
 
   return (
-    <section className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden bg-linear-to-br from-(--qs-bg,#fff) to-(--qs-bg-alt,#f7f7f7)  px-4 py-20 text-center @sm:px-6 @md:py-32">
+<section
+      className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-4 py-20 text-center @sm:px-6 @md:py-32"
+      style={{
+        // Gently injects 8% of the primary color directly into the background.
+        // If --qs-bg is dark, this creates a rich, dark tinted glow.
+        // If --qs-bg is light, it creates a soft, pastel tinted glow.
+        background:
+          "linear-gradient(130deg, var(--qs-bg), color-mix(in srgb, var(--qs-primary) 20%, var(--qs-bg)))",
+      }}
+    >
       {/* Dynamic Ambient Gradient Blooms */}
-      <div className="pointer-events-none absolute -top-40 -left-40 h-[400px] w-[400px] rounded-full bg-(--qs-primary) opacity-15 blur-[100px]" />
-      <div className="pointer-events-none absolute -right-20 bottom-0 h-[500px] w-[500px] rounded-full bg-(--qs-primary) opacity-10 blur-[130px]" />
+      {/* mix-blend-multiply deepens colors on light modes, while dark:mix-blend-screen makes them brilliantly luminous on dark modes */}
+      <div className="pointer-events-none absolute -top-40 -left-40 h-[450px] w-[450px] rounded-full bg-(--qs-primary) opacity-15 blur-[120px] mix-blend-multiply dark:mix-blend-screen" />
+      <div className="pointer-events-none absolute -right-20 bottom-0 h-[550px] w-[550px] rounded-full bg-(--qs-primary) opacity-10 blur-[140px] mix-blend-multiply dark:mix-blend-screen" />
 
       <div className="relative z-10 flex w-full max-w-4xl flex-col items-center justify-center">
         {/* Glassmorphism Badge */}
         {content?.badge && (
           <div
             {...editableProps("badge")}
-            className="mb-8 inline-flex items-center rounded-full border border-white/40 bg-white/30 px-4 py-1.5 text-xs font-semibold text-(--qs-text) shadow-[0_2px_12px_rgba(0,0,0,0.03)] backdrop-blur-md outline-none transition-all duration-300 dark:border-white/10 dark:bg-black/20 @sm:text-sm"
+            className="mb-8 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-(--qs-text) shadow-[0_2px_12px_rgba(0,0,0,0.03)] backdrop-blur-md outline-none transition-all duration-300 dark:border-white/10 dark:bg-black/30 @sm:text-sm"
           >
             {content.badge}
           </div>
         )}
 
-        {/* High-contrast Title */}
+        {/* High-contrast Title (Uses global text color so it flips with the theme) */}
         <h1
           {...editableProps("title")}
-          className="bg-linear-to-b from-(--qs-text,#111) to-(--qs-text-muted,#444) bg-clip-text text-4xl font-extrabold tracking-tight text-transparent outline-none @sm:text-6xl @md:text-7xl leading-none"
+          className="text-(--qs-text) py-2 text-4xl font-extrabold tracking-tight outline-none @sm:text-6xl @md:text-7xl leading-tight"
         >
           {content?.title}
         </h1>
@@ -363,7 +371,7 @@ const GradientVariant = ({
         {/* Subtle Framed Description */}
         <p
           {...editableProps("desc")}
-          className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-(--qs-text-muted) outline-none @sm:text-xl"
+          className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-(--qs-text) opacity-80 outline-none @sm:text-xl"
         >
           {content?.desc}
         </p>
@@ -390,7 +398,7 @@ const GradientVariant = ({
               linkConfig={content?.secondaryButtonLink}
               onLabelChange={(v) => onUpdate("secondaryButton", v)}
               onLinkChange={(cfg) => onUpdate("secondaryButtonLink", cfg)}
-              className="w-full rounded-xl border border-(--qs-border) bg-white/40 px-8 py-4 text-base font-semibold text-(--qs-text) backdrop-blur-xs transition-all duration-200 hover:bg-white/80 active:scale-98 dark:bg-black/10 dark:hover:bg-black/30 @sm:w-auto text-center"
+              className="w-full rounded-xl border border-(--qs-border) bg-white/20 px-8 py-4 text-base font-semibold text-(--qs-text) backdrop-blur-xs transition-all duration-200 hover:bg-white/40 active:scale-95 dark:bg-black/20 dark:hover:bg-black/40 @sm:w-auto text-center"
             />
           )}
         </div>
@@ -398,6 +406,7 @@ const GradientVariant = ({
     </section>
   );
 };
+
 
 const None = () => null;
 

@@ -57,9 +57,15 @@ export default function DashboardLayoutScreen({
   ];
 
   // ── Zustand Store ──────────────────────────────────────────
-  const { ui, setSidebarOpen } = useDashboardStore();
+  const { ui, setSidebarOpen, reset } = useDashboardStore();
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    return () => {
+      reset();
+    };
+  }, [reset]);
 
   // Handle Authentication Redirect
   useEffect(() => {
@@ -133,7 +139,9 @@ export default function DashboardLayoutScreen({
 
         <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto no-scrollbar">
           <div className="mb-4 px-2">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Main Menu</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
+              Main Menu
+            </p>
           </div>
           {sidebarLinks().map(({ icon: Icon, label, href }) => {
             const isActive =
@@ -154,17 +162,21 @@ export default function DashboardLayoutScreen({
                       : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
-                  <Icon className={`h-4.5 w-4.5 transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`} />
+                  <Icon
+                    className={`h-4.5 w-4.5 transition-transform duration-300 ${isActive ? "scale-110" : "group-hover:scale-110"}`}
+                  />
                   {label}
                 </div>
               </Link>
             );
           })}
-          
+
           {profile?.isAdmin === true && (
             <>
               <div className="mt-8 mb-4 px-2">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Admin</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">
+                  Admin
+                </p>
               </div>
               <Link href="/admin" onClick={() => setSidebarOpen(false)}>
                 <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-destructive hover:bg-destructive/10 transition-all cursor-pointer">
@@ -194,13 +206,17 @@ export default function DashboardLayoutScreen({
 
           <div className="flex items-center gap-3 px-2 py-1">
             <div className="h-10 w-10 rounded-xl bg-muted border border-border/50 flex items-center justify-center text-xs font-bold text-foreground shrink-0 shadow-sm overflow-hidden">
-               {user.photoURL ? (
-                 <img src={user.photoURL} alt={initials} className="h-full w-full object-cover" />
-               ) : (
-                 <div className="bg-primary/10 text-primary w-full h-full flex items-center justify-center">
-                   {initials}
-                 </div>
-               )}
+              {user.photoURL ? (
+                <img
+                  src={user.photoURL}
+                  alt={initials}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="bg-primary/10 text-primary w-full h-full flex items-center justify-center">
+                  {initials}
+                </div>
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold truncate text-foreground leading-tight">
@@ -279,9 +295,7 @@ export default function DashboardLayoutScreen({
         </header>
 
         <main className="flex-1 p-6 sm:p-8 overflow-y-auto no-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
-          <div className="max-w-7xl mx-auto w-full">
-            {children}
-          </div>
+          <div className="max-w-7xl mx-auto w-full">{children}</div>
         </main>
       </div>
     </div>

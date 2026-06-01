@@ -5,6 +5,8 @@ import { TemplateComponentProps } from "@/lib/templates";
 import { BuilderConfig, SectionVariantKey, SectionConfig } from "./types";
 import { BuilderSidebar, SectionMenu } from "./BuilderSidebar";
 
+import Reveal from "../shared/Reveal";
+
 // Variant Registries
 import { NavbarVariants } from "./variants/NavbarVariants";
 import { HeroVariants } from "./variants/HeroVariants";
@@ -109,9 +111,9 @@ export default function TemplateBuilder({
   slugs,
   customize,
   isPreview,
-  hasNavbar
+  hasNavbar,
 }: TemplateBuilderProps) {
-  const isEditMode = isEditor && !isPreview
+  const isEditMode = isEditor && !isPreview;
   // The config constant always points to the up-to-date config object.
   const config: BuilderConfig = content.builderConfig || {};
 
@@ -212,7 +214,14 @@ export default function TemplateBuilder({
       {customize && isEditor && sidebarOpen && (
         <>
           {/* Explicit width containment wrapping the Custom Sidebar */}
-          <div style={{ width: sidebarWidth, minWidth: sidebarWidth, flexShrink: 0 }} className="h-full relative">
+          <div
+            style={{
+              width: sidebarWidth,
+              minWidth: sidebarWidth,
+              flexShrink: 0,
+            }}
+            className="h-full relative"
+          >
             <BuilderSidebar
               config={internalConfig}
               onChange={handleConfigChange}
@@ -267,42 +276,49 @@ export default function TemplateBuilder({
         )}
 
         <div className={`@container w-full`}>
-          <Navbar
-            isEditor={isEditMode}
-            content={content.navbar || {}}
-            onUpdate={makeHandleUpdates("navbar")}
-            slugs={slugs}
-          />
+          <header className="relative ">
+            <Navbar
+              isEditor={isEditMode}
+              content={content.navbar || {}}
+              onUpdate={makeHandleUpdates("navbar")}
+              slugs={slugs}
+            />
+          </header>
 
-          <Hero
-            isEditor={isEditMode}
-            content={content.hero || {}}
-            onUpdate={makeHandleUpdates("hero")}
-            slugs={slugs}
-          />
+          <Reveal variant="scale">
+            <Hero
+              isEditor={isEditMode}
+              content={content.hero || {}}
+              onUpdate={makeHandleUpdates("hero")}
+              slugs={slugs}
+            />
+          </Reveal>
 
           <main>
             {enabledSections.map((sec, i) => (
-              <SectionWithMenu
-                key={sec.id + sec.type}
-                sec={sec}
-                content={content}
-                isEditor={isEditMode}
-                slugs={slugs}
-                makeHandleUpdates={makeHandleUpdates}
-                onConfigChange={handleConfigChange}
-                idx={i}
-                config={config}
-              />
+              <Reveal key={sec.id + sec.type} variant="bottom">
+                <SectionWithMenu
+                  sec={sec}
+                  content={content}
+                  isEditor={isEditMode}
+                  slugs={slugs}
+                  makeHandleUpdates={makeHandleUpdates}
+                  onConfigChange={handleConfigChange}
+                  idx={i}
+                  config={config}
+                />
+              </Reveal>
             ))}
           </main>
 
-          <Footer
-            isEditor={isEditMode}
-            content={content.footer || {}}
-            onUpdate={makeHandleUpdates("footer")}
-            slugs={slugs}
-          />
+          <Reveal variant="bottom">
+            <Footer
+              isEditor={isEditMode}
+              content={content.footer || {}}
+              onUpdate={makeHandleUpdates("footer")}
+              slugs={slugs}
+            />
+          </Reveal>
         </div>
       </div>
     </div>

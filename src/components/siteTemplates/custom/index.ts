@@ -10,7 +10,7 @@ const templateBuilderContent: TemplateContent = {
       "Fully dynamic template builder supporting multiple section instances.",
   },
   config: {
-    type: "template-builder",
+    type: "custom",
     theme: "warm",
     canCustomize: true,
     isPremium: true

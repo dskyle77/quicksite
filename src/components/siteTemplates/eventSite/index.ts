@@ -2,11 +2,12 @@
 
 import { makeWhatsappLink, makeCtaLink } from "@/components/shared/helpers";
 import { SchemaParams } from "@/components/templateBuilder/types";
+import { HeroVariantKey } from "@/components/templateBuilder/variants/HeroVariants";
 import { TemplateContent } from "@/lib/templates";
 
 export const eventSiteConfig = {
   navbar: "classic",
-  hero: "gradient",
+  hero: "background" as HeroVariantKey,
   footer: "classic",
   sections: [
     {

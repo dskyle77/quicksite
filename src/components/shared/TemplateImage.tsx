@@ -85,7 +85,7 @@ export default function TemplateImage({
         )}
         <div className="relative z-10 w-full">{children}</div>
         {isEditor && (
-          <div className="absolute top-4 right-4 z-20">
+          <div className="absolute bottom-4 right-4 z-20">
             <button
               onClick={() => inputRef.current?.click()}
               className={[

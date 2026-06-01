@@ -1,14 +1,16 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
+import { ArrowLeft, ArrowRight, Check, Loader2, Rocket, X } from "lucide-react";
 
 import authFetch from "@/lib/authFetch";
 import { useAuth } from "@/hooks/useAuth";
 import { useProfileStore } from "@/store/useProfileStore";
-import { isValidTemplate, premiumTemplates } from "@/lib/templates";
-import { CUSTOM_TEMPLATE_TYPE, canUseFeature, type Plan } from "@/lib/plans";
+import { isPremiumTemplate, isValidTemplate } from "@/lib/templates";
+import { canUseFeature, type Plan } from "@/lib/plans";
 
 import { NewSiteForm } from "./NewSiteForm";
 import { TemplatePicker } from "./TemplatesPicker";
@@ -21,27 +23,39 @@ export default function CreateSitePage() {
   const userPlan = (userProfile?.plan ?? "free") as Plan;
   const canUsePremiumTemplate = canUseFeature(userPlan, "premiumTemplate");
 
+  const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Track which fields the user has interacted with to prevent premature error messages
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(
+    {},
+  );
+
+  // Get the template type from the query string, considering allowed templates
   const templateTypeFromQuery = searchParams.get("template") || "";
-  let selectedTemplateType = isValidTemplate(templateTypeFromQuery)
+  let initialSelectedTemplateType = isValidTemplate(templateTypeFromQuery)
     ? templateTypeFromQuery
     : "";
-  if (selectedTemplateType === CUSTOM_TEMPLATE_TYPE && !canUsePremiumTemplate) {
-    selectedTemplateType = "";
+  if (
+    !canUsePremiumTemplate &&
+    isPremiumTemplate(initialSelectedTemplateType)
+  ) {
+    initialSelectedTemplateType = "";
   }
 
   const paramsName = searchParams.get("name");
   const paramsSlug = searchParams.get("slug");
   const whatsappNumber = userProfile?.whatsappNumber;
 
-  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: paramsName || "",
     slug: paramsSlug || "",
     description: "",
-    type: selectedTemplateType,
+    type: initialSelectedTemplateType,
     whatsappNumber: whatsappNumber || "",
     generateWithAI: false,
-    image: null as File | null, // ← Added
+    image: null as File | null,
   });
 
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,6 +63,8 @@ export default function CreateSitePage() {
       .toLowerCase()
       .replace(/\s+/g, "-")
       .replace(/[^a-z0-9-]/g, "");
+
+    setTouchedFields((prev) => ({ ...prev, slug: true }));
     setFormData((prev) => ({ ...prev, slug: val }));
   };
 
@@ -57,43 +73,116 @@ export default function CreateSitePage() {
     params.set("template", newTemplateType);
     router.replace(`?${params.toString()}`);
     setFormData((prev) => ({ ...prev, type: newTemplateType }));
+    if (errors.type) setErrors((prev) => ({ ...prev, type: "" }));
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const validateFields = (currentStep: number, isLive = false) => {
+    const newErrors: Record<string, string> = {};
+
+    if (currentStep === 1) {
+      // Name validation
+      if (!isLive || touchedFields.name) {
+        if (!formData.name.trim()) newErrors.name = "Site name is required.";
+      }
+
+      // Slug validation
+      if (!isLive || touchedFields.slug) {
+        if (!formData.slug.trim()) newErrors.slug = "URL slug is required.";
+      }
+
+      // WhatsApp validation
+      if (!isLive || touchedFields.whatsappNumber) {
+        if (!formData.whatsappNumber.trim()) {
+          newErrors.whatsappNumber = "WhatsApp number is required.";
+        } else if (
+          !/^\d{7,15}$/.test(formData.whatsappNumber.replace(/\D/g, ""))
+        ) {
+          newErrors.whatsappNumber = "Please enter a valid phone number.";
+        }
+      }
+    } else if (currentStep === 2) {
+      if (!formData.type) {
+        newErrors.type = "Please select a template to continue.";
+      }
+    } else if (currentStep === 3) {
+      if (formData.generateWithAI && !formData.description.trim()) {
+        newErrors.description = "Description is required for AI generation.";
+      }
+    }
+
+    return newErrors;
+  };
+
+  // Run live validation as user types
+  useEffect(() => {
+    const liveErrors = validateFields(step, true);
+    setErrors(liveErrors);
+  }, [formData, step, touchedFields]);
+
+  const nextStep = async () => {
+    // Mark current step fields as touched/dirty on submission attempt
+    if (step === 1) {
+      setTouchedFields({ name: true, slug: true, whatsappNumber: true });
+    }
+
+    const stepErrors = validateFields(step, false);
+    if (Object.keys(stepErrors).length === 0) {
+      if (step === 1) {
+        setLoading(true);
+        try {
+          const res = await authFetch(`/api/sites?slug=${formData.slug}`, {
+            method: "GET",
+          });
+          const data = await res.json();
+          if (!data.available) {
+            setErrors((prev) => ({
+              ...prev,
+              slug: "This URL is already taken. Try another.",
+            }));
+            return;
+          }
+        } catch (err) {
+          console.error(err);
+        } finally {
+          setLoading(false);
+        }
+      }
+      setStep((prev) => prev + 1);
+      setTouchedFields({});
+      setErrors({});
+      window.scrollTo(0, 0);
+    } else {
+      setErrors(stepErrors);
+    }
+  };
+
+  const prevStep = () => {
+    setStep((prev) => prev - 1);
+    setTouchedFields({});
+    setErrors({});
+    window.scrollTo(0, 0);
+  };
+
+  const handleCreate = async () => {
     if (!user) return toast.error("Please login first.");
 
-    const normalizedName = formData.name.trim();
-    const normalizedSlug = formData.slug.trim();
-
-    if (!normalizedName || !normalizedSlug) {
-      return toast.error("Please add both site name and URL slug.");
-    }
-    if (!formData.description && formData.generateWithAI) {
-      return toast.error("Please provide a description to use AI generation.");
-    }
-    if (formData.type === "") {
-      return toast.error("Please select a site template.");
-    }
-    if (formData.type === CUSTOM_TEMPLATE_TYPE && !canUsePremiumTemplate) {
-      return toast.error(
-        "Custom template requires Growth or Pro. Please upgrade your plan.",
-      );
+    const stepErrors = validateFields(3, false);
+    if (Object.keys(stepErrors).length > 0) {
+      setErrors(stepErrors);
+      return;
     }
 
     setLoading(true);
 
     try {
       const formDataToSend = new FormData();
-
-      formDataToSend.append("name", normalizedName);
-      formDataToSend.append("slug", normalizedSlug);
+      formDataToSend.append("name", formData.name.trim());
+      formDataToSend.append("slug", formData.slug.trim());
       formDataToSend.append("type", formData.type);
       formDataToSend.append("description", formData.description);
       formDataToSend.append("generateWithAI", String(formData.generateWithAI));
       formDataToSend.append("whatsappNumber", formData.whatsappNumber);
 
-      // Append image if exists
       if (formData.image) {
         formDataToSend.append("image", formData.image);
       }
@@ -101,12 +190,15 @@ export default function CreateSitePage() {
       const res = await authFetch("/api/sites", {
         method: "POST",
         body: formDataToSend,
-        // Do NOT set Content-Type header → browser will set multipart/form-data automatically
       });
 
       const data = await res.json();
-
       if (!res.ok) {
+        if (data.error?.toLowerCase().includes("slug")) {
+          setErrors({ slug: "This URL is already taken. Try another." });
+          setStep(1);
+          return;
+        }
         throw new Error(data.error || "Failed to create site.");
       }
 
@@ -122,40 +214,172 @@ export default function CreateSitePage() {
     }
   };
 
+  const steps = [
+    { id: 1, label: "Identity" },
+    { id: 2, label: "Design" },
+    { id: 3, label: "Content" },
+  ];
+
   return (
-    <div className="max-w-5xl mx-auto py-8 px-1 sm:py-12 sm:px-6">
-      <div className="mb-8 text-center">
+    <div className="max-w-4xl mx-auto py-8 px-4 sm:py-12 sm:px-6">
+      <div className="mb-10 text-center">
         <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
           Launch Your Site
         </h1>
         <p className="text-slate-500 mt-2 text-base sm:text-lg">
-          Start with a production-ready template.
+          Complete these simple steps to go live.
         </p>
       </div>
 
-      <form
-        onSubmit={handleCreate}
-        className="flex flex-col gap-6 md:grid md:grid-cols-3 md:gap-8"
-      >
-        <div className="order-1 md:order-2">
-          <TemplatePicker
-            selectedType={formData.type}
-            onTemplateChange={handleTemplateChange}
-            slugForPreview={formData.slug}
-            nameForPreview={formData.name}
-            canUsePremiumTemplate={canUsePremiumTemplate}
-          />
+      {/* Stepper */}
+      <div className="mb-12 relative">
+        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 -translate-y-1/2 hidden sm:block" />
+        <div className="relative flex justify-between items-center max-w-2xl mx-auto">
+          {steps.map((s) => (
+            <div
+              key={s.id}
+              className="flex flex-col items-center relative z-10 bg-white sm:px-4"
+            >
+              <div
+                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border-2 ${
+                  step === s.id
+                    ? "bg-primary border-primary text-white scale-110 shadow-lg"
+                    : step > s.id
+                      ? "bg-green-500 border-green-500 text-white"
+                      : "bg-white border-slate-200 text-slate-400"
+                }`}
+              >
+                {step > s.id ? <Check size={20} /> : s.id}
+              </div>
+              <span
+                className={`mt-2 text-xs font-bold uppercase tracking-wider ${
+                  step === s.id ? "text-primary" : "text-slate-400"
+                }`}
+              >
+                {s.label}
+              </span>
+            </div>
+          ))}
         </div>
+      </div>
 
-        <div className="order-2 md:order-1 md:col-span-2 space-y-6 bg-card p-4 sm:p-8 rounded-3xl border shadow-sm">
-          <NewSiteForm
-            formData={formData}
-            setFormData={setFormData}
-            loading={loading}
-            onSlugChange={handleSlugChange}
-          />
+      <div className="bg-card rounded-3xl border shadow-sm overflow-hidden">
+        <div className="p-6 sm:p-10">
+          {step === 1 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold">First, the basics</h2>
+                <p className="text-slate-500 text-sm">
+                  Give your site a name and a custom URL.
+                </p>
+              </div>
+              <NewSiteForm
+                step={1}
+                formData={formData}
+                setFormData={setFormData}
+                loading={loading}
+                onSlugChange={handleSlugChange}
+                errors={errors}
+                setTouchedFields={setTouchedFields}
+              />
+              <div className="pt-4">
+                <button
+                  disabled={loading}
+                  onClick={nextStep}
+                  className="w-full h-14 bg-primary text-primary-foreground rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50"
+                >
+                  {loading ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    <>
+                      Continue to Design <ArrowRight size={20} />
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 2 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold">Choose your style</h2>
+                <p className="text-slate-500 text-sm">
+                  Pick a template that matches your brand.
+                </p>
+              </div>
+              {errors.type && (
+                <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold flex items-center gap-2 border border-red-100 animate-in fade-in slide-in-from-top-2">
+                  <X size={18} /> {errors.type}
+                </div>
+              )}
+              <TemplatePicker
+                selectedType={formData.type}
+                onTemplateChange={handleTemplateChange}
+                slugForPreview={formData.slug}
+                nameForPreview={formData.name}
+                canUsePremiumTemplate={canUsePremiumTemplate}
+              />
+              <div className="flex flex-col sm:flex-row gap-3 pt-4">
+                <button
+                  onClick={prevStep}
+                  className="flex-1 h-14 bg-slate-100 text-slate-600 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-all"
+                >
+                  <ArrowLeft size={20} /> Back
+                </button>
+                <button
+                  onClick={nextStep}
+                  className="flex-2 h-14 bg-primary text-primary-foreground rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all"
+                >
+                  Looks Good, Continue <ArrowRight size={20} />
+                </button>
+              </div>
+            </div>
+          )}
+
+          {step === 3 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="mb-6">
+                <h2 className="text-2xl font-bold">Enhance with content</h2>
+                <p className="text-slate-500 text-sm">
+                  Add a logo and description. Use AI to auto-fill content.
+                </p>
+              </div>
+              <NewSiteForm
+                step={3}
+                formData={formData}
+                setFormData={setFormData}
+                loading={loading}
+                onSlugChange={handleSlugChange}
+                errors={errors}
+                setTouchedFields={setTouchedFields}
+              />
+              <div className="flex flex-col sm:flex-row gap-3 pt-6">
+                <button
+                  onClick={prevStep}
+                  disabled={loading}
+                  className="flex-1 h-14 bg-slate-100 text-slate-600 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-all disabled:opacity-50"
+                >
+                  <ArrowLeft size={20} /> Back
+                </button>
+                <button
+                  onClick={handleCreate}
+                  disabled={loading}
+                  className="flex-2 h-14 bg-primary text-primary-foreground rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50"
+                >
+                  {loading ? (
+                    <Loader2 className="animate-spin" />
+                  ) : (
+                    <>
+                      Launch My Site <Rocket size={20} />
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
-      </form>
+      </div>
     </div>
   );
 }

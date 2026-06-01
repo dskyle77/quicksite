@@ -3,7 +3,11 @@
 
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/server/auth";
-import { serverCreateSite, getUserPlan } from "@/server/serverFirestore";
+import {
+  serverCreateSite,
+  getUserPlan,
+  isIdentifierTaken,
+} from "@/server/serverFirestore";
 import { generateSiteContentWithAI } from "@/server/ai/generateSiteContent";
 import { generateWhatsappMessages } from "@/server/ai/generateWhatsappMessages";
 import {
@@ -128,7 +132,11 @@ async function resolveContent(
 
       // Inject AI-generated WhatsApp messages into the content
       const contentWithMessages = waMessages
-        ? injectWhatsappMessages(aiResult.content, waMessages, whatsappNumber || "")
+        ? injectWhatsappMessages(
+            aiResult.content,
+            waMessages,
+            whatsappNumber || "",
+          )
         : aiResult.content;
 
       return {
@@ -144,7 +152,10 @@ async function resolveContent(
 
   // Fallback to starter content
   const starterContent = templateEntry?.starterContent
-    ? templateEntry.starterContent({ selectedTitle: normalizedName, whatsappNumber })
+    ? templateEntry.starterContent({
+        selectedTitle: normalizedName,
+        whatsappNumber,
+      })
     : buildStarterContent(templateEntry!.contentConfig, {
         selectedTitle: normalizedName,
         whatsappNumber,
@@ -283,4 +294,20 @@ export async function POST(req: Request) {
       { status: isPlanError ? 403 : 500 },
     );
   }
+}
+
+export async function GET(req: Request) {
+  const user = await getUserFromSession();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
+  }
+
+  const { searchParams } = new URL(req.url);
+  const slug = searchParams.get("slug");
+  if (!slug) {
+    return NextResponse.json({ error: "Slug is required." }, { status: 400 });
+  }
+
+  const isAvailable = await isIdentifierTaken(slug, user.uid);
+  return NextResponse.json({ available: !isAvailable });
 }

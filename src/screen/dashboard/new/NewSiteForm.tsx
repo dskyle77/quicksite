@@ -2,8 +2,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useState } from "react";
 import {
-  ArrowRight,
-  Loader2,
   Sparkles,
   Upload,
   X,
@@ -18,6 +16,7 @@ const SITE_SHORT_NAME = process.env.NEXT_PUBLIC_SITE_SHORT_NAME;
 const DOMAIN_NAME = process.env.NEXT_PUBLIC_DOMAIN_NAME;
 
 interface NewSiteFormProps {
+  step: number;
   formData: {
     name: string;
     slug: string;
@@ -30,13 +29,18 @@ interface NewSiteFormProps {
   setFormData: React.Dispatch<React.SetStateAction<any>>;
   loading: boolean;
   onSlugChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  errors?: Record<string, string>;
+  setTouchedFields: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
 }
 
 export function NewSiteForm({
+  step,
   formData,
   setFormData,
   loading,
   onSlugChange,
+  errors = {},
+  setTouchedFields,
 }: NewSiteFormProps) {
   const { getUserPlan } = useProfileStore();
   const plan = getUserPlan();
@@ -46,283 +50,306 @@ export function NewSiteForm({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  // Handle image selection (used by both click and drop)
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const name = e.target.value;
+    setTouchedFields((prev) => ({ ...prev, name: true }));
+    
+    setFormData((prev: any) => {
+      const slug = name
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+      
+      const prevAutoSlug = prev.name.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+      const shouldUpdateSlug = !prev.slug || prev.slug === prevAutoSlug;
+
+      if (shouldUpdateSlug) {
+        setTouchedFields((t) => ({ ...t, slug: true }));
+      }
+
+      return {
+        ...prev,
+        name,
+        slug: shouldUpdateSlug ? slug : prev.slug,
+      };
+    });
+  };
+
   const handleImageSelect = (file: File) => {
     if (!file.type.startsWith("image/")) {
       alert("Please select a valid image file (PNG, JPG, WebP, GIF)");
       return;
     }
-
-    // Optional: Add file size limit (5MB)
     if (file.size > 5 * 1024 * 1024) {
       alert("Image size must be less than 5MB");
       return;
     }
-
     setFormData((prev: any) => ({ ...prev, image: file }));
-
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     setShowImageModal(false);
   };
 
-  // Remove selected image
   const removeImage = () => {
     setFormData((prev: any) => ({ ...prev, image: null }));
     if (previewUrl) URL.revokeObjectURL(previewUrl);
     setPreviewUrl(null);
   };
 
-  // Drag & Drop Handlers
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragging(true);
   };
 
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragging(false);
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
-    e.stopPropagation();
     setIsDragging(false);
-
     const file = e.dataTransfer.files[0];
-    if (file) {
-      handleImageSelect(file);
-    }
+    if (file) handleImageSelect(file);
   };
 
-  return (
-    <>
-      <div className="space-y-4">
-        {/* Image Upload with Drag & Drop */}
-        <div className="block">
-          <span className="text-sm font-bold ml-1">Site Image / Logo</span>
+  if (step === 1) {
+    return (
+      <div className="space-y-5">
+        {/* Site Name */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-bold ml-1 text-slate-700">Site Name</label>
+          <input
+            required
+            type="text"
+            className={`w-full px-4 py-3.5 rounded-2xl border ${errors.name ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all shadow-sm`}
+            placeholder="e.g. Blossom Bakery"
+            value={formData.name}
+            onChange={handleNameChange}
+            onBlur={() => setTouchedFields((prev) => ({ ...prev, name: true }))}
+          />
+          {errors.name && <p className="text-red-500 text-xs ml-1 font-medium">{errors.name}</p>}
+        </div>
 
+        {/* URL Slug */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-bold ml-1 text-slate-700">Desired URL</label>
+          <div className="flex group">
+            <span className={`inline-flex items-center px-4 rounded-l-2xl border border-r-0 ${errors.slug ? 'border-red-500 bg-red-50 text-red-400' : 'border-slate-200 bg-slate-50 text-slate-400'} text-xs font-medium transition-colors group-focus-within:border-primary group-focus-within:bg-primary/5`}>
+              {SITE_SHORT_NAME}{DOMAIN_NAME}/
+            </span>
+            <input
+              required
+              type="text"
+              className={`flex-1 min-w-0 px-4 py-3.5 rounded-r-2xl border ${errors.slug ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all text-sm shadow-sm`}
+              placeholder="blossom-bakery"
+              value={formData.slug}
+              onChange={onSlugChange}
+              onBlur={() => setTouchedFields((prev) => ({ ...prev, slug: true }))}
+            />
+          </div>
+          {errors.slug ? (
+            <p className="text-red-500 text-xs ml-1 font-medium">{errors.slug}</p>
+          ) : (
+            <p className="text-[10px] text-slate-400 ml-1 italic">You can&apos;t change this URL later.</p>
+          )}
+        </div>
+
+        {/* Whatsapp Number */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-bold ml-1 text-slate-700">WhatsApp Number</label>
+          <div className="flex group">
+            <span className={`inline-flex items-center px-4 rounded-l-2xl border border-r-0 ${errors.whatsappNumber ? 'border-red-500 bg-red-50 text-red-400' : 'border-slate-200 bg-slate-50 text-slate-400'} text-xs font-medium transition-colors group-focus-within:border-primary group-focus-within:bg-primary/5`}>
+              +234
+            </span>
+            <input
+              required
+              type="tel"
+              className={`flex-1 min-w-0 px-4 py-3.5 rounded-r-2xl border ${errors.whatsappNumber ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all text-sm shadow-sm`}
+              placeholder="8012345678"
+              value={formData.whatsappNumber}
+              onChange={(e) => {
+                setTouchedFields((prev) => ({ ...prev, whatsappNumber: true }));
+                setFormData((prev: any) => ({
+                  ...prev,
+                  whatsappNumber: e.target.value,
+                }));
+              }}
+              onBlur={() => setTouchedFields((prev) => ({ ...prev, whatsappNumber: true }))}
+            />
+          </div>
+          {errors.whatsappNumber && <p className="text-red-500 text-xs ml-1 font-medium">{errors.whatsappNumber}</p>}
+        </div>
+      </div>
+    );
+  }
+
+  if (step === 3) {
+    return (
+      <div className="space-y-6">
+        {/* Image Upload */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-bold ml-1 text-slate-700">Site Logo / Main Image</label>
           <div
             onClick={() => setShowImageModal(true)}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`mt-1 border-2 border-dashed rounded-2xl aspect-video flex flex-col items-center justify-center cursor-pointer transition-all
+            className={`mt-1 border-2 border-dashed rounded-3xl aspect-video flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden relative
               ${
                 isDragging
                   ? "border-primary bg-primary/10"
-                  : "border-slate-300 hover:border-primary hover:bg-primary/5"
+                  : "border-slate-200 hover:border-primary hover:bg-primary/5 bg-slate-50/50"
               }`}
           >
             {previewUrl ? (
-              <div className="relative">
+              <div className="w-full h-full relative group">
                 <img
                   src={previewUrl}
                   alt="Preview"
-                  className="w-full h-full object-cover rounded-2xl"
+                  className="w-full h-full object-cover"
                 />
+                <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                  <p className="text-white font-bold text-sm bg-black/50 px-4 py-2 rounded-full">Change Image</p>
+                </div>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
                     removeImage();
                   }}
-                  className="absolute top-3 right-3 bg-black/70 hover:bg-red-600 text-white p-1.5 rounded-full transition-colors"
+                  className="absolute top-4 right-4 bg-white/90 hover:bg-red-500 hover:text-white text-slate-600 p-2 rounded-full transition-all shadow-md z-10"
                 >
-                  <X size={18} />
+                  <X size={20} />
                 </button>
               </div>
             ) : (
-              <div className="text-center">
-                <Upload className="mx-auto text-slate-400 mb-3" size={36} />
-                <p className="font-medium text-sm">Upload Site Image</p>
-                <p className="text-xs text-slate-500 mt-1">
-                  PNG, JPG, WebP, GIF • Max 5MB
-                </p>
-                <p className="text-xs text-slate-400 mt-2">
-                  Drag & drop or click to upload
+              <div className="text-center p-6">
+                <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 border border-slate-100">
+                  <Upload className="text-primary" size={28} />
+                </div>
+                <p className="font-bold text-slate-700">Upload Site Image</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  Drag & drop or click to browse
                 </p>
               </div>
             )}
           </div>
         </div>
 
-        {/* Rest of the form remains the same */}
-        {/* Site Name */}
-        <label className="block">
-          <span className="text-sm font-bold ml-1">Site Name</span>
-          <input
-            required
-            type="text"
-            className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition-all"
-            placeholder="My Business Page"
-            value={formData.name}
-            onChange={(e) =>
-              setFormData((prev: any) => ({ ...prev, name: e.target.value }))
-            }
-          />
-        </label>
-
-        {/* URL Slug */}
-        <label className="block">
-          <span className="text-sm font-bold ml-1">Desired URL</span>
-          <div className="flex mt-1">
-            <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 bg-slate-50 text-slate-400 text-xs shrink-0">
-              {SITE_SHORT_NAME}
-              {DOMAIN_NAME}/
-            </span>
-            <input
-              required
-              type="text"
-              className="flex-1 min-w-0 px-3 py-3 rounded-r-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
-              placeholder="my-site"
-              value={formData.slug}
-              onChange={onSlugChange}
-            />
-          </div>
-        </label>
-
-        {/* Whatsapp Number */}
-        <label className="block">
-          <span className="text-sm font-bold ml-1">Whatsapp Number</span>
-          <div className="flex mt-1">
-            <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 bg-slate-50 text-slate-400 text-xs shrink-0">
-              +234
-            </span>
-            <input
-              required
-              type="number"
-              className="flex-1 min-w-0 px-3 py-3 rounded-r-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition-all text-sm"
-              placeholder="8012345678"
-              value={formData.whatsappNumber}
-              onChange={(e) =>
-                setFormData((prev: any) => ({
-                  ...prev,
-                  whatsappNumber: e.target.value,
-                }))
-              }
-            />
-          </div>
-        </label>
-
         {/* Description Field */}
-        <label className="block">
-          <span className="text-sm font-bold ml-1">Short Description</span>
+        <div className="space-y-1.5">
+          <label className="text-sm font-bold ml-1 text-slate-700">Business Description</label>
           <textarea
-            className="w-full mt-1 px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none transition-all resize-none"
-            placeholder="Tell us a bit about your business..."
-            rows={3}
+            className={`w-full px-4 py-3.5 rounded-2xl border ${errors.description ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all resize-none shadow-sm`}
+            placeholder="Briefly describe what your business does..."
+            rows={4}
             value={formData.description}
-            onChange={(e) =>
+            onChange={(e) => {
+              setTouchedFields((prev) => ({ ...prev, description: true }));
               setFormData((prev: any) => ({
                 ...prev,
                 description: e.target.value,
-              }))
-            }
+              }));
+            }}
+            onBlur={() => setTouchedFields((prev) => ({ ...prev, description: true }))}
           />
-        </label>
+          {errors.description && <p className="text-red-500 text-xs ml-1 font-medium">{errors.description}</p>}
+        </div>
 
         {/* AI Toggle */}
         {canUseAI && (
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-primary/5 border border-primary/10">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary rounded-lg">
-                <Sparkles size={18} className="text-white" />
+          <div className="flex items-center justify-between p-5 rounded-3xl bg-primary/5 border border-primary/10 shadow-sm">
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-primary rounded-2xl shadow-sm">
+                <Sparkles size={20} className="text-white" />
               </div>
               <div>
-                <p className="text-sm font-bold">Generate with AI</p>
-                <p className="text-[10px] text-slate-500">
-                  Auto-fill content based on your description
+                <p className="text-sm font-extrabold text-slate-800">Generate with AI</p>
+                <p className="text-[10px] text-slate-500 font-medium">
+                  We&apos;ll auto-fill your site content based on the description
                   {plan && ` (${AI_DAILY_LIMITS[plan]}/day)`}
                 </p>
               </div>
             </div>
-            <input
-              type="checkbox"
-              className="w-5 h-5 accent-primary cursor-pointer"
-              checked={formData.generateWithAI}
-              onChange={(e) =>
-                setFormData((prev: any) => ({
-                  ...prev,
-                  generateWithAI: e.target.checked,
-                }))
-              }
-            />
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={formData.generateWithAI}
+                onChange={(e) =>
+                  setFormData((prev: any) => ({
+                    ...prev,
+                    generateWithAI: e.target.checked,
+                  }))
+                }
+              />
+              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+            </label>
+          </div>
+        )}
+
+        {/* Image Upload Modal */}
+        {showImageModal && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-60 p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
+              <div className="p-8">
+                <div className="flex justify-between items-center mb-8">
+                  <h3 className="font-black text-2xl">Upload Image</h3>
+                  <button 
+                    onClick={() => setShowImageModal(false)}
+                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                  >
+                    <X size={24} />
+                  </button>
+                </div>
+
+                <div
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                  className={`border-2 border-dashed rounded-[24px] h-72 flex flex-col items-center justify-center cursor-pointer transition-all
+                    ${
+                      isDragging
+                        ? "border-primary bg-primary/5"
+                        : "border-slate-200 hover:border-primary bg-slate-50/50"
+                    }`}
+                >
+                  <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center mb-5 border border-slate-100">
+                    <ImageIcon size={40} className="text-slate-300" />
+                  </div>
+                  <p className="font-bold text-lg text-slate-700">
+                    {isDragging ? "Drop it here!" : "Drag & drop image"}
+                  </p>
+                  <p className="text-sm text-slate-400 mt-2">or</p>
+                  <label className="mt-5 px-8 py-3.5 bg-primary text-white rounded-2xl font-bold cursor-pointer hover:bg-primary/90 transition-all shadow-md active:scale-95">
+                    Browse Files
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) handleImageSelect(file);
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div className="p-6 bg-slate-50/50 border-t border-slate-100">
+                <button
+                  onClick={() => setShowImageModal(false)}
+                  className="w-full py-4 text-slate-500 font-bold hover:text-slate-700 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </div>
+    );
+  }
 
-      {/* Image Upload Modal (with Drag & Drop) */}
-      {showImageModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
-          <div className="bg-white rounded-3xl w-full max-w-md mx-4 overflow-hidden">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="font-bold text-xl">Upload Image</h3>
-                <button onClick={() => setShowImageModal(false)}>
-                  <X size={24} />
-                </button>
-              </div>
-
-              <div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                className={`border-2 border-dashed rounded-2xl h-64 flex flex-col items-center justify-center cursor-pointer transition-all
-                  ${
-                    isDragging
-                      ? "border-primary bg-primary/10"
-                      : "border-slate-300 hover:border-primary"
-                  }`}
-              >
-                <ImageIcon size={48} className="text-slate-400 mb-4" />
-                <p className="font-medium text-lg">
-                  {isDragging ? "Drop image here" : "Drag & drop image"}
-                </p>
-                <p className="text-sm text-slate-500 mt-1">or</p>
-                <label className="mt-3 px-6 py-2.5 bg-primary text-white rounded-2xl cursor-pointer hover:bg-primary/90 transition-all">
-                  Browse Files
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleImageSelect(file);
-                    }}
-                  />
-                </label>
-              </div>
-            </div>
-
-            <div className="border-t p-4">
-              <button
-                onClick={() => setShowImageModal(false)}
-                className="w-full py-3 border border-slate-300 rounded-2xl font-medium hover:bg-slate-50"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="pt-4">
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full h-14 bg-primary text-primary-foreground rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50"
-        >
-          {loading ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            <>
-              Create Site <ArrowRight size={20} />
-            </>
-          )}
-        </button>
-      </div>
-    </>
-  );
+  return null;
 }

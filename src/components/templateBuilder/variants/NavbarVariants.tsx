@@ -220,11 +220,11 @@ const NavbarShell = ({
   children: React.ReactNode;
   isEditor?: boolean;
 }) => (
-  <header
-    className={`${!isEditor ? "sticky top-0 z-50" : ""} border-b backdrop-blur-md bg-(--qs-bg)/95 border-(--qs-border)`}
+  <div
+    className={`absolute top-0 left-0 z-50 w-full border-b backdrop-blur-md bg-(--qs-bg)/0 border-(--qs-border)/0`}
   >
     {children}
-  </header>
+  </div>
 );
 
 // ─────────────────────────────────────────────
