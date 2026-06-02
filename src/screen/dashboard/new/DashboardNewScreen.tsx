@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { ArrowLeft, ArrowRight, Check, Loader2, Rocket, X } from "lucide-react";
@@ -76,7 +76,7 @@ export default function CreateSitePage() {
     if (errors.type) setErrors((prev) => ({ ...prev, type: "" }));
   };
 
-  const validateFields = (currentStep: number, isLive = false) => {
+  const validateFields = useCallback((currentStep: number, isLive = false) => {
     const newErrors: Record<string, string> = {};
 
     if (currentStep === 1) {
@@ -111,13 +111,13 @@ export default function CreateSitePage() {
     }
 
     return newErrors;
-  };
+  }, [formData.description, formData.name, formData.slug, formData.type, formData.whatsappNumber, touchedFields.name, touchedFields.slug, touchedFields.whatsappNumber]);
 
   // Run live validation as user types
   useEffect(() => {
     const liveErrors = validateFields(step, true);
     setErrors(liveErrors);
-  }, [formData, step, touchedFields]);
+  }, [formData, step, touchedFields, validateFields]);
 
   const nextStep = async () => {
     // Mark current step fields as touched/dirty on submission attempt

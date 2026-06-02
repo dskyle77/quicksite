@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { SectionProps } from "../../types";
 import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
 import Container from "@/components/shared/Container";
