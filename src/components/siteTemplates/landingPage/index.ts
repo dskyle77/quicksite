@@ -26,7 +26,7 @@ export const landingPageConfig = {
     {
       id: "pr_",
       type: "pricing",
-      variant: "highlight-top",
+      variant: "highlight",
       enabled: true,
       anchorName: "pricing",
     },
@@ -310,7 +310,7 @@ const landingPage: TemplateContent = {
   config: {
     type: "landing-page",
     theme: "light",
-    canCustomize: true,
+    canCustomize: false,
     isPremium: false,
   },
   contentConfig: landingPageConfig,

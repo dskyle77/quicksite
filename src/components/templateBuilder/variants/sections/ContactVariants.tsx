@@ -59,7 +59,7 @@ export const ContactSection = ({
                 contentEditable={isEditor}
                 suppressContentEditableWarning
                 onBlur={(e) =>
-                  onUpdate("content.title", e.currentTarget.textContent?.trim())
+                  onUpdate("title", e.currentTarget.textContent?.trim())
                 }
               >
                 {content.title ?? "Let's Work Together"}
@@ -71,7 +71,7 @@ export const ContactSection = ({
                 contentEditable={isEditor}
                 suppressContentEditableWarning
                 onBlur={(e) =>
-                  onUpdate("content.desc", e.currentTarget.textContent?.trim())
+                  onUpdate("desc", e.currentTarget.textContent?.trim())
                 }
               >
                 {content.desc ??
@@ -84,9 +84,9 @@ export const ContactSection = ({
                 isEditor={isEditor}
                 label={content.primaryButton ?? "Send a Message"}
                 linkConfig={content.primaryButtonLink}
-                onLabelChange={(v) => onUpdate("content.primaryButton", v)}
+                onLabelChange={(v) => onUpdate("primaryButton", v)}
                 onLinkChange={(cfg) =>
-                  onUpdate("content.primaryButtonLink", cfg)
+                  onUpdate("primaryButtonLink", cfg)
                 }
                 className="rounded-2xl px-8 py-5 font-bold text-center transition-all duration-300 hover:-translate-y-1"
                 style={{
@@ -100,9 +100,9 @@ export const ContactSection = ({
                   isEditor={isEditor}
                   label={content.secondaryButton}
                   linkConfig={content.secondaryButtonLink}
-                  onLabelChange={(v) => onUpdate("content.secondaryButton", v)}
+                  onLabelChange={(v) => onUpdate("secondaryButton", v)}
                   onLinkChange={(cfg) =>
-                    onUpdate("content.secondaryButtonLink", cfg)
+                    onUpdate("secondaryButtonLink", cfg)
                   }
                   className="rounded-2xl px-8 py-5 font-bold text-center transition-all duration-300 hover:-translate-y-1"
                   style={{
@@ -148,7 +148,7 @@ export const ContactSection = ({
               contentEditable={isEditor}
               suppressContentEditableWarning
               onBlur={(e) =>
-                onUpdate("content.title", e.currentTarget.textContent?.trim())
+                onUpdate("title", e.currentTarget.textContent?.trim())
               }
             >
               {content.title ?? "Get In Touch"}
@@ -160,7 +160,7 @@ export const ContactSection = ({
               contentEditable={isEditor}
               suppressContentEditableWarning
               onBlur={(e) =>
-                onUpdate("content.desc", e.currentTarget.textContent?.trim())
+                onUpdate("desc", e.currentTarget.textContent?.trim())
               }
             >
               {content.desc ??
@@ -172,9 +172,9 @@ export const ContactSection = ({
                 isEditor={isEditor}
                 label={content.primaryButton ?? "Send Message"}
                 linkConfig={content.primaryButtonLink}
-                onLabelChange={(v) => onUpdate("content.primaryButton", v)}
+                onLabelChange={(v) => onUpdate("primaryButton", v)}
                 onLinkChange={(cfg) =>
-                  onUpdate("content.primaryButtonLink", cfg)
+                  onUpdate("primaryButtonLink", cfg)
                 }
                 className="inline-flex items-center justify-center rounded-2xl px-10 py-5 font-bold transition-all duration-300 hover:-translate-y-1"
                 style={{
@@ -247,7 +247,7 @@ export const ContactSection = ({
                 contentEditable={isEditor}
                 suppressContentEditableWarning
                 onBlur={(e) =>
-                  onUpdate("content.title", e.currentTarget.textContent?.trim())
+                  onUpdate("title", e.currentTarget.textContent?.trim())
                 }
               >
                 {content.title ?? "Let's Talk About Your Project"}
@@ -259,7 +259,7 @@ export const ContactSection = ({
                 contentEditable={isEditor}
                 suppressContentEditableWarning
                 onBlur={(e) =>
-                  onUpdate("content.desc", e.currentTarget.textContent?.trim())
+                  onUpdate("desc", e.currentTarget.textContent?.trim())
                 }
               >
                 {content.desc ??
@@ -298,21 +298,21 @@ export const ContactSection = ({
                       onBlur={(e) => {
                         if (i === 0) {
                           onUpdate(
-                            "contact.email",
+                            "email",
                             e.currentTarget.textContent?.trim(),
                           );
                         }
 
                         if (i === 1) {
                           onUpdate(
-                            "contact.phone",
+                            "phone",
                             e.currentTarget.textContent?.trim(),
                           );
                         }
 
                         if (i === 2) {
                           onUpdate(
-                            "contact.location",
+                            "location",
                             e.currentTarget.textContent?.trim(),
                           );
                         }
@@ -419,7 +419,7 @@ export const ContactSection = ({
                       suppressContentEditableWarning
                       onBlur={(e) =>
                         onUpdate(
-                          "content.primaryButton",
+                          "primaryButton",
                           e.currentTarget.textContent?.trim(),
                         )
                       }
@@ -470,7 +470,7 @@ export const ContactSection = ({
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
-              onUpdate("content.title", e.currentTarget.textContent?.trim())
+              onUpdate("title", e.currentTarget.textContent?.trim())
             }
           >
             {content.title ?? "Let's Build Something Great"}
@@ -480,7 +480,7 @@ export const ContactSection = ({
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
-              onUpdate("content.desc", e.currentTarget.textContent?.trim())
+              onUpdate("desc", e.currentTarget.textContent?.trim())
             }
           >
             {content.desc ??
@@ -491,8 +491,8 @@ export const ContactSection = ({
               isEditor={isEditor}
               label={content.primaryButton ?? "Send a Message"}
               linkConfig={content.primaryButtonLink}
-              onLabelChange={(v) => onUpdate("content.primaryButton", v)}
-              onLinkChange={(cfg) => onUpdate("content.primaryButtonLink", cfg)}
+              onLabelChange={(v) => onUpdate("primaryButton", v)}
+              onLinkChange={(cfg) => onUpdate("primaryButtonLink", cfg)}
               className="rounded-lg px-6 py-3 font-bold text-center w-full @sm:w-auto transition-all duration-200 hover:-translate-y-1 bg-(--qs-primary) text-(--qs-primary-fg)"
             />
           </div>

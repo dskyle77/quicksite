@@ -2,8 +2,8 @@
 import { useState, useEffect, useRef } from "react";
 import { X } from "lucide-react";
 import { TemplateComponentProps } from "@/lib/templates";
-import { BuilderConfig, SectionVariantKey, SectionConfig } from "./types";
-import { BuilderSidebar, SectionMenu } from "./BuilderSidebar";
+import { BuilderConfig, SectionConfig } from "./types";
+import { BuilderSidebar, SectionMenu, GlobalMenu } from "./BuilderSidebar";
 
 import Reveal from "../shared/Reveal";
 
@@ -13,12 +13,111 @@ import { HeroVariants } from "./variants/HeroVariants";
 import { FooterVariants } from "./variants/FooterVariants";
 import { SectionVariants } from "./variants/sections/index";
 import { cn } from "@/lib/utils";
+import { useLongPress } from "@/hooks/useLongPress";
 
 type TemplateBuilderProps = Omit<TemplateComponentProps, "onUpdate"> & {
   onUpdate: (path: string, value: any) => void;
   customize: boolean;
   isPreview: boolean;
   hasNavbar: boolean;
+};
+
+type GlobalComponentWithMenuProps = {
+  type: "navbar" | "hero" | "footer";
+  children: React.ReactNode;
+  isEditor: boolean;
+  config: BuilderConfig;
+  onConfigChange: (newConfig: BuilderConfig) => void;
+  className?: string;
+  cs: boolean;
+  scs: () => void;
+};
+
+const GlobalComponentWithMenu = ({
+  type,
+  children,
+  isEditor,
+  config,
+  onConfigChange,
+  className,
+  cs,
+  scs,
+}: GlobalComponentWithMenuProps) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleChange = (v: BuilderConfig) => {
+    onConfigChange(v);
+    setMenuOpen(false);
+  };
+
+  const longPress = useLongPress({
+    delay: 800,
+    onLongPress() {
+      setMenuOpen(!menuOpen);
+    },
+  });
+
+  return (
+    <div
+      className={cn("relative", className)}
+      {...longPress}
+      onClick={() => scs()}
+    >
+      {cs && (
+        <div
+          className="absolute inset-0 z-20 pointer-events-none border-2 border-dashed border-indigo-400 rounded-lg min-h-16"
+          style={{ boxSizing: "border-box" }}
+        />
+      )}
+      <div
+        style={
+          type === "navbar" && isEditor
+            ? { width: "calc(100% - 30px)" }
+            : undefined
+        }
+      >
+        {children}
+      </div>
+      {isEditor && (
+        <div
+          className={cn(
+            "absolute top-4 right-3 z-31 bg-(--qs-bg-alt)/85 rounded-full w-8 h-8 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.08)] cursor-pointer",
+            type === "hero" && "top-30",
+          )}
+          title={`${type} Options`}
+          onClick={() => setMenuOpen(!menuOpen)}
+        >
+          {menuOpen ? (
+            <X />
+          ) : (
+            <svg
+              width="20"
+              height="20"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <circle cx="5" cy="12" r="2" />
+              <circle cx="12" cy="12" r="2" />
+              <circle cx="19" cy="12" r="2" />
+            </svg>
+          )}
+        </div>
+      )}
+      {isEditor && menuOpen && (
+        <div
+          className={cn(
+            "absolute top-8 right-3 z-32 bg-white rounded-lg shadow-lg border border-gray-200 mt-2 w-60",
+            type === "hero" && "top-38",
+          )}
+          style={{ minWidth: "210px" }}
+        >
+          <GlobalMenu config={config} onChange={handleChange} type={type} />
+        </div>
+      )}
+    </div>
+  );
 };
 
 type SectionWithMenuProps = {
@@ -33,6 +132,9 @@ type SectionWithMenuProps = {
   onConfigChange: (newConfig: BuilderConfig) => void;
   idx: number;
   config: BuilderConfig;
+
+  cs: boolean;
+  scs: () => void;
 };
 
 const SectionWithMenu = ({
@@ -45,8 +147,15 @@ const SectionWithMenu = ({
   onConfigChange,
   idx,
   config,
+  cs,
+  scs,
 }: SectionWithMenuProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleChange = (v: BuilderConfig) => {
+    onConfigChange(v);
+    setMenuOpen(false);
+  };
 
   const SectionComponent = SectionVariants[sec.type];
   if (!SectionComponent) return null;
@@ -55,13 +164,30 @@ const SectionWithMenu = ({
   const contentKey = `${sec.id}${sec.type}`;
   const sectionContent = content[contentKey] || {};
   return (
-    <div className={cn("relative", !enabled && "h-30")}>
+    <div className={cn("relative", !enabled && "h-40")} onClick={() => scs()}>
+      {cs && (
+        <div
+          className="absolute inset-0 z-20 pointer-events-none border-2 border-dashed border-indigo-400 rounded-lg"
+          style={{ boxSizing: "border-box" }}
+        />
+      )}
       {!enabled && (
-        <div className="absolute inset-0 z-10 pointer-events-none bg-gray-800/80" />
+        <div className="absolute inset-0 z-20 pointer-events-none flex flex-col justify-center items-center bg-linear-to-br from-gray-900/90 to-gray-800/70 text-white border-2 border-dashed border-red-400 shadow-xl transition-all duration-300">
+          <div className="flex flex-col items-center">
+            <span className="flex items-center gap-3">
+              <span className="text-5xl font-black tracking-tight text-red-300 drop-shadow">
+                DISABLED
+              </span>
+            </span>
+            <p className="text-lg font-medium bg-black/20 rounded-md px-2 py-1 mt-2 shadow-inner text-red-100 text-center max-w-xs">
+              This section will not show in your site preview or live website.
+            </p>
+          </div>
+        </div>
       )}
 
       <SectionComponent
-        variant={sec.variant as SectionVariantKey}
+        variant={sec.variant as string}
         isEditor={isEditor && enabled}
         content={sectionContent}
         onUpdate={makeHandleUpdates(contentKey)}
@@ -72,7 +198,10 @@ const SectionWithMenu = ({
       />
       {isEditor && (
         <div
-          className="absolute top-3 right-3 z-20 bg-white/85 rounded-full w-8 h-8 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.08)] cursor-pointer"
+          className={cn(
+            "absolute top-3 right-3 z-20 rounded-full w-8 h-8 flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.08)] cursor-pointer",
+            idx % 2 === 0 ? "bg-(--qs-bg-alt)/85" : "bg-(--qs-bg)/85",
+          )}
           title="Section Options"
           onClick={() => setMenuOpen(!menuOpen)}
         >
@@ -103,7 +232,7 @@ const SectionWithMenu = ({
             config={config}
             section={sec}
             index={idx}
-            onChange={onConfigChange}
+            onChange={handleChange}
             type="section"
           />
         </div>
@@ -133,8 +262,10 @@ export default function TemplateBuilder({
   );
 
   // Dynamic Sidebar Width States (Min: 280px, Max: 600px)
-  const [sidebarWidth, setSidebarWidth] = useState(340);
+  const [sidebarWidth, setSidebarWidth] = useState(320);
   const isResizingRef = useRef(false);
+
+  const [currentSection, setCurrentSection] = useState<string>("");
 
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
@@ -254,9 +385,9 @@ export default function TemplateBuilder({
           overflowY: "auto",
         }}
       >
-        {customize && isEditor && !sidebarOpen && (
+        {customize && isEditMode && !sidebarOpen && (
           <button
-            className="fixed top-32 left-4 z-30 bg-white border rounded-full shadow-md px-4 py-2 text-xs font-semibold flex items-center gap-2 hover:bg-gray-50 transition"
+            className="fixed top-32 left-4 z-50 bg-(--qs-bg)/85 border rounded-full shadow-md px-4 py-2 text-xs font-semibold flex items-center gap-2 hover:bg-gray-50 transition"
             style={{
               boxShadow: "0 2px 10px 0 rgba(0,0,0,0.08)",
             }}
@@ -284,49 +415,85 @@ export default function TemplateBuilder({
         )}
 
         <div className={`@container w-full`}>
-          <header className="relative ">
-            <Navbar
-              isEditor={isEditMode}
-              content={content.navbar || {}}
-              onUpdate={makeHandleUpdates("navbar")}
-              slugs={slugs}
-            />
-          </header>
+          <GlobalComponentWithMenu
+            type="navbar"
+            isEditor={isEditMode}
+            config={effectiveConfig}
+            onConfigChange={handleConfigChange}
+            // cs={currentSection === "navbar" && isEditMode}
+            cs={false}
+            scs={() => setCurrentSection("navbar")}
+          >
+            <header className="relative ">
+              <Navbar
+                isEditor={isEditMode}
+                content={content.navbar || {}}
+                onUpdate={makeHandleUpdates("navbar")}
+                slugs={slugs}
+              />
+            </header>
+          </GlobalComponentWithMenu>
 
           <Reveal variant="scale">
-            <Hero
+            <GlobalComponentWithMenu
+              type="hero"
               isEditor={isEditMode}
-              content={content.hero || {}}
-              onUpdate={makeHandleUpdates("hero")}
-              slugs={slugs}
-            />
+              config={effectiveConfig}
+              onConfigChange={handleConfigChange}
+              cs={currentSection === "hero" && isEditMode}
+              scs={() => setCurrentSection("hero")}
+            >
+              <Hero
+                isEditor={isEditMode}
+                content={content.hero || {}}
+                onUpdate={makeHandleUpdates("hero")}
+                slugs={slugs}
+              />
+            </GlobalComponentWithMenu>
           </Reveal>
 
           <main>
-            {enabledSections.map((sec, i) => (
-              <Reveal key={sec.id + sec.type} variant="bottom">
-                <SectionWithMenu
-                  enabled={sec.enabled}
-                  sec={sec}
-                  content={content}
-                  isEditor={isEditMode}
-                  slugs={slugs}
-                  makeHandleUpdates={makeHandleUpdates}
-                  onConfigChange={handleConfigChange}
-                  idx={i}
-                  config={config}
-                />
-              </Reveal>
-            ))}
+            {enabledSections.map((sec, i) => {
+              const isSelected =
+                currentSection === sec.id + sec.type &&
+                sec.enabled &&
+                isEditMode;
+              return (
+                <Reveal key={sec.id + sec.type} variant="bottom">
+                  <SectionWithMenu
+                    enabled={sec.enabled}
+                    sec={sec}
+                    content={content}
+                    isEditor={isEditMode}
+                    slugs={slugs}
+                    makeHandleUpdates={makeHandleUpdates}
+                    onConfigChange={handleConfigChange}
+                    idx={i}
+                    config={config}
+                    cs={isSelected}
+                    scs={() => setCurrentSection(sec.id + sec.type)}
+                  />
+                </Reveal>
+              );
+            })}
           </main>
 
           <Reveal variant="bottom">
-            <Footer
+            <GlobalComponentWithMenu
+              type="footer"
               isEditor={isEditMode}
-              content={content.footer || {}}
-              onUpdate={makeHandleUpdates("footer")}
-              slugs={slugs}
-            />
+              config={effectiveConfig}
+              onConfigChange={handleConfigChange}
+              cs={currentSection === "footer" && isEditMode}
+              scs={() => setCurrentSection("footer")}
+            >
+              <Footer
+                isEditor={isEditMode}
+                content={content.footer || {}}
+                onUpdate={makeHandleUpdates("footer")}
+                slugs={slugs}
+              />
+            </GlobalComponentWithMenu>
           </Reveal>
         </div>
       </div>

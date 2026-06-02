@@ -11,7 +11,7 @@ import { PricingSection } from "./PricingVariants";
 import { FaqSection } from "./FaqVariants";
 import { CtaSection } from "./CtaVariants";
 
-export const SectionVariants: Partial<SectionVariantRegistry> = {
+export const SectionVariants: SectionVariantRegistry = {
   about: AboutSection,
   skills: SkillsSection,
   items: ItemsSection,

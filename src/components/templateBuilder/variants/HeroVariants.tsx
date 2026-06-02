@@ -99,93 +99,78 @@ const SplitVariant = ({
   isEditor,
   content,
   onUpdate,
-}: TemplateComponentProps) => (
-  <section
-    className="px-4 @sm:px-6 py-12 @sm:py-20 @md:py-32"
-    style={{ background: "var(--qs-bg, white)" }}
-  >
-    <Container>
-      <div className="grid gap-10 @md:gap-16 grid-cols-1 @md:grid-cols-2 items-center">
-        <div className="text-center @md:text-left flex flex-col items-center @md:items-start">
-          <span
-            className="mb-4 block text-xs @sm:text-sm font-bold uppercase tracking-widest"
-            style={{ color: "var(--qs-primary)" }}
-            contentEditable={isEditor}
-            suppressContentEditableWarning
-            onBlur={(e) =>
-              onUpdate("badge", e.currentTarget.textContent?.trim())
-            }
-          >
-            {content?.badge}
-          </span>
-          <h1
-            className="text-3xl @sm:text-5xl @lg:text-6xl font-bold leading-tight tracking-tight"
-            style={{
-              color: "var(--qs-text, #18181b)",
-            }}
-            contentEditable={isEditor}
-            suppressContentEditableWarning
-            onBlur={(e) =>
-              onUpdate("title", e.currentTarget.textContent?.trim())
-            }
-          >
-            {content?.title}
-          </h1>
-          <p
-            className="mt-6 text-base @sm:text-lg leading-relaxed max-w-xl"
-            style={{ color: "var(--qs-text-muted)" }}
-            contentEditable={isEditor}
-            suppressContentEditableWarning
-            onBlur={(e) =>
-              onUpdate("desc", e.currentTarget.textContent?.trim())
-            }
-          >
-            {content?.desc}
-          </p>
-          <div className="mt-8 @sm:mt-10 flex flex-col @sm:flex-row gap-4 w-full @sm:w-auto justify-center @md:justify-start">
-            <EditableLinkButton
-              isEditor={isEditor}
-              label={content?.primaryButton}
-              className="w-full @sm:w-auto text-center rounded-lg px-8 py-4 font-bold shadow-lg"
-              style={{
-                background: "var(--qs-primary)",
-                color: "var(--qs-primary-fg)",
-              }}
-              onLabelChange={(v) => onUpdate("primaryButton", v)}
-              linkConfig={content?.primaryButtonLink}
-              onLinkChange={(cfg) => onUpdate("primaryButtonLink", cfg)}
-            />
-            {content?.secondaryButton && (
+}: TemplateComponentProps) => {
+  const editableProps = (field: string) => ({
+    contentEditable: isEditor,
+    suppressContentEditableWarning: true,
+    onBlur: (e: React.FocusEvent<HTMLElement>) =>
+      onUpdate(field, e.currentTarget.textContent?.trim() || ""),
+  });
+
+  return (
+    <section
+      className="px-4 @sm:px-6 py-12 pt-20 @sm:py-20 @md:py-32"
+      style={{
+        background:
+          "linear-gradient(130deg, var(--qs-bg) 50%, var(--qs-primary) 120%)",
+      }}
+    >
+      <Container>
+        <div className="grid gap-10 @md:gap-16 grid-cols-1 @md:grid-cols-2 items-center">
+          <div className="text-center @md:text-left flex flex-col items-center @md:items-start">
+            <span
+              className="mb-4 block text-xs @sm:text-sm font-bold uppercase tracking-widest text-(--qs-primary)"
+              {...editableProps("badge")}
+            >
+              {content?.badge}
+            </span>
+            <h1
+              className="text-3xl @sm:text-5xl @lg:text-6xl font-bold leading-tight tracking-tight text-(--qs-text)"
+              {...editableProps("title")}
+            >
+              {content?.title}
+            </h1>
+            <p
+              className="mt-6 text-base @sm:text-lg leading-relaxed max-w-xl text-(--qs-text-muted)"
+              {...editableProps("desc")}
+            >
+              {content?.desc}
+            </p>
+            <div className="mt-8 @sm:mt-10 flex flex-col @sm:flex-row gap-4 w-full @sm:w-auto justify-center @md:justify-start">
               <EditableLinkButton
                 isEditor={isEditor}
-                label={content?.secondaryButton}
-                className="w-full @sm:w-auto text-center rounded-lg px-8 py-4 font-bold"
-                style={{
-                  border: "2px solid var(--qs-border)",
-                  color: "var(--qs-text)",
-                  background: "var(--qs-bg-alt, transparent)",
-                }}
-                onLabelChange={(v) => onUpdate("secondaryButton", v)}
-                linkConfig={content?.secondaryButtonLink}
-                onLinkChange={(cfg) => onUpdate("secondaryButtonLink", cfg)}
+                label={content?.primaryButton}
+                className="w-full @sm:w-auto text-center rounded-lg px-8 py-4 font-bold shadow-lg bg-(--qs-primary) text-(--qs-primary-fg)"
+                onLabelChange={(v) => onUpdate("primaryButton", v)}
+                linkConfig={content?.primaryButtonLink}
+                onLinkChange={(cfg) => onUpdate("primaryButtonLink", cfg)}
               />
-            )}
+              {content?.secondaryButton && (
+                <EditableLinkButton
+                  isEditor={isEditor}
+                  label={content?.secondaryButton}
+                  className="w-full @sm:w-auto text-center rounded-lg px-8 py-4 font-bold border-2 border-(--qs-border) text-(--qs-text) bg-(--qs-bg-alt,transparent)"
+                  onLabelChange={(v) => onUpdate("secondaryButton", v)}
+                  linkConfig={content?.secondaryButtonLink}
+                  onLinkChange={(cfg) => onUpdate("secondaryButtonLink", cfg)}
+                />
+              )}
+            </div>
+          </div>
+          <div
+            className="relative overflow-hidden rounded-2xl @sm:rounded-3xl border-4 @sm:border-0 shadow-2xl w-full max-w-lg @md:max-w-none mx-auto border-(--qs-bg-alt)"
+          >
+            <TemplateImage
+              source={content?.image1}
+              path={"hero.image1"}
+              isEditor={isEditor}
+            />
           </div>
         </div>
-        <div
-          className="relative overflow-hidden rounded-2xl @sm:rounded-3xl border-4 @sm:border-8 shadow-2xl w-full max-w-lg @md:max-w-none mx-auto"
-          style={{ borderColor: "var(--qs-bg-alt)" }}
-        >
-          <TemplateImage
-            source={content?.image1}
-            path={"hero.image1"}
-            isEditor={isEditor}
-          />
-        </div>
-      </div>
-    </Container>
-  </section>
-);
+      </Container>
+    </section>
+  );
+};
 
 // ─── 3. Minimalist ────────────────────────────────────────────────────────────
 

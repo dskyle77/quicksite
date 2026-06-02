@@ -17,6 +17,7 @@ import { ExperienceVariantList } from "./variants/sections/ExperienceVariants";
 import { SkillsVariantList } from "./variants/sections/SkillsVariants";
 
 import { makeWhatsappLink, year, img } from "../shared/helpers";
+import { PricingVariantList } from "./variants/sections/PricingVariants";
 // ─── Shared Helpers ───────────────────────────────────────────────────────────
 
 // ─── NAVBAR ───────────────────────────────────────────────────────────────────
@@ -503,7 +504,7 @@ export const variantOptions: Record<string, string[]> = {
   testimonials: ["grid", "carousel", "list"],
   contact: ["default", "split", "minimal", "form"],
   features: ["default", "list", "icons"],
-  pricing: ["default", "highlight-top", "compact"],
+  pricing: PricingVariantList,
   faq: ["default", "accordion", "numbered"],
   cta: ["default", "banner", "simple"],
   footer: ["classic", "centered", "columns", "none"],

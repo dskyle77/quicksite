@@ -8,11 +8,12 @@ import { TemplateComponentProps } from "@/lib/templates";
 import React from "react";
 import { LinkConfig } from "../shared/EditableLink";
 import { HeroVariantKey } from "./variants/HeroVariants";
+import { PricingSectionVariants } from "./variants/sections/PricingVariants";
 
 // ─── Shared Component Interface ───────────────────────────────────────────────
 
 export type SectionProps = TemplateComponentProps & {
-  variant?: SectionVariantKey;
+  variant: string;
   position: number;
   anchorName: string;
   path: string;
@@ -42,31 +43,31 @@ export type SectionType =
   | "team"
   | "gallery";
 
-export type SectionVariantKey =
-  | "default"
-  | "split"
-  | "grid"
-  | "grid-small"
-  | "list"
-  | "card"
-  | "carousel"
-  | "timeline"
-  | "cards"
-  | "minimal"
-  | "centered"
-  | "card-stats"
-  | "tags"
-  | "icons"
-  | "compact"
-  | "minimal-left"
-  | "banner"
-  | "form"
-  | "simple"
-  | "numbered"
-  | "accordion"
-  | "highlight-top"
-  | "card-stack"
-  | "card-grid";
+// export type string =
+//   | "default"
+//   | "split"
+//   | "grid"
+//   | "grid-small"
+//   | "list"
+//   | "card"
+//   | "carousel"
+//   | "timeline"
+//   | "cards"
+//   | "minimal"
+//   | "centered"
+//   | "card-stats"
+//   | "tags"
+//   | "icons"
+//   | "compact"
+//   | "minimal-left"
+//   | "banner"
+//   | "form"
+//   | "simple"
+//   | "numbered"
+//   | "accordion"
+//   | "highlight"
+//   | "card-stack"
+//   | "card-grid";
 
 // ─── Section Config ───────────────────────────────────────────────────────────
 
@@ -74,9 +75,9 @@ export interface SectionConfig {
   /** Unique ID — used as React key and for reordering */
   id: string;
   /** Which section component to render */
-  type: SectionType;
+  type: string;
   /** Which visual variant of that section to render */
-  variant: SectionVariantKey;
+  variant: string;
   /** Toggle visibility without removing from config */
   enabled: boolean;
   /** Optional override title shown in the editor sidebar */
@@ -121,17 +122,22 @@ export type VariantRegistry<K extends string = string> = Record<
   React.FC<TemplateComponentProps>
 >;
 
-export type SectionVariantRegistry = Record<
-  SectionType,
-  React.FC<
+export type SectionVariants = {
+  pricing: PricingSectionVariants;
+  [key: string]: string; 
+};
+
+// Registry mapping SectionType to component, with specific variant type per section.
+export type SectionVariantRegistry = {
+  [K in keyof SectionVariants]: React.FC<
     TemplateComponentProps & {
-      variant: SectionVariantKey;
+      variant: string;
       position: number;
       anchorName: string;
       path: string;
     }
-  >
->;
+  >;
+};
 
 // ─── Schema / Starter Content Helpers ────────────────────────────────────────
 // Each template's content.ts exports these two functions.

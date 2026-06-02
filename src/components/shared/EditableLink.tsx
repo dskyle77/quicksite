@@ -356,7 +356,7 @@ export default function EditableLinkButton({
 
   const { slugs, site } = useSiteContext();
   const slug = slugs?.slug;
-  const whatsappNumber = site?.whatsappNumber || ""
+  const whatsappNumber = site?.whatsappNumber || "";
 
   const handleClick = (e?: React.MouseEvent<HTMLAnchorElement>) => {
     // If there is no linkConfig, prevent navigation and do nothing
@@ -440,8 +440,12 @@ export default function EditableLinkButton({
   }
 
   return (
-    <span ref={wrapRef} className="relative inline-flex flex-col items-center">
+    <span
+      ref={wrapRef}
+      className="group relative inline-flex flex-col items-center"
+    >
       <span className="inline-flex items-center gap-1">
+        {/* Editable Label */}
         <span
           className={className}
           style={style}
@@ -453,9 +457,12 @@ export default function EditableLinkButton({
         >
           {label}
         </span>
+
+        {/* Edit Button - Only visible on hover */}
         <button
           title="Edit link"
-          className="ml-1 flex h-6 w-6 items-center justify-center rounded-full text-xs transition-transform hover:scale-110"
+          className="absolute top-0 right-0 flex h-6 w-6 items-center justify-center rounded-full text-xs transition-all duration-200 
+                     opacity-0 group-hover:opacity-100 group-hover:scale-110 hover:scale-125"
           style={{
             background:
               linkConfig?.type === "whatsapp"
@@ -485,9 +492,10 @@ export default function EditableLinkButton({
         </button>
       </span>
 
+      {/* Preview Link Info */}
       {linkConfig && !noPreview && (
         <span
-          className="truncate max-w-[160px] text-[10px] font-medium absolute -bottom-3"
+          className="truncate max-w-[160px] text-[10px] font-medium absolute -bottom-3 opacity-70 group-hover:opacity-100 transition-opacity"
           style={{
             color:
               linkConfig.type === "whatsapp"

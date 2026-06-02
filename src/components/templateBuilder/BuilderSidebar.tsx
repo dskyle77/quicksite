@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/set-state-in-effect */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 
 "use client";
 
@@ -9,7 +8,6 @@ import { variantOptions } from "./contentBlocks";
 import {
   BuilderConfig,
   SectionConfig,
-  SectionVariantKey,
   SectionType,
 } from "./types";
 
@@ -84,6 +82,33 @@ const Select = <T extends string>({
   </div>
 );
 
+// ─── GlobalMenu ───────────────────────────────────────────────────────────────
+
+export const GlobalMenu: React.FC<{
+  config: BuilderConfig;
+  onChange: (config: BuilderConfig) => void;
+  type: "navbar" | "hero" | "footer";
+}> = ({ config, onChange, type }) => {
+  const updateRoot = (key: "navbar" | "hero" | "footer", value: string) => {
+    onChange({ ...config, [key]: value });
+  };
+
+  const variants = variantOptions[type] as string[];
+
+  return (
+    <div className={cls.card}>
+      <div className="mb-0">
+        <label className={cls.label}>{type} Variant</label>
+        <Select
+          value={config[type]}
+          options={variants}
+          onChange={(v) => updateRoot(type, v)}
+        />
+      </div>
+    </div>
+  );
+};
+
 // ─── SectionMenu ──────────────────────────────────────────────────────────────
 
 export const SectionMenu: React.FC<{
@@ -123,7 +148,7 @@ export const SectionMenu: React.FC<{
     setTimeout(scrollTo);
   };
 
-  const variants = variantOptions[section.type] as readonly SectionVariantKey[];
+  const variants = variantOptions[section.type] as readonly string[];
 
   const handleAnchorInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -287,14 +312,10 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
   open,
   onClose,
 }) => {
-  const updateRoot = (key: "navbar" | "hero" | "footer", value: string) => {
-    onChange({ ...config, [key]: value });
-  };
-
   const addSection = (type: string) => {
     if (!Object.keys(variantOptions).includes(type)) return;
     const stype = type as SectionType;
-    const variants = variantOptions[stype] as readonly SectionVariantKey[];
+    const variants = variantOptions[stype] as readonly string[];
     const newSectionId = crypto.randomUUID();
     const newSection: SectionConfig = {
       id: newSectionId,
@@ -352,14 +373,12 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
             </h3>
             <div className="space-y-3">
               {(["navbar", "hero", "footer"] as const).map((key) => (
-                <div key={key}>
-                  <label className={cls.label}>{key}</label>
-                  <Select
-                    value={config[key]}
-                    options={variantOptions[key] as any}
-                    onChange={(v) => updateRoot(key, v)}
-                  />
-                </div>
+                <GlobalMenu
+                  key={key}
+                  config={config}
+                  onChange={onChange}
+                  type={key}
+                />
               ))}
             </div>
           </section>

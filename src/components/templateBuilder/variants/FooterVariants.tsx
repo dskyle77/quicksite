@@ -93,32 +93,65 @@ const CenteredFooter = ({
   isEditor,
   content,
   onUpdate,
-}: TemplateComponentProps) => (
-  <footer
-    className="py-20 px-6 text-center"
-    style={{ background: "var(--qs-bg-alt)" }}
-  >
-    <div className="text-3xl mb-6">✦</div>
-    <nav className="flex justify-center flex-wrap gap-8 mb-8 font-medium text-sm">
-      {["About", "Work", "Contact"].map((label) => (
-        <a key={label} href="#" className="hover:opacity-70 transition-opacity">
-          {label}
-        </a>
-      ))}
-    </nav>
-    <p
-      className="text-sm"
-      style={{ color: "var(--qs-text-muted)" }}
-      contentEditable={isEditor}
-      suppressContentEditableWarning
-      onBlur={(e) => onUpdate("copyright", e.currentTarget.textContent?.trim())}
+}: TemplateComponentProps) => {
+  const socials = content?.socials ?? [
+    { label: "About", linkConfig: { type: "url" as const, url: "#" } },
+    { label: "Work", linkConfig: { type: "url" as const, url: "#" } },
+    { label: "Contact", linkConfig: { type: "url" as const, url: "#" } },
+  ];
+
+  return (
+    <footer
+      className="py-20 px-6 text-center"
+      style={{ background: "var(--qs-bg-alt)" }}
     >
-      {content?.copyright ??
-        `© ${new Date().getFullYear()} All rights reserved.`}
-    </p>
-    <div className="mt-6 flex justify-center">{!isEditor && <Branding />}</div>
-  </footer>
-);
+      <div className="text-3xl mb-6">✦</div>
+      <nav className="flex justify-center flex-wrap gap-8 mb-8 font-medium text-sm">
+        {socials.map((social: any, i: number) => (
+          <EditableLinkButton
+            key={i}
+            isEditor={isEditor}
+            className="transition-opacity hover:opacity-70"
+            noPreview={true}
+            label={typeof social === "string" ? social : (social?.label ?? "")}
+            linkConfig={
+              typeof social === "string" ? undefined : social?.linkConfig
+            }
+            onLabelChange={(label) => {
+              const next = [...socials];
+              next[i] =
+                typeof social === "string"
+                  ? { label, linkConfig: { type: "url", url: "" } }
+                  : { ...next[i], label };
+              onUpdate("socials", next);
+            }}
+            onLinkChange={(linkConfig) => {
+              const next = [...socials];
+              next[i] =
+                typeof social === "string"
+                  ? { label: social, linkConfig }
+                  : { ...next[i], linkConfig };
+              onUpdate("socials", next);
+            }}
+          />
+        ))}
+      </nav>
+      <p
+        className="text-sm"
+        style={{ color: "var(--qs-text-muted)" }}
+        contentEditable={isEditor}
+        suppressContentEditableWarning
+        onBlur={(e) =>
+          onUpdate("copyright", e.currentTarget.textContent?.trim())
+        }
+      >
+        {content?.copyright ??
+          `© ${new Date().getFullYear()} All rights reserved.`}
+      </p>
+      <div className="mt-6 flex justify-center">{!isEditor && <Branding />}</div>
+    </footer>
+  );
+};
 
 // ─── 3. Columns ───────────────────────────────────────────────────────────────
 // Multi-column layout — brand column + link groups. Good for landing pages.
@@ -182,14 +215,14 @@ const ColumnsFooter = ({
             Connect
           </p>
           <div className="flex flex-col gap-2 text-sm">
-            {[0, 1, 2].map((n: any) => (
+            {socials.map((social: any, n: number) => (
               <EditableLinkButton
                 key={n}
                 isEditor={isEditor}
                 className="hover:opacity-70 transition-opacity"
                 noPreview={true}
-                label={socials[n]?.label}
-                linkConfig={socials[n]?.linkConfig}
+                label={social?.label}
+                linkConfig={social?.linkConfig}
                 onLabelChange={(label) => {
                   const updtd = [...socials];
                   updtd[n] = {
@@ -249,7 +282,7 @@ const ColumnsFooter = ({
 
 // None variant: Renders no footer at all.
 
-const None = () => <div></div>;
+const None = () => null;
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
 
