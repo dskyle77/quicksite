@@ -48,7 +48,7 @@ export default function SitesScreen({
 
   // Data state
   const [sites, setSites] = useState<AdminSite[]>(initial);
-  const [users, setUsers] = useState<AdminUser[]>(initialUsers);
+  const [users] = useState<AdminUser[]>(initialUsers);
   const [search, setSearch] = useState(currentSearch || "");
   const [filter, setFilter] = useState(currentStatus || "all");
 

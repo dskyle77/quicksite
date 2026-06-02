@@ -248,33 +248,35 @@ export default function DashboardLayoutScreen({
 
       {/* ── Main ─────────────────────────────────────────────────────── */}
       <div className="flex-1 flex flex-col min-w-0 relative h-screen overflow-hidden">
-        <header className="sticky top-0 z-20 bg-background/80 dark:bg-[#050505]/80 backdrop-blur-md border-b border-border/50 px-6 py-4 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+        <header className="sticky top-0 z-20 bg-background/80 dark:bg-[#050505]/80 backdrop-blur-md border-b border-border/50 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <button
-              className="lg:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors"
+              className="lg:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors flex-shrink-0"
               onClick={() => setSidebarOpen(true)}
+              aria-label="Open sidebar menu"
             >
               <Menu className="h-5 w-5" />
             </button>
-            <div className="space-y-0.5">
-              <h1 className="font-extrabold text-xl tracking-tight capitalize text-foreground">
+            <div className="space-y-0.5 min-w-0">
+              <h1 className="font-extrabold text-lg sm:text-xl tracking-tight capitalize text-foreground truncate">
                 {pageTitle}
               </h1>
-              <div className="flex items-center gap-2 text-[11px] font-medium text-muted-foreground">
+              <div className="flex items-center gap-1 sm:gap-2 text-[10px] sm:text-[11px] font-medium text-muted-foreground flex-wrap">
                 <span className="opacity-70">Dashboard</span>
                 <span className="opacity-40">/</span>
-                <span className="text-primary capitalize">{pageTitle}</span>
+                <span className="text-primary capitalize truncate">{pageTitle}</span>
               </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             {mounted && (
               <button
                 onClick={() =>
                   setTheme(resolvedTheme === "dark" ? "light" : "dark")
                 }
-                className="h-10 w-10 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-300 border border-transparent hover:border-border/50"
+                className="h-9 w-9 sm:h-10 sm:w-10 flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-all duration-300 border border-transparent hover:border-border/50"
+                aria-label="Toggle theme"
               >
                 {resolvedTheme === "dark" ? (
                   <Sun className="h-5 w-5" />
@@ -286,13 +288,15 @@ export default function DashboardLayoutScreen({
 
             <Link
               href="/dashboard/new"
-              className="inline-flex items-center gap-2 bg-primary text-primary-foreground rounded-xl h-10 px-5 text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer"
+              className="inline-flex items-center gap-1 sm:gap-2 bg-primary text-primary-foreground rounded-xl h-9 sm:h-10 px-4 sm:px-5 text-xs sm:text-sm font-bold shadow-lg shadow-primary/20 hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 cursor-pointer"
+              tabIndex={0}
             >
-              <Plus className="h-4.5 w-4.5" />
-              <span className="hidden sm:inline">Create Site</span>
+              <Plus className="h-4 w-4 sm:h-4.5 sm:w-4.5" />
+              <span className="hidden xs:inline sm:inline">Create Site</span>
             </Link>
           </div>
         </header>
+   
 
         <main className="flex-1 p-6 sm:p-8 overflow-y-auto no-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
           <div className="max-w-7xl mx-auto w-full">{children}</div>

@@ -14,7 +14,6 @@ export const FeaturesSection = ({
   variant,
   position,
   anchorName,
-  path
 }: SectionProps) => {
   const items: FeatureItem[] = content?.items ?? [];
 

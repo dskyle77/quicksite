@@ -13,8 +13,8 @@ export default function MobileReadySection() {
       aria-labelledby="mobile-friendly-heading"
       className="bg-background py-20"
     >
-      <div className="container mx-auto px-4">
-        <div className="relative overflow-hidden rounded-3xl bg-primary p-10 text-primary-foreground sm:p-14">
+      <div className="container mx-auto px-2">
+        <div className="relative overflow-hidden rounded-3xl bg-primary px-8 py-10 text-primary-foreground sm:p-14">
           {/* Background effect */}
           <div
             aria-hidden="true"
@@ -49,9 +49,9 @@ export default function MobileReadySection() {
               {/* CTA */}
               <nav aria-label="Mobile section actions">
                 <Link href="/templates">
-                  <button className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-secondary px-8 font-semibold text-secondary-foreground shadow-lg shadow-black/10 transition-all hover:opacity-90">
+                  <button className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-secondary px-4 font-semibold text-secondary-foreground shadow-lg shadow-black/10 transition-all hover:opacity-90">
                     See mobile-friendly templates
-                    <ArrowRight className="ml-1.5 h-4 w-4" />
+                    <ArrowRight className="h-4 w-4" />
                   </button>
                 </Link>
               </nav>

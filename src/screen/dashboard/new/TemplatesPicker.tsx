@@ -102,8 +102,8 @@ export function TemplatePicker({
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: themeVars.textMuted }} size={18} />
+        <div className="relative flex-1 w-full sm:max-w-md">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
           <input
             type="text"
             placeholder="Search by category or style..."
@@ -116,11 +116,10 @@ export function TemplatePicker({
               borderRadius: "1rem",
               border: `1px solid ${themeVars.border}`,
               background: `color-mix(in srgb, ${themeVars.backgroundMuted} 50%, ${themeVars.background} 50%)`,
-              fontSize: "0.95rem",
               outline: "none",
               transition: "all 0.2s",
             }}
-            className="focus:ring-2 focus:ring-primary/20 focus:border-primary"
+            className="focus:ring-2 focus:ring-primary/20 focus:border-primary text-sm sm:text-[0.95rem]"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             autoComplete="off"
@@ -128,23 +127,13 @@ export function TemplatePicker({
         </div>
         <Link
           href={`/templates?name=${encodeURIComponent(nameForPreview)}&slug=${encodeURIComponent(slugForPreview)}`}
-          style={{
-            color: themeVars.foregroundPrimary,
-            fontWeight: 700,
-            fontSize: "0.95rem",
-            display: "flex",
-            alignItems: "center",
-            gap: "0.25rem",
-            alignSelf: "end",
-            textDecoration: "underline",
-          }}
-          className="hover:underline self-end sm:self-auto"
+          className="text-primary font-bold text-xs sm:text-[0.95rem] flex items-center gap-1 self-end sm:self-auto hover:underline"
         >
           View All Templates <ArrowRight size={14} className="inline" />
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {filteredTemplates.length > 0 ? (
           filteredTemplates.map((t) => {
             const type = t.config.type;
@@ -158,8 +147,7 @@ export function TemplatePicker({
                 disabled={isLocked}
                 style={{
                   position: "relative",
-                  padding: "1rem",
-                  borderRadius: "1.5rem",
+                  borderRadius: "1.25rem sm:1.5rem",
                   border: `2px solid ${
                     isLocked
                       ? themeVars.border
@@ -185,14 +173,13 @@ export function TemplatePicker({
                   textAlign: "left",
                   overflow: "hidden",
                 }}
-                className={`group`}
+                className={`group p-3 sm:p-4`}
                 onClick={() => !isLocked && onTemplateChange(type)}
               >
-                <div className="flex items-start gap-4">
+                <div className="flex items-start gap-3 sm:gap-4">
                   <div
                     style={{
-                      padding: "0.75rem",
-                      borderRadius: "1rem",
+                      borderRadius: "0.75rem sm:1rem",
                       border: `1px solid ${
                         selected
                           ? themeVars.borderPrimary
@@ -207,19 +194,15 @@ export function TemplatePicker({
                       transition: "all 0.2s",
                       flexShrink: 0,
                     }}
-                    className="group-hover:text-primary group-hover:border-primary/20"
+                    className="p-2 sm:p-3 group-hover:text-primary group-hover:border-primary/20"
                   >
-                    {isLocked ? <Lock size={20} /> : <Layout size={20} />}
+                    {isLocked ? <Lock size={18} /> : <Layout size={18} />}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 mb-1">
+                    <div className="flex items-center gap-2 mb-0.5 sm:mb-1">
                       <h3
+                        className="font-extrabold text-sm sm:text-[0.95rem] truncate"
                         style={{
-                          fontWeight: 800,
-                          fontSize: "0.95rem",
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
                           color: selected ? themeVars.foregroundPrimary : themeVars.foreground,
                         }}
                       >
@@ -227,16 +210,10 @@ export function TemplatePicker({
                       </h3>
                       {t.config.isPremium && (
                         <span
+                          className="px-1.5 py-0.5 text-[8px] sm:text-[9px] rounded-full font-bold uppercase tracking-wider shrink-0"
                           style={{
-                            padding: "0.125rem 0.5rem",
-                            fontSize: "9px",
-                            borderRadius: "999px",
                             background: themeVars.backgroundPremium,
                             color: themeVars.textPremium,
-                            fontWeight: 700,
-                            textTransform: "uppercase",
-                            letterSpacing: "0.05em",
-                            marginLeft: "0.25rem",
                           }}
                         >
                           Premium
@@ -244,13 +221,8 @@ export function TemplatePicker({
                       )}
                     </div>
                     <p
+                      className="text-[10px] sm:text-[11px] leading-relaxed line-clamp-2"
                       style={{
-                        fontSize: "11px",
-                        lineHeight: "1.5",
-                        display: "-webkit-box",
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: "vertical",
-                        overflow: "hidden",
                         color: selected ? "color-mix(in srgb, " + themeVars.foregroundPrimary + " 70%, " + themeVars.foreground + " 30%)" : themeVars.textMuted,
                       }}
                     >
@@ -262,33 +234,24 @@ export function TemplatePicker({
                   <div
                     style={{
                       position: "absolute",
-                      top: "0.75rem",
-                      right: "0.75rem",
+                      top: "0.5rem",
+                      right: "0.5rem",
                       color: themeVars.foregroundPrimary,
                     }}
-                    className="text-primary"
+                    className="text-primary sm:top-3 sm:right-3"
                   >
-                    <CheckCircle2 size={20} fill="currentColor" className="text-white fill-primary" />
+                    <CheckCircle2 size={18} fill="currentColor" className="text-white fill-primary sm:w-5 sm:h-5" />
                   </div>
                 )}
               </button>
             );
           })
         ) : (
-          <div
-            style={{
-              gridColumn: "1 / -1",
-              padding: "3rem 0",
-              textAlign: "center",
-              background: themeVars.backgroundMuted,
-              borderRadius: "2rem",
-              border: `1px dashed ${themeVars.border}`,
-            }}
-          >
-            <p style={{ color: themeVars.textMuted, fontWeight: 500 }}>No templates match your search.</p>
+          <div className="col-span-full py-10 sm:py-12 text-center rounded-2xl sm:rounded-[2rem] border border-dashed border-slate-200 bg-slate-50">
+            <p className="text-slate-400 font-medium text-sm">No templates match your search.</p>
             <button
               onClick={() => setSearch("")}
-              style={{ color: themeVars.foregroundPrimary, fontWeight: 700, fontSize: "0.95rem", marginTop: "0.5rem" }}
+              className="text-primary font-bold text-sm mt-2"
             >Clear search</button>
           </div>
         )}
@@ -298,22 +261,10 @@ export function TemplatePicker({
         <div className="pt-2">
           <div className="relative py-4">
             <div className="absolute inset-0 flex items-center">
-              <span
-                style={{ width: "100%", borderTop: `1px solid ${themeVars.border}` }}
-              ></span>
+              <span className="w-full border-t border-slate-100"></span>
             </div>
             <div className="relative flex justify-center">
-              <span
-                style={{
-                  background: themeVars.backgroundWhite,
-                  padding: "0 1rem",
-                  fontSize: "0.85rem",
-                  fontWeight: 700,
-                  color: themeVars.textMuted,
-                  textTransform: "uppercase",
-                  letterSpacing: "0.06em",
-                }}
-              >
+              <span className="bg-white px-3 text-[10px] sm:text-xs font-bold text-slate-400 uppercase tracking-widest">
                 Advanced
               </span>
             </div>
@@ -324,8 +275,7 @@ export function TemplatePicker({
             disabled={!canUsePremiumTemplate}
             style={{
               position: "relative",
-              padding: "1.25rem",
-              borderRadius: "1.5rem",
+              borderRadius: "1.25rem sm:1.5rem",
               border: `2px solid ${
                 !canUsePremiumTemplate
                   ? themeVars.border
@@ -352,14 +302,13 @@ export function TemplatePicker({
               width: "100%",
               textAlign: "left",
             }}
-            className="group"
+            className="group p-4 sm:p-5"
             onClick={() => canUsePremiumTemplate && onTemplateChange(CUSTOM_TEMPLATE_TYPE)}
           >
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-4 sm:gap-5">
               <div
                 style={{
-                  padding: "1rem",
-                  borderRadius: "1rem",
+                  borderRadius: "0.75rem sm:1rem",
                   border: `1px solid ${
                     selectedType === CUSTOM_TEMPLATE_TYPE
                       ? themeVars.borderPrimary
@@ -374,16 +323,14 @@ export function TemplatePicker({
                   transition: "all 0.2s",
                   flexShrink: 0,
                 }}
-                className="group-hover:text-primary"
+                className="p-3 sm:p-4 group-hover:text-primary"
               >
-                {!canUsePremiumTemplate ? <Lock size={24} /> : <Layout size={24} />}
+                {!canUsePremiumTemplate ? <Lock size={20} className="sm:w-6 sm:h-6" /> : <Layout size={20} className="sm:w-6 sm:h-6" />}
               </div>
               <div className="flex-1 min-w-0">
                 <h3
+                  className="font-black text-base sm:text-[1.15rem] mb-0.5 sm:mb-1"
                   style={{
-                    fontWeight: 900,
-                    fontSize: "1.15rem",
-                    marginBottom: "0.25rem",
                     color: selectedType === CUSTOM_TEMPLATE_TYPE
                       ? themeVars.foregroundPrimary
                       : themeVars.foreground,
@@ -392,20 +339,20 @@ export function TemplatePicker({
                   {templateBuilderTemplate.meta?.title ?? "Custom Builder"}
                 </h3>
                 <p
+                  className="text-[11px] sm:text-[0.85rem] leading-tight"
                   style={{
-                    fontSize: "0.85rem",
                     color: selectedType === CUSTOM_TEMPLATE_TYPE
                       ? "color-mix(in srgb, " + themeVars.foregroundPrimary + " 70%, " + themeVars.foreground + " 30%)"
                       : themeVars.textMuted,
                   }}
                 >
                   {!canUsePremiumTemplate
-                    ? "Upgrade to Growth or Pro to unlock the full power of our drag-and-drop builder."
+                    ? "Upgrade to Growth or Pro to unlock the full power of our builder."
                     : (templateBuilderTemplate.meta?.description ?? "Build your site exactly how you want it with modular sections.")}
                 </p>
               </div>
               {selectedType === CUSTOM_TEMPLATE_TYPE && canUsePremiumTemplate && (
-                <CheckCircle2 size={24} fill="currentColor" className="text-white fill-primary" />
+                <CheckCircle2 size={20} fill="currentColor" className="text-white fill-primary sm:w-6 sm:h-6" />
               )}
             </div>
           </button>
@@ -415,25 +362,10 @@ export function TemplatePicker({
       <div className="flex justify-center pt-2">
         <Link
           href={`/templates/${encodeURIComponent(selectedType)}?from=/dashboard/new&name=${encodeURIComponent(nameForPreview)}&slug=${encodeURIComponent(slugForPreview)}`}
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: "0.5rem",
-            padding: "0.75rem 1.5rem",
-            borderRadius: "999px",
-            background: "#18181b",
-            color: "#fff",
-            fontSize: "0.99rem",
-            fontWeight: 700,
-            boxShadow: themeVars.shadow,
-            transition: "all 0.15s",
-            outline: "none",
-            border: 0,
-          }}
-          className="hover:bg-slate-800 active:scale-95"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-slate-900 text-white text-sm font-bold shadow-lg hover:bg-slate-800 active:scale-95 transition-all"
         >
-          <Eye size={18} />
-          Live Preview Selected Template
+          <Eye size={16} />
+          Live Preview Selected
         </Link>
       </div>
     </div>

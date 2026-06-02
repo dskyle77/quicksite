@@ -135,13 +135,13 @@ export function NewSiteForm({
         <div className="space-y-1.5">
           <label className="text-sm font-bold ml-1 text-slate-700">Desired URL</label>
           <div className="flex group">
-            <span className={`inline-flex items-center px-4 rounded-l-2xl border border-r-0 ${errors.slug ? 'border-red-500 bg-red-50 text-red-400' : 'border-slate-200 bg-slate-50 text-slate-400'} text-xs font-medium transition-colors group-focus-within:border-primary group-focus-within:bg-primary/5`}>
+            <span className={`inline-flex items-center px-3 sm:px-4 rounded-l-2xl border border-r-0 ${errors.slug ? 'border-red-500 bg-red-50 text-red-400' : 'border-slate-200 bg-slate-50 text-slate-400'} text-[10px] sm:text-xs font-medium transition-colors group-focus-within:border-primary group-focus-within:bg-primary/5 whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px] sm:max-w-none`}>
               {SITE_SHORT_NAME}{DOMAIN_NAME}/
             </span>
             <input
               required
               type="text"
-              className={`flex-1 min-w-0 px-4 py-3.5 rounded-r-2xl border ${errors.slug ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all text-sm shadow-sm`}
+              className={`flex-1 min-w-0 px-3 sm:px-4 py-3 sm:py-3.5 rounded-r-2xl border ${errors.slug ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all text-sm shadow-sm`}
               placeholder="blossom-bakery"
               value={formData.slug}
               onChange={onSlugChange}
@@ -165,7 +165,7 @@ export function NewSiteForm({
             <input
               required
               type="tel"
-              className={`flex-1 min-w-0 px-4 py-3.5 rounded-r-2xl border ${errors.whatsappNumber ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all text-sm shadow-sm`}
+              className={`flex-1 min-w-0 px-3 sm:px-4 py-3 sm:py-3.5 rounded-r-2xl border ${errors.whatsappNumber ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all text-sm shadow-sm`}
               placeholder="8012345678"
               value={formData.whatsappNumber}
               onChange={(e) => {
@@ -195,7 +195,7 @@ export function NewSiteForm({
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
-            className={`mt-1 border-2 border-dashed rounded-3xl aspect-video flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden relative
+            className={`mt-1 border-2 border-dashed rounded-2xl sm:rounded-3xl aspect-video flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden relative
               ${
                 isDragging
                   ? "border-primary bg-primary/10"
@@ -217,18 +217,18 @@ export function NewSiteForm({
                     e.stopPropagation();
                     removeImage();
                   }}
-                  className="absolute top-4 right-4 bg-white/90 hover:bg-red-500 hover:text-white text-slate-600 p-2 rounded-full transition-all shadow-md z-10"
+                  className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 hover:bg-red-500 hover:text-white text-slate-600 p-1.5 sm:p-2 rounded-full transition-all shadow-md z-10"
                 >
-                  <X size={20} />
+                  <X size={18} />
                 </button>
               </div>
             ) : (
-              <div className="text-center p-6">
-                <div className="w-16 h-16 bg-white rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-4 border border-slate-100">
-                  <Upload className="text-primary" size={28} />
+              <div className="text-center p-4 sm:p-6">
+                <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-xl sm:rounded-2xl shadow-sm flex items-center justify-center mx-auto mb-3 sm:mb-4 border border-slate-100">
+                  <Upload className="text-primary" size={24} />
                 </div>
-                <p className="font-bold text-slate-700">Upload Site Image</p>
-                <p className="text-xs text-slate-400 mt-1">
+                <p className="font-bold text-sm sm:text-base text-slate-700">Upload Site Image</p>
+                <p className="text-[10px] sm:text-xs text-slate-400 mt-1">
                   Drag & drop or click to browse
                 </p>
               </div>
@@ -240,7 +240,7 @@ export function NewSiteForm({
         <div className="space-y-1.5">
           <label className="text-sm font-bold ml-1 text-slate-700">Business Description</label>
           <textarea
-            className={`w-full px-4 py-3.5 rounded-2xl border ${errors.description ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all resize-none shadow-sm`}
+            className={`w-full px-4 py-3 rounded-2xl border ${errors.description ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all resize-none shadow-sm text-sm sm:text-base`}
             placeholder="Briefly describe what your business does..."
             rows={4}
             value={formData.description}
@@ -258,20 +258,20 @@ export function NewSiteForm({
 
         {/* AI Toggle */}
         {canUseAI && (
-          <div className="flex items-center justify-between p-5 rounded-3xl bg-primary/5 border border-primary/10 shadow-sm">
-            <div className="flex items-center gap-4">
-              <div className="p-3 bg-primary rounded-2xl shadow-sm">
-                <Sparkles size={20} className="text-white" />
+          <div className="flex items-center justify-between p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-primary/5 border border-primary/10 shadow-sm">
+            <div className="flex items-center gap-3 sm:gap-4">
+              <div className="p-2 sm:p-3 bg-primary rounded-xl sm:rounded-2xl shadow-sm">
+                <Sparkles size={18} className="text-white" />
               </div>
               <div>
-                <p className="text-sm font-extrabold text-slate-800">Generate with AI</p>
-                <p className="text-[10px] text-slate-500 font-medium">
-                  We&apos;ll auto-fill your site content based on the description
+                <p className="text-xs sm:text-sm font-extrabold text-slate-800">Generate with AI</p>
+                <p className="text-[9px] sm:text-[10px] text-slate-500 font-medium leading-tight">
+                  We&apos;ll auto-fill content based on the description
                   {plan && ` (${AI_DAILY_LIMITS[plan]}/day)`}
                 </p>
               </div>
             </div>
-            <label className="relative inline-flex items-center cursor-pointer">
+            <label className="relative inline-flex items-center cursor-pointer shrink-0 ml-2">
               <input
                 type="checkbox"
                 className="sr-only peer"
@@ -283,23 +283,23 @@ export function NewSiteForm({
                   }))
                 }
               />
-              <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              <div className="w-10 h-5 sm:w-11 sm:h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 sm:after:h-5 sm:after:w-5 after:transition-all peer-checked:bg-primary"></div>
             </label>
           </div>
         )}
 
         {/* Image Upload Modal */}
         {showImageModal && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-60 p-4 animate-in fade-in duration-200">
-            <div className="bg-white rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200">
-              <div className="p-8">
-                <div className="flex justify-between items-center mb-8">
-                  <h3 className="font-black text-2xl">Upload Image</h3>
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-60 p-0 sm:p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-t-3xl sm:rounded-[32px] w-full max-w-md overflow-hidden shadow-2xl animate-in slide-in-from-bottom-full sm:zoom-in-95 duration-300 sm:duration-200">
+              <div className="p-6 sm:p-8">
+                <div className="flex justify-between items-center mb-6 sm:mb-8">
+                  <h3 className="font-black text-xl sm:text-2xl text-slate-800">Upload Image</h3>
                   <button 
                     onClick={() => setShowImageModal(false)}
-                    className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                    className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400"
                   >
-                    <X size={24} />
+                    <X size={20} />
                   </button>
                 </div>
 
@@ -307,21 +307,21 @@ export function NewSiteForm({
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
-                  className={`border-2 border-dashed rounded-[24px] h-72 flex flex-col items-center justify-center cursor-pointer transition-all
+                  className={`border-2 border-dashed rounded-2xl sm:rounded-[24px] h-60 sm:h-72 flex flex-col items-center justify-center cursor-pointer transition-all
                     ${
                       isDragging
                         ? "border-primary bg-primary/5"
                         : "border-slate-200 hover:border-primary bg-slate-50/50"
                     }`}
                 >
-                  <div className="w-20 h-20 bg-white rounded-3xl shadow-sm flex items-center justify-center mb-5 border border-slate-100">
-                    <ImageIcon size={40} className="text-slate-300" />
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-2xl sm:rounded-3xl shadow-sm flex items-center justify-center mb-4 sm:mb-5 border border-slate-100">
+                    <ImageIcon size={32} className="text-slate-300" />
                   </div>
-                  <p className="font-bold text-lg text-slate-700">
+                  <p className="font-bold text-base sm:text-lg text-slate-700 text-center px-4">
                     {isDragging ? "Drop it here!" : "Drag & drop image"}
                   </p>
-                  <p className="text-sm text-slate-400 mt-2">or</p>
-                  <label className="mt-5 px-8 py-3.5 bg-primary text-white rounded-2xl font-bold cursor-pointer hover:bg-primary/90 transition-all shadow-md active:scale-95">
+                  <p className="text-xs sm:text-sm text-slate-400 mt-2">or</p>
+                  <label className="mt-4 sm:mt-5 px-6 sm:px-8 py-3 sm:py-3.5 bg-primary text-white rounded-xl sm:rounded-2xl font-bold cursor-pointer hover:bg-primary/90 transition-all shadow-md active:scale-95 text-sm">
                     Browse Files
                     <input
                       type="file"
@@ -336,10 +336,10 @@ export function NewSiteForm({
                 </div>
               </div>
 
-              <div className="p-6 bg-slate-50/50 border-t border-slate-100">
+              <div className="p-5 sm:p-6 bg-slate-50/50 border-t border-slate-100">
                 <button
                   onClick={() => setShowImageModal(false)}
-                  className="w-full py-4 text-slate-500 font-bold hover:text-slate-700 transition-colors"
+                  className="w-full py-3 sm:py-4 text-slate-500 font-bold hover:text-slate-700 transition-colors text-sm sm:text-base"
                 >
                   Cancel
                 </button>
@@ -347,6 +347,7 @@ export function NewSiteForm({
             </div>
           </div>
         )}
+
       </div>
     );
   }

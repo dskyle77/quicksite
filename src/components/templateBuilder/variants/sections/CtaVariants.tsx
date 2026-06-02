@@ -36,7 +36,6 @@ export const CtaSection = ({
   variant,
   position,
   anchorName,
-  path
 }: SectionProps) => {
   const isEven = position % 2 === 0;
   const sectionBg = isEven ? "var(--qs-bg)" : "var(--qs-bg-alt)";

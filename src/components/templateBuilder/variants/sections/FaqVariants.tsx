@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SectionProps } from "../../types";
 import { AddButton, Xbutton } from "@/components/shared/ActionButtons";
 import Container from "@/components/shared/Container";
@@ -10,7 +9,6 @@ export const FaqSection = ({
   variant,
   position,
   anchorName,
-  path
 }: SectionProps) => {
   const list = content?.items || [];
   const isEven = position % 2 === 0;

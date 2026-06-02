@@ -54,6 +54,21 @@ export async function generateWhatsappMessages(
     const raw = response.choices[0]?.message?.content;
     if (!raw) return fallback;
 
+    // Check for refusal markers in the generated content (safety check)
+    const contentString = raw.toLowerCase();
+    const refusalMarkers = [
+      "not supported",
+      "unsafe content",
+      "cannot generate",
+      "violates safety",
+      "prohibited content",
+    ];
+
+    if (refusalMarkers.some((marker) => contentString.includes(marker))) {
+      console.warn("[generateWhatsappMessages] AI refused based on safety, using fallback.");
+      return fallback;
+    }
+
     const parsed = JSON.parse(raw) as Partial<GeneratedWhatsappMessages>;
 
     // Validate and merge with fallbacks

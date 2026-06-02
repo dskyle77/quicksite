@@ -2,6 +2,7 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
+// --- (imports unchanged) ---
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
@@ -32,7 +33,7 @@ export default function SiteManageScreen() {
   const { slug } = useParams<{ slug: string }>();
   const router = useRouter();
   const { user } = useAuth();
-  const { sites, toggleSiteStatus, removeSite } = useDashboardStore(); // Removed updateSite network call reference
+  const { sites, toggleSiteStatus, removeSite } = useDashboardStore();
 
   const site = sites.find((s) => s.slug === slug);
 
@@ -74,7 +75,7 @@ export default function SiteManageScreen() {
 
   if (!site) {
     return (
-      <div className="flex flex-col items-center justify-center py-32 text-center">
+      <div className="flex flex-col items-center justify-center py-24 md:py-32 text-center">
         <Globe className="h-10 w-10 text-muted-foreground/20 mb-4" />
         <h2 className="font-bold text-xl mb-2">Site not found</h2>
         <Link
@@ -106,7 +107,7 @@ export default function SiteManageScreen() {
       );
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Failed to update status.",
+        err instanceof Error ? err.message : "Failed to update status."
       );
     } finally {
       setToggling(false);
@@ -124,7 +125,7 @@ export default function SiteManageScreen() {
       router.push("/dashboard/sites");
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Failed to delete site.",
+        err instanceof Error ? err.message : "Failed to delete site."
       );
       setDeleting(false);
     }
@@ -188,7 +189,7 @@ export default function SiteManageScreen() {
       router.refresh();
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Failed to save settings.",
+        err instanceof Error ? err.message : "Failed to save settings."
       );
     } finally {
       setSaving(false);
@@ -196,7 +197,8 @@ export default function SiteManageScreen() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-10 px-4 space-y-6">
+    <div className="max-w-2xl mx-auto py-6 px-2 sm:px-4 md:py-10 space-y-6">
+      {/* Toolbar link */}
       <Link
         href="/dashboard/sites"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition"
@@ -204,35 +206,33 @@ export default function SiteManageScreen() {
         <ArrowLeft className="h-4 w-4" /> Back to Sites
       </Link>
 
-      <div className="flex items-start justify-between">
+      {/* Responsive: stack on mobile, row on desktop */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h1 className="text-2xl font-black">{site.name}</h1>
-
+          <h1 className="text-xl md:text-2xl font-black break-all">{site.name}</h1>
           {siteUrl && (
             <a
               href={siteUrl}
               target="_blank"
               rel="noreferrer"
-              className="text-xs text-primary hover:underline flex items-center gap-1 mt-1"
+              className="text-xs text-primary hover:underline flex items-center gap-1 mt-1 break-all"
             >
               {siteUrl} <ExternalLink className="h-3 w-3" />
             </a>
           )}
-
           {site.customDomain && (
             <a
               href={`https://${site.customDomain}`}
               target="_blank"
               rel="noreferrer"
-              className="text-xs text-emerald-600 hover:underline flex items-center gap-1 mt-0.5"
+              className="text-xs text-emerald-600 hover:underline flex items-center gap-1 mt-0.5 break-all"
             >
               {site.customDomain} <ExternalLink className="h-3 w-3" />
             </a>
           )}
         </div>
-
         <span
-          className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+          className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mt-2 sm:mt-0 ${
             site.status === "published"
               ? "bg-emerald-500/10 text-emerald-600"
               : "bg-orange-500/10 text-orange-500"
@@ -242,21 +242,23 @@ export default function SiteManageScreen() {
         </span>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-card border border-border rounded-2xl p-5">
+      {/* Stats - stack on xs, grid on sm+ */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
           <p className="text-xs text-muted-foreground mb-1">Total Visits</p>
-          <p className="text-3xl font-black">{site.visits ?? 0}</p>
+          <p className="text-2xl sm:text-3xl font-black">{site.visits ?? 0}</p>
         </div>
-        <div className="bg-card border border-border rounded-2xl p-5">
+        <div className="bg-card border border-border rounded-2xl p-4 sm:p-5">
           <p className="text-xs text-muted-foreground mb-1">WhatsApp Clicks</p>
-          <p className="text-3xl font-black">{site.whatsappClicks ?? 0}</p>
+          <p className="text-2xl sm:text-3xl font-black">{site.whatsappClicks ?? 0}</p>
         </div>
       </div>
 
+      {/* Actions */}
       <div className="bg-card border border-border rounded-2xl divide-y divide-border overflow-hidden">
         <Link
           href={`/editor/${site.slug}`}
-          className="flex items-center justify-between px-5 py-4 hover:bg-muted transition"
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 sm:px-5 py-4 hover:bg-muted transition"
         >
           <div className="flex items-center gap-3">
             <Edit3 className="h-4 w-4 text-muted-foreground" />
@@ -267,12 +269,12 @@ export default function SiteManageScreen() {
               </p>
             </div>
           </div>
-          <ExternalLink className="h-4 w-4 text-muted-foreground" />
+          <ExternalLink className="hidden sm:inline h-4 w-4 text-muted-foreground" />
         </Link>
 
         <Link
           href={`/dashboard/domains?site=${site.slug || site.id}`}
-          className="flex items-center justify-between px-5 py-4 hover:bg-muted transition"
+          className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 sm:px-5 py-4 hover:bg-muted transition"
         >
           <div className="flex items-center gap-3">
             <LinkIcon className="h-4 w-4 text-muted-foreground" />
@@ -285,13 +287,13 @@ export default function SiteManageScreen() {
               </p>
             </div>
           </div>
-          <ExternalLink className="h-4 w-4 text-muted-foreground" />
+          <ExternalLink className="hidden sm:inline h-4 w-4 text-muted-foreground" />
         </Link>
 
         <button
           onClick={handleToggle}
           disabled={toggling}
-          className="w-full flex items-center justify-between px-5 py-4 hover:bg-muted transition disabled:opacity-60"
+          className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-3 sm:px-5 py-4 hover:bg-muted transition disabled:opacity-60"
         >
           <div className="flex items-center gap-3">
             {site.status === "published" ? (
@@ -318,13 +320,15 @@ export default function SiteManageScreen() {
         </button>
       </div>
 
+      {/* Responsive site settings */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-black">Site Settings</h2>
+        {/* Heading and Save button: stack on mobile, row on md+ */}
+        <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+          <h2 className="text-lg md:text-xl font-black">Site Settings</h2>
           <button
             onClick={handleSave}
             disabled={saving || !isDirty}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition disabled:opacity-40"
+            className="inline-flex items-center gap-2 w-full md:w-auto justify-center px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition disabled:opacity-40"
           >
             {saving ? (
               <Loader2 className="h-4 w-4 animate-spin" />
@@ -335,7 +339,8 @@ export default function SiteManageScreen() {
           </button>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-5 space-y-2">
+        {/* SEO Description */}
+        <div className="bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-2">
           <label className="text-sm font-semibold">SEO Description</label>
           <p className="text-xs text-muted-foreground">
             Shown in search results. Keep it under 160 characters.
@@ -355,7 +360,8 @@ export default function SiteManageScreen() {
           </p>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-5 space-y-2">
+        {/* WhatsApp Number */}
+        <div className="bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-2">
           <label className="text-sm font-semibold">WhatsApp Number</label>
           <p className="text-xs text-muted-foreground">
             Digits only, no + or country code prefix needed (e.g. 8161592059).
@@ -374,7 +380,8 @@ export default function SiteManageScreen() {
           />
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-5 space-y-2">
+        {/* Social Preview Image (OG) */}
+        <div className="bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-2">
           <label className="text-sm font-semibold">
             Social Preview Image (OG)
           </label>
@@ -436,13 +443,14 @@ export default function SiteManageScreen() {
           </div>
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-5 space-y-3">
+        {/* Tags */}
+        <div className="bg-card border border-border rounded-2xl p-4 sm:p-5 space-y-3">
           <label className="text-sm font-semibold">Tags</label>
           <p className="text-xs text-muted-foreground">
             Keywords that describe your business. Used for search and discovery.
           </p>
 
-          <div className="flex gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <input
               type="text"
               value={tagInput}
@@ -483,7 +491,8 @@ export default function SiteManageScreen() {
         </div>
       </div>
 
-      <div className="bg-card border border-destructive/20 rounded-2xl p-5 space-y-3">
+      {/* Danger Zone */}
+      <div className="bg-card border border-destructive/20 rounded-2xl p-4 sm:p-5 space-y-3">
         <p className="text-sm font-bold text-destructive">Danger Zone</p>
         <p className="text-xs text-muted-foreground">
           Permanently delete{" "}
@@ -494,12 +503,12 @@ export default function SiteManageScreen() {
         {!confirmDelete ? (
           <button
             onClick={() => setConfirmDelete(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-destructive/10 text-destructive text-sm font-semibold hover:bg-destructive hover:text-white transition"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-destructive/10 text-destructive text-sm font-semibold hover:bg-destructive hover:text-white transition w-full sm:w-auto justify-center"
           >
             <Trash2 className="h-4 w-4" /> Delete Site
           </button>
         ) : (
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               disabled={deleting}
               onClick={() => setConfirmDelete(false)}

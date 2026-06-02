@@ -1,5 +1,6 @@
 // src/server/ai/generateSiteContent.ts
-// UPDATED — now accepts whatsappMessages context so AI can reference them in copy
+// UPDATED — pre-flight validation on title/description before AI call;
+//           AI now sets __refused__: true intentionally instead of burying text markers.
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import "server-only";
@@ -8,6 +9,61 @@ import { variantOptions } from "@/components/templateBuilder/contentBlocks";
 import { getThemeOptionsForAI, isValidThemeId } from "@/lib/themes";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+// ---------------------------------------------------------------------------
+// Pre-flight validation — runs BEFORE spending tokens on an AI call.
+// ---------------------------------------------------------------------------
+
+const BLOCKED_TERMS = [
+  "escort",
+  "erotic",
+  "pornograph",
+  "porn",
+  "adult content",
+  "onlyfans",
+  "nude",
+  "fetish",
+  "sex service",
+  "gambling",
+  "casino",
+  "slot machine",
+  "drug dealer",
+  "weapon",
+  "illegal service",
+  "hack",
+];
+
+function preflightCheck(title: string, description: string): void {
+  const trimmedTitle = title.trim();
+
+  if (!trimmedTitle || trimmedTitle.length < 2) {
+    throw new Error("INVALID_INPUT: Business name is too short.");
+  }
+  if (trimmedTitle.length > 80) {
+    throw new Error(
+      "INVALID_INPUT: Business name must be 80 characters or fewer.",
+    );
+  }
+  if (!description.trim()) {
+    throw new Error("INVALID_INPUT: Please provide a business description.");
+  }
+  if (description.length > 2000) {
+    throw new Error(
+      "INVALID_INPUT: Description must be 2000 characters or fewer.",
+    );
+  }
+
+  // Block obviously unsafe content before hitting the AI
+  const combined = `${trimmedTitle} ${description}`.toLowerCase();
+  const blockedHit = BLOCKED_TERMS.find((term) => combined.includes(term));
+  if (blockedHit) {
+    throw new Error("AI_REFUSAL");
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Main generation function
+// ---------------------------------------------------------------------------
 
 export async function generateSiteContentWithAI({
   selectedTitle,
@@ -20,6 +76,9 @@ export async function generateSiteContentWithAI({
   schemaBase: any;
   defaultThemeId?: string;
 }) {
+  // Run cheap pre-flight checks before spending tokens on the AI call
+  preflightCheck(selectedTitle, description);
+
   const themeOptions = getThemeOptionsForAI();
   const systemPrompt = `
   You are QuickSite's AI copywriter. QuickSite helps Nigerian small businesses (restaurants, salons, vendors, creatives, professionals) launch a mobile-friendly website in minutes — often with WhatsApp as the main call-to-action.
@@ -30,9 +89,10 @@ export async function generateSiteContentWithAI({
   
   OUTPUT RULES (non-negotiable):
   1. Return ONE JSON object based on this schema: ${JSON.stringify(schemaBase)}
-     Also include these two extra top-level keys:
+     Also include these extra top-level keys:
      - "description": a 1–2 sentence SEO meta description for the business (under 160 chars, benefit-led, no hashtags)
      - "tags": an array of 5–8 lowercase keyword strings relevant to the business (e.g. ["restaurant", "lagos", "nigerian food", "delivery"])
+     - "__refused__": false   ← always include this key; only set it to true when refusing (see SAFETY RULES)
   2. Do NOT add, remove, or rename top-level keys. Section content keys follow the pattern "{sectionId}{sectionType}" (e.g. "init-aboutabout") — keep those keys unchanged.
   3. Fill every empty string with specific, credible copy grounded in the business description — except "theme". Do not use lorem ipsum, generic filler, or placeholder names (John Doe, Jane Doe, John Smith, "A satisfied customer", etc.).which must be a theme id from the SITE THEME list below. Do not use lorem ipsum or generic filler.
   4. Keep all "image" and "imagePId" field values exactly as they appear in the schema — never modify image URLs or generate fake imagePId values.
@@ -42,9 +102,9 @@ export async function generateSiteContentWithAI({
   SAFETY RULES (non-negotiable):
   - Never generate, describe, promote, or imply sexually explicit, pornographic, fetish, erotic, nude, adult, or age-restricted content.
   - Never generate content involving minors in romantic, sexual, suggestive, or adult contexts.
-  - If the business description requests adult, erotic, escort, pornography, fetish, gambling, drugs, weapons, illegal services, or other unsafe content, do not create the website.
-  - Instead return valid JSON matching the schema, but populate content with a brief message indicating the business type is not supported.
-  - Keep the JSON structure intact even when refusing.
+  - If the business title or description requests adult, erotic, escort, pornography, fetish, gambling, drugs, weapons, illegal services, or other unsafe content — DO NOT generate site content.
+  - REFUSAL MECHANISM: When refusing, you MUST set the top-level "__refused__" key to true. This is the only refusal signal — do NOT bury refusal text inside content fields or use phrases like "not supported". Simply set "__refused__": true and fill the rest of the schema with empty strings or minimal placeholders to keep the JSON valid.
+  - Example refusal response shape: { "__refused__": true, "theme": "warm", "description": "", "tags": [], ...all other schema keys with empty strings or empty arrays }
   - Never attempt to bypass, reframe, or disguise prohibited content.
 
   ARRAY EXPANSION (important):
@@ -145,6 +205,13 @@ export async function generateSiteContentWithAI({
   const rawContent = response.choices[0].message.content || "{}";
   const aiContent = JSON.parse(rawContent);
 
+  // Check the intentional refusal flag FIRST — the AI sets this explicitly
+  // when it determines the requested content is unsafe/prohibited.
+  if (aiContent.__refused__ === true) {
+    throw new Error("AI_REFUSAL");
+  }
+
+  // Validate that all expected schema keys are present
   const schemaKeys = Object.keys(schemaBase);
   const isValid = schemaKeys.every((key) => Object.hasOwn(aiContent, key));
 
@@ -153,7 +220,8 @@ export async function generateSiteContentWithAI({
   }
 
   const {
-    theme: theme,
+    __refused__: _refused, // strip internal flag from output
+    theme,
     description: siteDescription,
     tags,
     ...siteContent

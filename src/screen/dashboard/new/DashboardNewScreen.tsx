@@ -221,7 +221,7 @@ export default function CreateSitePage() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 sm:py-12 sm:px-6">
+    <div className="max-w-4xl mx-auto py-8 sm:py-12 sm:px-6">
       <div className="mb-10 text-center">
         <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
           Launch Your Site
@@ -232,16 +232,16 @@ export default function CreateSitePage() {
       </div>
 
       {/* Stepper */}
-      <div className="mb-12 relative">
-        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-slate-100 -translate-y-1/2 hidden sm:block" />
+      <div className="mb-8 sm:mb-12 relative px-2">
+        <div className="absolute top-5 left-0 w-full h-0.5 bg-slate-100 -translate-y-1/2 hidden sm:block" />
         <div className="relative flex justify-between items-center max-w-2xl mx-auto">
           {steps.map((s) => (
             <div
               key={s.id}
-              className="flex flex-col items-center relative z-10 bg-white sm:px-4"
+              className="flex flex-col items-center relative z-10 bg-white px-2 sm:px-4"
             >
               <div
-                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-300 border-2 ${
+                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-sm sm:text-base font-bold transition-all duration-300 border-2 ${
                   step === s.id
                     ? "bg-primary border-primary text-white scale-110 shadow-lg"
                     : step > s.id
@@ -249,10 +249,10 @@ export default function CreateSitePage() {
                       : "bg-white border-slate-200 text-slate-400"
                 }`}
               >
-                {step > s.id ? <Check size={20} /> : s.id}
+                {step > s.id ? <Check size={18} /> : s.id}
               </div>
               <span
-                className={`mt-2 text-xs font-bold uppercase tracking-wider ${
+                className={`mt-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider ${
                   step === s.id ? "text-primary" : "text-slate-400"
                 }`}
               >
@@ -263,13 +263,13 @@ export default function CreateSitePage() {
         </div>
       </div>
 
-      <div className="bg-card rounded-3xl border shadow-sm overflow-hidden">
-        <div className="p-6 sm:p-10">
+      <div className="bg-card rounded-2xl sm:rounded-3xl border shadow-sm overflow-hidden">
+        <div className="p-5 sm:p-10">
           {step === 1 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold">First, the basics</h2>
-                <p className="text-slate-500 text-sm">
+              <div className="mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">First, the basics</h2>
+                <p className="text-slate-500 text-xs sm:text-sm">
                   Give your site a name and a custom URL.
                 </p>
               </div>
@@ -286,13 +286,13 @@ export default function CreateSitePage() {
                 <button
                   disabled={loading}
                   onClick={nextStep}
-                  className="w-full h-14 bg-primary text-primary-foreground rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50"
+                  className="w-full h-12 sm:h-14 bg-primary text-primary-foreground rounded-xl sm:rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50 text-sm sm:text-base"
                 >
                   {loading ? (
                     <Loader2 className="animate-spin" />
                   ) : (
                     <>
-                      Continue to Design <ArrowRight size={20} />
+                      Continue to Design <ArrowRight size={18} />
                     </>
                   )}
                 </button>
@@ -302,14 +302,14 @@ export default function CreateSitePage() {
 
           {step === 2 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold">Choose your style</h2>
-                <p className="text-slate-500 text-sm">
+              <div className="mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Choose your style</h2>
+                <p className="text-slate-500 text-xs sm:text-sm">
                   Pick a template that matches your brand.
                 </p>
               </div>
               {errors.type && (
-                <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-bold flex items-center gap-2 border border-red-100 animate-in fade-in slide-in-from-top-2">
+                <div className="p-4 bg-red-50 text-red-600 rounded-xl sm:rounded-2xl text-sm font-bold flex items-center gap-2 border border-red-100 animate-in fade-in slide-in-from-top-2">
                   <X size={18} /> {errors.type}
                 </div>
               )}
@@ -323,15 +323,15 @@ export default function CreateSitePage() {
               <div className="flex flex-col sm:flex-row gap-3 pt-4">
                 <button
                   onClick={prevStep}
-                  className="flex-1 h-14 bg-slate-100 text-slate-600 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-all"
+                  className="order-2 sm:order-1 flex-1 h-12 sm:h-14 bg-slate-100 text-slate-600 rounded-xl sm:rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-all text-sm sm:text-base py-2"
                 >
-                  <ArrowLeft size={20} /> Back
+                  <ArrowLeft size={18} /> Back
                 </button>
                 <button
                   onClick={nextStep}
-                  className="flex-2 h-14 bg-primary text-primary-foreground rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all"
+                  className="order-1 sm:order-2 flex-2 h-12 sm:h-14 bg-primary text-primary-foreground rounded-xl sm:rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all text-sm sm:text-base py-2"
                 >
-                  Looks Good, Continue <ArrowRight size={20} />
+                  Looks Good, Continue <ArrowRight size={18} />
                 </button>
               </div>
             </div>
@@ -339,9 +339,9 @@ export default function CreateSitePage() {
 
           {step === 3 && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="mb-6">
-                <h2 className="text-2xl font-bold">Enhance with content</h2>
-                <p className="text-slate-500 text-sm">
+              <div className="mb-4 sm:mb-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-slate-800">Enhance with content</h2>
+                <p className="text-slate-500 text-xs sm:text-sm">
                   Add a logo and description. Use AI to auto-fill content.
                 </p>
               </div>
@@ -358,20 +358,20 @@ export default function CreateSitePage() {
                 <button
                   onClick={prevStep}
                   disabled={loading}
-                  className="flex-1 h-14 bg-slate-100 text-slate-600 rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-all disabled:opacity-50"
+                  className="order-2 sm:order-1 flex-1 h-12 sm:h-14 bg-slate-100 text-slate-600 rounded-xl sm:rounded-2xl font-bold flex items-center justify-center gap-2 hover:bg-slate-200 transition-all disabled:opacity-50 text-sm sm:text-base"
                 >
-                  <ArrowLeft size={20} /> Back
+                  <ArrowLeft size={18} /> Back
                 </button>
                 <button
                   onClick={handleCreate}
                   disabled={loading}
-                  className="flex-2 h-14 bg-primary text-primary-foreground rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50"
+                  className="order-1 sm:order-2 flex-2 h-12 sm:h-14 bg-primary text-primary-foreground rounded-xl sm:rounded-2xl font-bold flex items-center justify-center gap-2 hover:opacity-90 transition-all disabled:opacity-50 text-sm sm:text-base"
                 >
                   {loading ? (
                     <Loader2 className="animate-spin" />
                   ) : (
                     <>
-                      Launch My Site <Rocket size={20} />
+                      Launch My Site <Rocket size={18} />
                     </>
                   )}
                 </button>

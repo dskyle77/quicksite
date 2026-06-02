@@ -1,5 +1,6 @@
 // src/app/api/sites/route.ts
 // UPDATED — AI-generated WhatsApp messages injected into site content on creation
+//           AI_REFUSAL and INVALID_INPUT errors surface as 400s instead of 500s
 
 import { NextResponse } from "next/server";
 import { getUserFromSession } from "@/server/auth";
@@ -145,12 +146,28 @@ async function resolveContent(
         description: aiResult.description,
         tags: aiResult.tags,
       };
-    } catch (error) {
-      console.error("AI Generation failed, falling back to default:", error);
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+
+      if (
+        errorMessage === "AI_REFUSAL" ||
+        errorMessage.startsWith("INVALID_INPUT:")
+      ) {
+        // Safety refusal or bad input — re-throw so the outer handler returns
+        // a proper 400. Do NOT silently fall back to starter content.
+        throw error;
+      }
+
+      // Any other AI error (timeout, parse failure, etc.) — fall back gracefully
+      console.error(
+        "[sites/route] AI generation failed, falling back to default:",
+        error,
+      );
     }
   }
 
-  // Fallback to starter content
+  // Fallback to starter content (generic safe content)
   const starterContent = templateEntry?.starterContent
     ? templateEntry.starterContent({
         selectedTitle: normalizedName,
@@ -170,7 +187,7 @@ async function resolveContent(
     content: contentWithMessages,
     themeId: defaultTheme,
     description,
-    tags: []
+    tags: [],
   };
 }
 
@@ -281,11 +298,27 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Server error.";
+
+    // Safety refusal from preflightCheck or AI __refused__ flag
+    if (message === "AI_REFUSAL") {
+      return NextResponse.json(
+        { error: "This type of business is not supported." },
+        { status: 400 },
+      );
+    }
+
+    // Input validation errors from preflightCheck
+    if (message.startsWith("INVALID_INPUT:")) {
+      return NextResponse.json(
+        { error: message.replace("INVALID_INPUT: ", "") },
+        { status: 400 },
+      );
+    }
+
     const isPlanError =
-      typeof message === "string" &&
-      (message.toLowerCase().includes("plan limit") ||
-        message.toLowerCase().includes("plan upgrade") ||
-        message.toLowerCase().includes("upgrade your plan"));
+      message.toLowerCase().includes("plan limit") ||
+      message.toLowerCase().includes("plan upgrade") ||
+      message.toLowerCase().includes("upgrade your plan");
 
     return NextResponse.json(
       {

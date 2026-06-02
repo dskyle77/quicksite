@@ -8,7 +8,6 @@ export const TextSection = ({
   onUpdate,
   position,
   anchorName,
-  path
 }: SectionProps) => {
   const isEven = position % 2 === 0;
 
