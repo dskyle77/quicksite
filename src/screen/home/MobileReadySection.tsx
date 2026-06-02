@@ -10,7 +10,7 @@ import {
 export default function MobileReadySection() {
   return (
     <section
-      aria-labelledby="mobile-ready-heading"
+      aria-labelledby="mobile-friendly-heading"
       className="bg-background py-20"
     >
       <div className="container mx-auto px-4">
@@ -30,30 +30,27 @@ export default function MobileReadySection() {
             <header>
               {/* Badge */}
               <aside className="mb-4 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-2.5 py-0.5 text-xs font-semibold">
-                Built for mobile
+                Mobile Friendly
               </aside>
 
               {/* Heading */}
               <h2
-                id="mobile-ready-heading"
+                id="mobile-friendly-heading"
                 className="mb-4 text-3xl font-bold leading-tight text-balance sm:text-4xl"
               >
-                Your customers are on their phones. Make your business easy to
-                discover, browse, and contact.
+                Make your business mobile friendly and accessible from any device.
               </h2>
 
               {/* Description */}
               <p className="mb-6 max-w-md leading-relaxed text-primary-foreground/80">
-                Every Quicksite business page is optimized for Android, iPhone,
-                and low-data browsing — helping customers discover your
-                business, browse products, and contact you instantly.
+                Every Quicksite business page is expertly crafted to be mobile friendly for Android, iPhone, and low-data users—making it easy for customers to browse, discover, and contact your business wherever they are.
               </p>
 
               {/* CTA */}
               <nav aria-label="Mobile section actions">
                 <Link href="/templates">
                   <button className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-secondary px-8 font-semibold text-secondary-foreground shadow-lg shadow-black/10 transition-all hover:opacity-90">
-                    Browse mobile-ready templates
+                    See mobile-friendly templates
                     <ArrowRight className="ml-1.5 h-4 w-4" />
                   </button>
                 </Link>
@@ -62,7 +59,7 @@ export default function MobileReadySection() {
 
             {/* Right visual */}
             <aside
-              aria-label="Mobile website preview"
+              aria-label="Mobile website friendly preview"
               className="relative flex h-75 items-center justify-center sm:h-95"
             >
               {/* Main mobile preview */}
@@ -118,12 +115,11 @@ export default function MobileReadySection() {
 
                   <div className="space-y-1.5">
                     <p className="text-[11px] font-bold text-foreground">
-                      Mobile Optimization Complete
+                      Mobile Friendly Complete
                     </p>
 
                     <p className="text-[10px] leading-tight text-muted-foreground">
-                      Your business page is ready for mobile visitors and
-                      WhatsApp leads.
+                      Your business page is fully mobile friendly and ready for WhatsApp leads.
                     </p>
                   </div>
                 </div>
