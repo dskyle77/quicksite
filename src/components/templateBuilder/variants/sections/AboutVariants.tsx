@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { SectionProps } from "../../types";
 import TemplateImage from "@/components/shared/TemplateImage";
 import Container from "@/components/shared/Container";
@@ -22,25 +20,27 @@ export const AboutSection = ({
   const showImage = content.image1;
 
   // ─────────────────────────────────────────────
-  // SPLIT VARIANT
+  // SPLIT VARIANT — MOBILE FRIENDLY
   // ─────────────────────────────────────────────
 
   if (variant === "split") {
     return (
       <section
         id={anchorName}
-        className="py-24"
+        className="py-14 sm:py-20 md:py-24"
         style={{ background: sectionBg }}
       >
         <Container>
           <div
-            className={`grid gap-14 items-center ${
-              showImage ? "@md:grid-cols-2" : "max-w-3xl mx-auto text-center"
+            className={`grid gap-10 sm:gap-14 items-center ${
+              showImage
+                ? "md:grid-cols-2"
+                : "max-w-3xl mx-auto text-center"
             }`}
           >
             <div>
               <p
-                className="uppercase tracking-[0.25em] text-xs font-bold mb-5"
+                className="uppercase tracking-[0.25em] text-xs font-bold mb-4 sm:mb-5"
                 style={{ color: "var(--qs-primary)" }}
                 contentEditable={isEditor}
                 suppressContentEditableWarning
@@ -52,7 +52,7 @@ export const AboutSection = ({
               </p>
 
               <h2
-                className="text-4xl @md:text-6xl font-black tracking-tight leading-tight"
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black tracking-tight leading-tight"
                 style={{ color: "var(--qs-text)" }}
                 contentEditable={isEditor}
                 suppressContentEditableWarning
@@ -64,7 +64,7 @@ export const AboutSection = ({
               </h2>
 
               <p
-                className="mt-7 text-lg leading-relaxed"
+                className="mt-5 sm:mt-7 text-base sm:text-lg leading-relaxed"
                 style={{ color: "var(--qs-text-muted)" }}
                 contentEditable={isEditor}
                 suppressContentEditableWarning
@@ -79,7 +79,7 @@ export const AboutSection = ({
 
             {showImage && (
               <div
-                className="overflow-hidden rounded-[32px] border shadow-2xl"
+                className="overflow-hidden rounded-[20px] sm:rounded-[32px] border shadow-2xl max-w-xs mx-auto md:max-w-full w-full"
                 style={{
                   border: "1px solid var(--qs-border)",
                   background: cardBg,
@@ -99,19 +99,19 @@ export const AboutSection = ({
   }
 
   // ─────────────────────────────────────────────
-  // CARD STATS VARIANT
+  // CARD STATS VARIANT — MOBILE FRIENDLY
   // ─────────────────────────────────────────────
 
   if (variant === "card-stats") {
     return (
       <section
         id={anchorName}
-        className="py-24"
+        className="py-14 sm:py-20 md:py-24"
         style={{ background: sectionBg }}
       >
         <Container>
           <div
-            className="rounded-[36px] border p-8 @md:p-14"
+            className="rounded-[20px] sm:rounded-[36px] border p-5 sm:p-8 md:p-14"
             style={{
               background: cardBg,
               border: "1px solid var(--qs-border)",
@@ -119,12 +119,12 @@ export const AboutSection = ({
             }}
           >
             <div
-              className={`grid gap-14 items-center ${
-                showImage ? "@md:grid-cols-2" : "max-w-4xl mx-auto"
+              className={`grid gap-10 sm:gap-14 items-center ${
+                showImage ? "md:grid-cols-2" : "max-w-4xl mx-auto"
               }`}
             >
               {showImage && (
-                <div className="overflow-hidden rounded-[28px] border border-(--qs-border)">
+                <div className="overflow-hidden rounded-[18px] sm:rounded-[28px] border border-[--qs-border] max-w-xs mx-auto md:max-w-full w-full mb-8 md:mb-0">
                   <TemplateImage
                     source={content.image1}
                     path={path + ".image1"}
@@ -135,7 +135,7 @@ export const AboutSection = ({
 
               <div className={!showImage ? "text-center" : ""}>
                 <p
-                  className="uppercase tracking-[0.25em] text-xs font-bold mb-4"
+                  className="uppercase tracking-[0.25em] text-xs font-bold mb-3 sm:mb-4"
                   style={{ color: "var(--qs-primary)" }}
                   contentEditable={isEditor}
                   suppressContentEditableWarning
@@ -147,7 +147,7 @@ export const AboutSection = ({
                 </p>
 
                 <h2
-                  className="text-4xl @md:text-5xl font-black tracking-tight mb-6"
+                  className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tight mb-5 sm:mb-6"
                   style={{ color: "var(--qs-text)" }}
                   contentEditable={isEditor}
                   suppressContentEditableWarning
@@ -159,7 +159,7 @@ export const AboutSection = ({
                 </h2>
 
                 <p
-                  className="text-lg leading-relaxed mb-10"
+                  className="text-base sm:text-lg leading-relaxed mb-7 sm:mb-10"
                   style={{ color: "var(--qs-text-muted)" }}
                   contentEditable={isEditor}
                   suppressContentEditableWarning
@@ -171,18 +171,18 @@ export const AboutSection = ({
                     "Add a strong paragraph that explains your expertise, journey, or value."}
                 </p>
 
-                <div className="grid grid-cols-2 gap-5">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-5">
                   {[1, 2, 3, 4].map((n) => (
                     <div
                       key={n}
-                      className="rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-1"
+                      className="rounded-2xl border p-3 sm:p-4 md:p-6 transition-all duration-300 hover:-translate-y-1"
                       style={{
                         background: "var(--qs-bg)",
                         border: "1px solid var(--qs-border)",
                       }}
                     >
                       <div
-                        className="text-3xl @md:text-4xl font-black mb-2"
+                        className="text-2xl sm:text-3xl md:text-4xl font-black mb-1 sm:mb-2"
                         style={{ color: "var(--qs-primary)" }}
                         contentEditable={isEditor}
                         suppressContentEditableWarning
@@ -197,7 +197,7 @@ export const AboutSection = ({
                       </div>
 
                       <div
-                        className="text-sm"
+                        className="text-xs sm:text-sm"
                         style={{ color: "var(--qs-text-muted)" }}
                         contentEditable={isEditor}
                         suppressContentEditableWarning
@@ -222,19 +222,19 @@ export const AboutSection = ({
   }
 
   // ─────────────────────────────────────────────
-  // DEFAULT CENTERED
+  // DEFAULT CENTERED — MOBILE FRIENDLY
   // ─────────────────────────────────────────────
 
   return (
     <section
       id={anchorName}
-      className="py-28"
+      className="py-16 sm:py-24 md:py-28"
       style={{ background: sectionBg }}
     >
       <Container className="text-center">
         {showImage && (
           <div
-            className="mx-auto mb-12 w-72 overflow-hidden rounded-[32px] border shadow-2xl"
+            className="mx-auto mb-8 sm:mb-12 w-44 sm:w-72 overflow-hidden rounded-[20px] sm:rounded-[32px] border shadow-2xl"
             style={{
               border: "1px solid var(--qs-border)",
               background: cardBg,
@@ -249,7 +249,7 @@ export const AboutSection = ({
         )}
 
         <p
-          className="uppercase tracking-[0.25em] text-xs font-bold mb-5"
+          className="uppercase tracking-[0.25em] text-xs font-bold mb-4 sm:mb-5"
           style={{ color: "var(--qs-primary)" }}
           contentEditable={isEditor}
           suppressContentEditableWarning
@@ -259,7 +259,7 @@ export const AboutSection = ({
         </p>
 
         <h2
-          className="text-5xl @md:text-6xl font-black tracking-tight mb-7"
+          className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight mb-5 sm:mb-7"
           style={{ color: "var(--qs-text)" }}
           contentEditable={isEditor}
           suppressContentEditableWarning
@@ -269,7 +269,7 @@ export const AboutSection = ({
         </h2>
 
         <p
-          className="text-lg leading-relaxed max-w-3xl mx-auto"
+          className="text-base sm:text-lg leading-relaxed max-w-[95vw] sm:max-w-3xl mx-auto"
           style={{ color: "var(--qs-text-muted)" }}
           contentEditable={isEditor}
           suppressContentEditableWarning

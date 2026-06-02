@@ -36,9 +36,22 @@ export const ContactSection = ({
   if (variant === "split") {
     return (
       <section id={anchorName} style={{ background: sectionBg }}>
-        <Container className="py-24">
+        <Container className="py-12 sm:py-16 md:py-24">
           <div
-            className="grid @md:grid-cols-2 gap-12 items-center rounded-[36px] border p-8 @md:p-14"
+            className="
+              grid
+              gap-8
+              md:gap-12
+              items-center
+              rounded-2xl
+              md:rounded-[36px]
+              border
+              p-5 
+              sm:p-8 
+              md:p-14
+              grid-cols-1
+              md:grid-cols-2
+            "
             style={{
               background: cardBg,
               border: "1px solid var(--qs-border)",
@@ -47,14 +60,14 @@ export const ContactSection = ({
           >
             <div>
               <p
-                className="uppercase tracking-[0.25em] text-xs font-bold mb-5"
+                className="uppercase tracking-[0.25em] text-xs font-bold mb-4 sm:mb-5"
                 style={{ color: "var(--qs-primary)" }}
               >
                 CONTACT
               </p>
 
               <h2
-                className="text-4xl @md:text-6xl font-black tracking-tight leading-tight"
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-6xl font-black tracking-tight leading-tight"
                 style={{ color: "var(--qs-text)" }}
                 contentEditable={isEditor}
                 suppressContentEditableWarning
@@ -66,7 +79,7 @@ export const ContactSection = ({
               </h2>
 
               <p
-                className="mt-6 text-lg leading-relaxed"
+                className="mt-4 sm:mt-6 text-base sm:text-lg leading-relaxed"
                 style={{ color: "var(--qs-text-muted)" }}
                 contentEditable={isEditor}
                 suppressContentEditableWarning
@@ -79,7 +92,7 @@ export const ContactSection = ({
               </p>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3 sm:gap-4 w-full">
               <EditableLinkButton
                 isEditor={isEditor}
                 label={content.primaryButton ?? "Send a Message"}
@@ -88,7 +101,7 @@ export const ContactSection = ({
                 onLinkChange={(cfg) =>
                   onUpdate("primaryButtonLink", cfg)
                 }
-                className="rounded-2xl px-8 py-5 font-bold text-center transition-all duration-300 hover:-translate-y-1"
+                className="rounded-2xl px-6 sm:px-8 py-4 sm:py-5 font-bold text-center transition-all duration-300 hover:-translate-y-1 w-full"
                 style={{
                   background: "var(--qs-primary)",
                   color: "var(--qs-primary-fg)",
@@ -104,7 +117,7 @@ export const ContactSection = ({
                   onLinkChange={(cfg) =>
                     onUpdate("secondaryButtonLink", cfg)
                   }
-                  className="rounded-2xl px-8 py-5 font-bold text-center transition-all duration-300 hover:-translate-y-1"
+                  className="rounded-2xl px-6 sm:px-8 py-4 sm:py-5 font-bold text-center transition-all duration-300 hover:-translate-y-1 w-full"
                   style={{
                     background: "transparent",
                     color: "var(--qs-text)",
@@ -126,9 +139,9 @@ export const ContactSection = ({
   if (variant === "minimal") {
     return (
       <section id={anchorName} style={{ background: sectionBg }}>
-        <Container className="py-24 text-center">
+        <Container className="py-12 sm:py-16 md:py-24 text-center">
           <div
-            className="rounded-[36px] border p-8 @md:p-14"
+            className="rounded-2xl md:rounded-[36px] border p-5 sm:p-8 md:p-14"
             style={{
               background: cardBg,
               border: "1px solid var(--qs-border)",
@@ -136,14 +149,14 @@ export const ContactSection = ({
             }}
           >
             <div
-              className="text-6xl mb-8"
+              className="text-4xl sm:text-5xl md:text-6xl mb-6 sm:mb-8"
               style={{ color: "var(--qs-primary)" }}
             >
               ✦
             </div>
 
             <h2
-              className="text-4xl @md:text-5xl font-black tracking-tight"
+              className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight"
               style={{ color: "var(--qs-text)" }}
               contentEditable={isEditor}
               suppressContentEditableWarning
@@ -155,7 +168,7 @@ export const ContactSection = ({
             </h2>
 
             <p
-              className="mt-6 text-lg leading-relaxed"
+              className="mt-4 sm:mt-6 text-base sm:text-lg leading-relaxed"
               style={{ color: "var(--qs-text-muted)" }}
               contentEditable={isEditor}
               suppressContentEditableWarning
@@ -167,7 +180,7 @@ export const ContactSection = ({
                 "Have an idea, project, or opportunity? Reach out anytime."}
             </p>
 
-            <div className="mt-10">
+            <div className="mt-8 sm:mt-10">
               <EditableLinkButton
                 isEditor={isEditor}
                 label={content.primaryButton ?? "Send Message"}
@@ -176,7 +189,7 @@ export const ContactSection = ({
                 onLinkChange={(cfg) =>
                   onUpdate("primaryButtonLink", cfg)
                 }
-                className="inline-flex items-center justify-center rounded-2xl px-10 py-5 font-bold transition-all duration-300 hover:-translate-y-1"
+                className="inline-flex items-center justify-center rounded-2xl px-6 sm:px-10 py-4 sm:py-5 font-bold transition-all duration-300 hover:-translate-y-1 w-full sm:w-auto"
                 style={{
                   background: "var(--qs-primary)",
                   color: "var(--qs-primary-fg)",
@@ -220,12 +233,22 @@ export const ContactSection = ({
     return (
       <section
         id={anchorName}
-        className="py-24"
+        className="py-12 sm:py-16 md:py-24"
         style={{ background: sectionBg }}
       >
-        <div className="max-w-6xl mx-auto px-4">
+        <div className="max-w-2xl md:max-w-6xl mx-auto px-2 sm:px-4">
           <div
-            className="grid @lg:grid-cols-2 gap-10 rounded-[36px] border overflow-hidden"
+            className="
+              grid
+              grid-cols-1
+              md:grid-cols-2
+              gap-6
+              md:gap-10
+              rounded-2xl
+              md:rounded-[36px]
+              border
+              overflow-hidden
+            "
             style={{
               background: cardBg,
               border: "1px solid var(--qs-border)",
@@ -233,16 +256,16 @@ export const ContactSection = ({
             }}
           >
             {/* Left */}
-            <div className="p-8 @md:p-14">
+            <div className="p-5 sm:p-8 md:p-14">
               <p
-                className="uppercase tracking-[0.25em] text-xs font-bold mb-5"
+                className="uppercase tracking-[0.25em] text-xs font-bold mb-4 sm:mb-5"
                 style={{ color: "var(--qs-primary)" }}
               >
                 CONTACT
               </p>
 
               <h2
-                className="text-4xl @md:text-5xl font-black tracking-tight leading-tight"
+                className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight leading-tight"
                 style={{ color: "var(--qs-text)" }}
                 contentEditable={isEditor}
                 suppressContentEditableWarning
@@ -254,7 +277,7 @@ export const ContactSection = ({
               </h2>
 
               <p
-                className="mt-6 text-lg leading-relaxed"
+                className="mt-4 sm:mt-6 text-base sm:text-lg leading-relaxed"
                 style={{ color: "var(--qs-text-muted)" }}
                 contentEditable={isEditor}
                 suppressContentEditableWarning
@@ -266,7 +289,7 @@ export const ContactSection = ({
                   "Use this section to collect leads, enquiries, or project requests."}
               </p>
 
-              <div className="mt-10 space-y-5">
+              <div className="mt-7 sm:mt-10 space-y-4 sm:space-y-5">
                 {[
                   content.email || "hello@example.com",
                   content.phone || "+234 000 000 0000",
@@ -274,14 +297,23 @@ export const ContactSection = ({
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="flex items-center gap-4 rounded-2xl border px-5 py-4"
+                    className="
+                      flex
+                      items-center
+                      gap-3
+                      sm:gap-4
+                      rounded-2xl
+                      border
+                      px-4 sm:px-5
+                      py-3 sm:py-4
+                    "
                     style={{
                       border: "1px solid var(--qs-border)",
                       background: "rgba(255,255,255,0.03)",
                     }}
                   >
                     <div
-                      className="h-10 w-10 rounded-full flex items-center justify-center font-bold"
+                      className="h-8 w-8 sm:h-10 sm:w-10 rounded-full flex items-center justify-center font-bold"
                       style={{
                         background: "var(--qs-primary)",
                         color: "var(--qs-primary-fg)",
@@ -291,7 +323,7 @@ export const ContactSection = ({
                     </div>
 
                     <div
-                      className="font-medium"
+                      className="font-medium text-sm sm:text-base"
                       style={{ color: "var(--qs-text)" }}
                       contentEditable={isEditor}
                       suppressContentEditableWarning
@@ -327,13 +359,13 @@ export const ContactSection = ({
 
             {/* Right */}
             <div
-              className="p-8 @md:p-14 border-l"
+              className="p-5 sm:p-8 md:p-14 border-t md:border-t-0 md:border-l"
               style={{
                 borderColor: "var(--qs-border)",
                 background: "rgba(255,255,255,0.02)",
               }}
             >
-              <form className="space-y-5" onSubmit={handleSubmit} noValidate>
+              <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit} noValidate>
                 <div>
                   <label
                     className="block text-sm font-semibold mb-2"
@@ -346,7 +378,7 @@ export const ContactSection = ({
                     type="text"
                     placeholder="John Doe"
                     disabled={isEditor || submitting}
-                    className="w-full rounded-2xl px-5 py-4 outline-none disabled:opacity-60"
+                    className="w-full rounded-2xl px-4 sm:px-5 py-3 sm:py-4 outline-none disabled:opacity-60"
                     style={{
                       background: "var(--qs-bg)",
                       border: "1px solid var(--qs-border)",
@@ -369,7 +401,7 @@ export const ContactSection = ({
                     type="email"
                     placeholder="john@example.com"
                     disabled={isEditor || submitting}
-                    className="w-full rounded-2xl px-5 py-4 outline-none disabled:opacity-60"
+                    className="w-full rounded-2xl px-4 sm:px-5 py-3 sm:py-4 outline-none disabled:opacity-60"
                     style={{
                       background: "var(--qs-bg)",
                       border: "1px solid var(--qs-border)",
@@ -389,11 +421,11 @@ export const ContactSection = ({
                   </label>
 
                   <textarea
-                    rows={6}
+                    rows={5}
                     required
                     placeholder="Tell me about your project..."
                     disabled={isEditor || submitting}
-                    className="w-full rounded-2xl px-5 py-4 outline-none resize-none disabled:opacity-60"
+                    className="w-full rounded-2xl px-4 sm:px-5 py-3 sm:py-4 outline-none resize-none disabled:opacity-60"
                     style={{
                       background: "var(--qs-bg)",
                       border: "1px solid var(--qs-border)",
@@ -404,11 +436,11 @@ export const ContactSection = ({
                   />
                 </div>
 
-                <div className="pt-2 space-y-2">
+                <div className="pt-1 sm:pt-2 space-y-1 sm:space-y-2">
                   <button
                     type={isEditor ? "button" : "submit"}
                     disabled={!isEditor && submitting}
-                    className="w-full rounded-2xl px-8 py-5 font-bold text-center transition-all duration-300 hover:-translate-y-1 disabled:opacity-60 disabled:hover:translate-y-0"
+                    className="w-full rounded-2xl px-6 sm:px-8 py-4 sm:py-5 font-bold text-center transition-all duration-300 hover:-translate-y-1 disabled:opacity-60 disabled:hover:translate-y-0"
                     style={{
                       background: "var(--qs-primary)",
                       color: "var(--qs-primary-fg)",
@@ -453,19 +485,19 @@ export const ContactSection = ({
 
   return (
     <section id={anchorName} style={{ background: sectionBg }}>
-      <Container className="py-14">
+      <Container className="py-8 sm:py-12 md:py-14">
         <div
-          className="rounded-2xl shadow-lg border border-(--qs-border) px-5 py-8 @md:px-10 @md:py-12 bg-(--qs-bg-alt) flex flex-col gap-4 items-start"
+          className="rounded-xl md:rounded-2xl shadow-lg border border-[--qs-border] px-4 sm:px-5 py-6 sm:py-8 md:px-10 md:py-12 bg-[--qs-bg-alt] flex flex-col gap-4 items-start"
           style={{
             background: "var(--qs-bg-alt)",
             color: "var(--qs-text)",
           }}
         >
-          <div className="text-2xl mb-1 select-none" aria-hidden>
+          <div className="text-xl sm:text-2xl mb-1 select-none" aria-hidden>
             🚀
           </div>
           <h2
-            className="text-2xl @md:text-4xl font-extrabold tracking-tight mb-2"
+            className="text-xl sm:text-2xl md:text-4xl font-extrabold tracking-tight mb-2"
             style={{ color: "var(--qs-primary)" }}
             contentEditable={isEditor}
             suppressContentEditableWarning
@@ -476,7 +508,7 @@ export const ContactSection = ({
             {content.title ?? "Let's Build Something Great"}
           </h2>
           <p
-            className="mt-0 text-base @md:text-lg leading-relaxed mb-5 text-(--qs-text-muted) max-w-xl"
+            className="mt-0 text-sm sm:text-base md:text-lg leading-relaxed mb-4 sm:mb-5 text-[--qs-text-muted] max-w-xl"
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
@@ -486,14 +518,14 @@ export const ContactSection = ({
             {content.desc ??
               "Ready to start your next project? Reach out and let's make it happen."}
           </p>
-          <div className="flex flex-col @sm:flex-row items-center gap-3 w-full mt-1">
+          <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full mt-1">
             <EditableLinkButton
               isEditor={isEditor}
               label={content.primaryButton ?? "Send a Message"}
               linkConfig={content.primaryButtonLink}
               onLabelChange={(v) => onUpdate("primaryButton", v)}
               onLinkChange={(cfg) => onUpdate("primaryButtonLink", cfg)}
-              className="rounded-lg px-6 py-3 font-bold text-center w-full @sm:w-auto transition-all duration-200 hover:-translate-y-1 bg-(--qs-primary) text-(--qs-primary-fg)"
+              className="rounded-lg px-5 sm:px-6 py-3 font-bold text-center w-full sm:w-auto transition-all duration-200 hover:-translate-y-1 bg-[--qs-primary] text-[--qs-primary-fg]"
             />
           </div>
         </div>

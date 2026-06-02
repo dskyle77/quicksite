@@ -94,7 +94,7 @@ export const ItemsSection = ({
   const Header = () => (
     <div className="mb-14 text-center">
       <h2
-        className="text-4xl font-black tracking-tight @md:text-5xl"
+        className="text-3xl sm:text-4xl font-black tracking-tight @md:text-5xl"
         contentEditable={isEditor}
         suppressContentEditableWarning
         onBlur={(e) =>
@@ -105,7 +105,7 @@ export const ItemsSection = ({
       </h2>
 
       <p
-        className="mx-auto mt-5 max-w-2xl text-lg opacity-70"
+        className="mx-auto mt-5 max-w-xl sm:max-w-2xl text-base sm:text-lg opacity-70"
         contentEditable={isEditor}
         suppressContentEditableWarning
         onBlur={(e) =>
@@ -175,7 +175,7 @@ export const ItemsSection = ({
         linkConfig={p.projectBtnLink}
         onLabelChange={(v) => updateOne(i, { btnLabel: v })}
         onLinkChange={(cfg) => updateOne(i, { projectBtnLink: cfg })}
-        className="rounded-lg px-4 py-2 font-semibold transition-transform hover:scale-[1.02]"
+        className="rounded-lg px-4 py-2 font-semibold transition-transform hover:scale-[1.02] text-sm xs:text-base"
         messageOverride={autoMessage}
         style={{
           background: "var(--qs-primary)",
@@ -190,26 +190,26 @@ export const ItemsSection = ({
   if (variant === "list") {
     return (
       <section id={anchorName} style={{ background: sectionBg }}>
-        <Container className="py-24">
+        <Container className="py-10 sm:py-16 md:py-24">
           <Header />
 
-          <div className="space-y-12">
+          <div className="space-y-8 sm:space-y-12">
             {items.map((p, i) => (
               <div
                 key={i}
-                className="relative grid gap-10 rounded-3xl border p-8 transition @md:grid-cols-2"
+                className="relative grid gap-6 sm:gap-10 rounded-2xl md:rounded-3xl border p-4 sm:p-6 md:p-8 transition @md:grid-cols-2"
                 style={{
                   background: cardBg,
                   border: "1px solid var(--qs-border)",
                 }}
               >
                 {isEditor && (
-                  <div className="absolute right-4 top-4">
+                  <div className="absolute right-3 top-3 sm:right-4 sm:top-4">
                     <Xbutton onClick={() => remove(i)} color="red" />
                   </div>
                 )}
 
-                <div className="overflow-hidden rounded-2xl">
+                <div className="overflow-hidden rounded-xl md:rounded-2xl aspect-[4/3] sm:aspect-auto">
                   <TemplateImage
                     source={p.image}
                     path={path + `.items.${i}.image`}
@@ -217,9 +217,9 @@ export const ItemsSection = ({
                   />
                 </div>
 
-                <div className="flex flex-col justify-center">
+                <div className="flex flex-col justify-center mt-4 sm:mt-0">
                   <h3
-                    className="text-3xl font-bold"
+                    className="text-xl sm:text-2xl md:text-3xl font-bold"
                     contentEditable={isEditor}
                     suppressContentEditableWarning
                     onBlur={(e) =>
@@ -232,7 +232,7 @@ export const ItemsSection = ({
                   </h3>
 
                   <p
-                    className="mt-4 leading-7 opacity-70"
+                    className="mt-2 sm:mt-4 leading-6 sm:leading-7 opacity-70 text-sm sm:text-base"
                     contentEditable={isEditor}
                     suppressContentEditableWarning
                     onBlur={(e) =>
@@ -246,14 +246,14 @@ export const ItemsSection = ({
 
                   {renderTags(p, i)}
 
-                  <div className="mt-7">{renderLinkButton(p, i)}</div>
+                  <div className="mt-4 sm:mt-7">{renderLinkButton(p, i)}</div>
                 </div>
               </div>
             ))}
           </div>
 
           {isEditor && (
-            <div className="mt-12 flex justify-center">
+            <div className="mt-8 sm:mt-12 flex justify-center">
               <AddButton onClick={add}>Add Item</AddButton>
             </div>
           )}
@@ -266,21 +266,21 @@ export const ItemsSection = ({
   if (variant === "grid-small") {
     return (
       <section id={anchorName} style={{ background: sectionBg }}>
-        <Container className="py-24">
+        <Container className="py-10 sm:py-16 md:py-24">
           <Header />
 
-          <div className="grid gap-8 @sm:grid-cols-2 @md:grid-cols-3 @xl:grid-cols-4">
+          <div className="grid gap-6 sm:gap-8 grid-cols-1 @sm:grid-cols-2 @md:grid-cols-3 @xl:grid-cols-4">
             {items.map((p, i) => (
               <div
                 key={i}
-                className="relative overflow-hidden rounded-2xl border transition hover:-translate-y-1"
+                className="relative overflow-hidden rounded-xl md:rounded-2xl border transition hover:-translate-y-1"
                 style={{
                   background: cardBg,
                   border: "1px solid var(--qs-border)",
                 }}
               >
                 {isEditor && (
-                  <div className="absolute right-3 top-3 z-10">
+                  <div className="absolute right-2 top-2 sm:right-3 sm:top-3 z-10">
                     <Xbutton onClick={() => remove(i)} color="red" />
                   </div>
                 )}
@@ -291,9 +291,9 @@ export const ItemsSection = ({
                   path={path + `.items.${i}.image`}
                 />
 
-                <div className="flex h-full flex-col p-6">
+                <div className="flex h-full flex-col p-4 sm:p-6">
                   <h3
-                    className="text-xl font-bold"
+                    className="text-base sm:text-lg md:text-xl font-bold"
                     contentEditable={isEditor}
                     suppressContentEditableWarning={true}
                     onBlur={(e) =>
@@ -305,7 +305,7 @@ export const ItemsSection = ({
                   </h3>
 
                   <p
-                    className="mt-3 text-sm opacity-70"
+                    className="mt-2 sm:mt-3 text-xs sm:text-sm opacity-70"
                     contentEditable={isEditor}
                     suppressContentEditableWarning={true}
                     onBlur={(e) =>
@@ -318,14 +318,14 @@ export const ItemsSection = ({
 
                   {renderTags(p, i)}
 
-                  <div className="mt-7">{renderLinkButton(p, i)}</div>
+                  <div className="mt-4 sm:mt-7">{renderLinkButton(p, i)}</div>
                 </div>
               </div>
             ))}
           </div>
 
           {isEditor && (
-            <div className="mt-12 flex justify-center">
+            <div className="mt-8 sm:mt-12 flex justify-center">
               <AddButton onClick={add}>Add Item</AddButton>
             </div>
           )}
@@ -336,21 +336,21 @@ export const ItemsSection = ({
   // ───────────────────────── GRID ─────────────────────────
   return (
     <section id={anchorName} style={{ background: sectionBg }}>
-      <Container className="py-24">
+      <Container className="py-10 sm:py-16 md:py-24">
         <Header />
 
-        <div className="grid gap-8 @md:grid-cols-2 @xl:grid-cols-3">
+        <div className="grid gap-6 sm:gap-8 grid-cols-1 @md:grid-cols-2 @xl:grid-cols-3">
           {items.map((p, i) => (
             <div
               key={i}
-              className="relative overflow-hidden rounded-3xl border transition hover:-translate-y-1"
+              className="relative overflow-hidden rounded-xl md:rounded-3xl border transition hover:-translate-y-1"
               style={{
                 background: cardBg,
                 border: "1px solid var(--qs-border)",
               }}
             >
               {isEditor && (
-                <div className="absolute right-3 top-3 z-10">
+                <div className="absolute right-2 top-2 sm:right-3 sm:top-3 z-10">
                   <Xbutton onClick={() => remove(i)} color="red" />
                 </div>
               )}
@@ -361,9 +361,9 @@ export const ItemsSection = ({
                 path={path + `.items.${i}.image`}
               />
 
-              <div className="flex h-full flex-col p-6">
+              <div className="flex h-full flex-col p-4 sm:p-6">
                 <h3
-                  className="text-xl font-bold"
+                  className="text-base sm:text-lg md:text-xl font-bold"
                   contentEditable={isEditor}
                   suppressContentEditableWarning={true}
                   onBlur={(e) =>
@@ -375,7 +375,7 @@ export const ItemsSection = ({
                 </h3>
 
                 <p
-                  className="mt-3 text-sm opacity-70"
+                  className="mt-2 sm:mt-3 text-xs sm:text-sm opacity-70"
                   contentEditable={isEditor}
                   suppressContentEditableWarning={true}
                   onBlur={(e) =>
@@ -388,14 +388,14 @@ export const ItemsSection = ({
 
                 {renderTags(p, i)}
 
-                <div className="mt-7">{renderLinkButton(p, i)}</div>
+                <div className="mt-4 sm:mt-7">{renderLinkButton(p, i)}</div>
               </div>
             </div>
           ))}
         </div>
 
         {isEditor && (
-          <div className="mt-12 flex justify-center">
+          <div className="mt-8 sm:mt-12 flex justify-center">
             <AddButton onClick={add}>Add Item</AddButton>
           </div>
         )}
