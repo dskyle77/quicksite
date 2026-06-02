@@ -21,7 +21,7 @@ export const TestimonialsSection = ({
 
   const sectionBg = isEven ? "var(--qs-bg)" : "var(--qs-bg-alt)";
 
-  const cardBg = isEven ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.05)";
+  const cardBg = isEven ? "var(--qs-bg-alt)" : "var(--qs-bg)";
 
   const handleAdd = () => {
     onUpdate("items", [
