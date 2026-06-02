@@ -38,20 +38,7 @@ export const ContactSection = ({
       <section id={anchorName} style={{ background: sectionBg }}>
         <Container className="py-12 sm:py-16 md:py-24">
           <div
-            className="
-              grid
-              gap-8
-              md:gap-12
-              items-center
-              rounded-2xl
-              md:rounded-[36px]
-              border
-              p-5 
-              sm:p-8 
-              md:p-14
-              grid-cols-1
-              md:grid-cols-2
-            "
+            className=" grid gap-8 md:gap-12 items-center rounded-2xl md:rounded-[36px] border p-5  sm:p-8  md:p-14 grid-cols-1 md:grid-cols-2"
             style={{
               background: cardBg,
               border: "1px solid var(--qs-border)",
@@ -98,9 +85,7 @@ export const ContactSection = ({
                 label={content.primaryButton ?? "Send a Message"}
                 linkConfig={content.primaryButtonLink}
                 onLabelChange={(v) => onUpdate("primaryButton", v)}
-                onLinkChange={(cfg) =>
-                  onUpdate("primaryButtonLink", cfg)
-                }
+                onLinkChange={(cfg) => onUpdate("primaryButtonLink", cfg)}
                 className="rounded-2xl px-6 sm:px-8 py-4 sm:py-5 font-bold text-center transition-all duration-300 hover:-translate-y-1 w-full"
                 style={{
                   background: "var(--qs-primary)",
@@ -114,9 +99,7 @@ export const ContactSection = ({
                   label={content.secondaryButton}
                   linkConfig={content.secondaryButtonLink}
                   onLabelChange={(v) => onUpdate("secondaryButton", v)}
-                  onLinkChange={(cfg) =>
-                    onUpdate("secondaryButtonLink", cfg)
-                  }
+                  onLinkChange={(cfg) => onUpdate("secondaryButtonLink", cfg)}
                   className="rounded-2xl px-6 sm:px-8 py-4 sm:py-5 font-bold text-center transition-all duration-300 hover:-translate-y-1 w-full"
                   style={{
                     background: "transparent",
@@ -186,9 +169,7 @@ export const ContactSection = ({
                 label={content.primaryButton ?? "Send Message"}
                 linkConfig={content.primaryButtonLink}
                 onLabelChange={(v) => onUpdate("primaryButton", v)}
-                onLinkChange={(cfg) =>
-                  onUpdate("primaryButtonLink", cfg)
-                }
+                onLinkChange={(cfg) => onUpdate("primaryButtonLink", cfg)}
                 className="inline-flex items-center justify-center rounded-2xl px-6 sm:px-10 py-4 sm:py-5 font-bold transition-all duration-300 hover:-translate-y-1 w-full sm:w-auto"
                 style={{
                   background: "var(--qs-primary)",
@@ -365,7 +346,11 @@ export const ContactSection = ({
                 background: "rgba(255,255,255,0.02)",
               }}
             >
-              <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit} noValidate>
+              <form
+                className="space-y-4 sm:space-y-5"
+                onSubmit={handleSubmit}
+                noValidate
+              >
                 <div>
                   <label
                     className="block text-sm font-semibold mb-2"
