@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import authFetch from "@/lib/authFetch";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import {
   Search,
@@ -32,7 +31,7 @@ import { Button } from "@/components/ui/button";
 
 export default function SitesScreen({
   sites: initial,
-  users,
+  users: initialUsers,
   nextCursor: initialNextCursor,
   currentSearch,
   currentStatus,
@@ -44,17 +43,18 @@ export default function SitesScreen({
   currentStatus?: string;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
 
   // Data state
   const [sites, setSites] = useState<AdminSite[]>(initial);
+  const [users, setUsers] = useState<AdminUser[]>(initialUsers);
   const [search, setSearch] = useState(currentSearch || "");
   const [filter, setFilter] = useState(currentStatus || "all");
 
-  // Pagination state (Mirrored from UsersScreen)
+  // Pagination state
   const [cursorStack, setCursorStack] = useState<string[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(
-    initialNextCursor,
-  );
+  const [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor);
   const [loading, setLoading] = useState(false);
 
   // Action state
@@ -63,13 +63,13 @@ export default function SitesScreen({
 
   // Fetch logic for pagination
   const fetchPage = useCallback(
-    async (cursor?: string) => {
+    async (cursor?: string, s?: string, f?: string) => {
       setLoading(true);
       try {
         const params = new URLSearchParams();
         if (cursor) params.set("cursor", cursor);
-        if (search) params.set("search", search);
-        if (filter !== "all") params.set("status", filter);
+        if (s) params.set("search", s);
+        if (f && f !== "all") params.set("status", f);
 
         const res = await authFetch(`/api/admin/sites?${params.toString()}`);
         if (!res.ok) throw new Error("Failed to fetch sites");
@@ -77,20 +77,50 @@ export default function SitesScreen({
         const data = await res.json();
         setSites(data.sites);
         setNextCursor(data.nextCursor);
+        
+        // In a real app, we might want to fetch users for these sites if not already loaded
+        // For simplicity, we rely on the parent page to provide them or we could fetch them here.
       } catch (err) {
         toast.error("Failed to load sites");
       } finally {
         setLoading(false);
       }
     },
-    [search, filter],
+    [],
   );
+
+  // Debounced search
+  useEffect(() => {
+    if (search === (currentSearch || "")) return;
+    const timer = setTimeout(() => {
+      setCursorStack([]);
+      fetchPage(undefined, search, filter);
+      
+      const params = new URLSearchParams(searchParams.toString());
+      if (search) params.set("search", search);
+      else params.delete("search");
+      params.delete("cursor");
+      router.replace(`${pathname}?${params.toString()}`);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search, fetchPage, pathname, router, searchParams, currentSearch, filter]);
+
+  const handleFilter = (f: string) => {
+    setFilter(f);
+    setCursorStack([]);
+    fetchPage(undefined, search, f);
+    
+    const params = new URLSearchParams(searchParams.toString());
+    if (f !== "all") params.set("status", f);
+    else params.delete("status");
+    params.delete("cursor");
+    router.replace(`${pathname}?${params.toString()}`);
+  };
 
   const goNext = async () => {
     if (!nextCursor) return;
-    // Push current first site ID to stack for "Prev" navigation
     setCursorStack((prev) => [...prev, sites[0]?.id ?? ""]);
-    await fetchPage(nextCursor);
+    await fetchPage(nextCursor, search, filter);
   };
 
   const goPrev = async () => {
@@ -98,16 +128,8 @@ export default function SitesScreen({
     const newStack = [...cursorStack];
     const prevCursor = newStack.pop();
     setCursorStack(newStack);
-    await fetchPage(newStack.length === 0 ? undefined : prevCursor);
+    await fetchPage(newStack.length === 0 ? undefined : prevCursor, search, filter);
   };
-
-  // Client-side filtering for the current page
-  const filtered = sites.filter(
-    (s) =>
-      (s.name.toLowerCase().includes(search.toLowerCase()) ||
-        s.slug.toLowerCase().includes(search.toLowerCase())) &&
-      (filter === "all" || s.status === filter),
-  );
 
   const deleteSite = async () => {
     if (!deleteTarget) return;
@@ -122,7 +144,6 @@ export default function SitesScreen({
       }
       setSites((prev) => prev.filter((s) => s.id !== deleteTarget.id));
       toast.success("Site deleted");
-      router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Delete failed");
     } finally {
@@ -188,7 +209,7 @@ export default function SitesScreen({
         </div>
         <select
           value={filter}
-          onChange={(e) => setFilter(e.target.value)}
+          onChange={(e) => handleFilter(e.target.value)}
           className="px-3 py-2 border border-slate-200 rounded-xl text-[13px] bg-white cursor-pointer"
         >
           <option value="all">All Statuses</option>
@@ -227,7 +248,7 @@ export default function SitesScreen({
                     <Loader2 className="w-5 h-5 animate-spin text-slate-400 mx-auto" />
                   </td>
                 </tr>
-              ) : filtered.length === 0 ? (
+              ) : sites.length === 0 ? (
                 <tr>
                   <td
                     colSpan={6}
@@ -237,13 +258,13 @@ export default function SitesScreen({
                   </td>
                 </tr>
               ) : (
-                filtered.map((site, i) => {
+                sites.map((site, i) => {
                   const owner = users.find((u) => u.uid === site.uid);
                   return (
                     <tr
                       key={site.id}
                       className={cn(
-                        i < filtered.length - 1 && "border-b border-slate-50",
+                        i < sites.length - 1 && "border-b border-slate-50",
                       )}
                     >
                       <td className="px-4 py-3">
@@ -323,11 +344,11 @@ export default function SitesScreen({
           </table>
         </div>
 
-        {/* Pagination footer (Mirrored from UsersScreen) */}
+        {/* Pagination footer */}
         <div className="border-t border-slate-100 px-4 py-3 flex items-center justify-between bg-slate-50">
           <p className="text-[12px] text-slate-500">
             Showing{" "}
-            <span className="font-bold text-slate-700">{filtered.length}</span>{" "}
+            <span className="font-bold text-slate-700">{sites.length}</span>{" "}
             sites
           </p>
           <div className="flex gap-2">

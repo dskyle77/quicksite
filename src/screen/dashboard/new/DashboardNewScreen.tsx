@@ -105,8 +105,8 @@ export default function CreateSitePage() {
         newErrors.type = "Please select a template to continue.";
       }
     } else if (currentStep === 3) {
-      if (formData.generateWithAI && !formData.description.trim()) {
-        newErrors.description = "Description is required for AI generation.";
+      if (!formData.description.trim()) {
+        newErrors.description = "Description is required.";
       }
     }
 

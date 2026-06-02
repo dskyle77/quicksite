@@ -64,7 +64,6 @@ export default function TemplatesPreview({ type }: { type: string }) {
     ? templateEntry.starterContent(starterContentArgs)
     : buildStarterContent(templateEntry.contentConfig, starterContentArgs);
 
-  console.log(templateData);
 
   let useTemplateHref = `/dashboard/new?template=${encodeURIComponent(type)}`;
   const useQueryParams: string[] = [];

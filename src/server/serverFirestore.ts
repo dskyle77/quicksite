@@ -35,7 +35,7 @@ async function assertSiteOwner(siteId: string, uid: string): Promise<any> {
 /**
  * Checks if a slug is used as a Doc ID OR if a domain is used in any field.
  */
-export async function isIdentifierTaken(
+export async function isSlugTaken(
   identifier: string,
   excludeSiteId?: string,
 ): Promise<boolean> {
@@ -43,15 +43,15 @@ export async function isIdentifierTaken(
 
   // 1. Check if ID exists (Slug)
   const idDoc = await adminDb.collection("sites").doc(clean).get();
-  if (idDoc.exists && idDoc.id !== excludeSiteId) return true;
+  return idDoc.exists && idDoc.id !== excludeSiteId;
 
-  // 2. Check if customDomain field exists
-  const domainSnap = await adminDb
-    .collection("sites")
-    .where("customDomain", "==", clean)
-    .get();
+  // // 2. Check if customDomain field exists
+  // const domainSnap = await adminDb
+  //   .collection("sites")
+  //   .where("customDomain", "==", clean)
+  //   .get();
 
-  return domainSnap.docs.some((d) => d.id !== excludeSiteId);
+  // return domainSnap.docs.some((d) => d.id !== excludeSiteId);
 }
 
 // ── Sites ─────────────────────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ export async function serverCreateSite(
 
   if (currentCount >= getSiteLimit(plan))
     throw new Error("Plan limit reached.");
-  if (await isIdentifierTaken(slug)) throw new Error("URL already taken.");
+  if (await isSlugTaken(slug)) throw new Error("URL already taken.");
 
   const batch = adminDb.batch();
   const siteRef = adminDb.collection("sites").doc(slug);
@@ -104,7 +104,7 @@ export async function serverRenameSlug(
   newSlug: string,
 ): Promise<string> {
   const normalizedNew = newSlug.trim().toLowerCase();
-  if (await isIdentifierTaken(normalizedNew)) throw new Error("Slug taken.");
+  if (await isSlugTaken(normalizedNew)) throw new Error("Slug taken.");
 
   const oldRef = adminDb.collection("sites").doc(oldSlug);
   const oldDoc = await oldRef.get();
@@ -154,7 +154,7 @@ export async function serverUpdateDomain(
 ): Promise<void> {
   await assertSiteOwner(siteId, uid);
 
-  if (domain && (await isIdentifierTaken(domain, siteId))) {
+  if (domain && (await isSlugTaken(domain, siteId))) {
     throw new Error("Domain already in use.");
   }
 

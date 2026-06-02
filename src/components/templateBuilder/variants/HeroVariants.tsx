@@ -9,7 +9,7 @@ export type HeroVariantKey =
   | "background"
   | "split"
   | "minimalist"
-  | "gradient"
+  | "left"
   | "centered"
   | "none";
 
@@ -253,7 +253,10 @@ const CenteredVariant = ({
 }: TemplateComponentProps) => (
   <section
     className="relative flex min-h-[80vh] flex-col items-center justify-center px-4 @sm:px-6 text-center py-16 @md:py-24"
-    style={{ background: "var(--qs-bg, #fff)" }}
+    style={{
+      background:
+        "linear-gradient(to bottom, var(--qs-primary, #fff) 0%, var(--qs-bg, #f7f7fa) 60%)",
+    }}
   >
     {content?.badge && (
       <div
@@ -321,7 +324,7 @@ const CenteredVariant = ({
 );
 
 // ─── 5. Gradient ─────────────────────────────────────────────────────────────
-const GradientVariant = ({
+const LeftVariant = ({
   isEditor,
   content,
   onUpdate,
@@ -334,22 +337,14 @@ const GradientVariant = ({
   });
 
   return (
-<section
-      className="relative flex min-h-[85vh] flex-col items-center justify-center overflow-hidden px-4 py-20 text-center @sm:px-6 @md:py-32"
+    <section
+      className="relative flex min-h-[85vh] flex-col overflow-hidden px-4 py-20 text-left @sm:px-20 @md:py-32"
       style={{
-        // Gently injects 8% of the primary color directly into the background.
-        // If --qs-bg is dark, this creates a rich, dark tinted glow.
-        // If --qs-bg is light, it creates a soft, pastel tinted glow.
         background:
-          "linear-gradient(130deg, var(--qs-bg), color-mix(in srgb, var(--qs-primary) 20%, var(--qs-bg)))",
+          "linear-gradient(130deg, var(--qs-bg) 30%, var(--qs-primary) 100%)",
       }}
     >
-      {/* Dynamic Ambient Gradient Blooms */}
-      {/* mix-blend-multiply deepens colors on light modes, while dark:mix-blend-screen makes them brilliantly luminous on dark modes */}
-      <div className="pointer-events-none absolute -top-40 -left-40 h-[450px] w-[450px] rounded-full bg-(--qs-primary) opacity-15 blur-[120px] mix-blend-multiply dark:mix-blend-screen" />
-      <div className="pointer-events-none absolute -right-20 bottom-0 h-[550px] w-[550px] rounded-full bg-(--qs-primary) opacity-10 blur-[140px] mix-blend-multiply dark:mix-blend-screen" />
-
-      <div className="relative z-10 flex w-full max-w-4xl flex-col items-center justify-center">
+      <div className="relative z-10 flex w-full max-w-3xl flex-col items-start">
         {/* Glassmorphism Badge */}
         {content?.badge && (
           <div
@@ -359,32 +354,29 @@ const GradientVariant = ({
             {content.badge}
           </div>
         )}
-
-        {/* High-contrast Title (Uses global text color so it flips with the theme) */}
+        {/* Title */}
         <h1
           {...editableProps("title")}
-          className="text-(--qs-text) py-2 text-4xl font-extrabold tracking-tight outline-none @sm:text-6xl @md:text-7xl leading-tight"
+          className="text-(--qs-text) py-2 text-4xl font-extrabold tracking-tight outline-none @sm:text-6xl @md:text-7xl leading-tight text-left w-full"
         >
           {content?.title}
         </h1>
-
-        {/* Subtle Framed Description */}
+        {/* Description */}
         <p
           {...editableProps("desc")}
-          className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-(--qs-text) opacity-80 outline-none @sm:text-xl"
+          className="mt-6 max-w-2xl text-base leading-relaxed text-(--qs-text) opacity-80 outline-none @sm:text-xl text-left w-full"
         >
           {content?.desc}
         </p>
-
         {/* Dynamic CTAs */}
-        <div className="mt-10 flex w-full flex-col items-center justify-center gap-4 @sm:w-auto @sm:flex-row">
+        <div className="mt-10 flex w-full flex-col items-start justify-start gap-4 @sm:w-auto @sm:flex-row">
           <EditableLinkButton
             isEditor={isEditor}
             label={content?.primaryButton ?? "Get Started"}
             linkConfig={content?.primaryButtonLink}
             onLabelChange={(v) => onUpdate("primaryButton", v)}
             onLinkChange={(cfg) => onUpdate("primaryButtonLink", cfg)}
-            className="w-full rounded-xl bg-(--qs-primary) px-8 py-4 text-base font-bold text-(--qs-primary-fg) shadow-[0_10px_25px_-5px_rgba(var(--qs-primary),0.3)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 @sm:w-auto text-center"
+            className="w-full rounded-xl bg-(--qs-primary) px-8 py-4 text-base font-bold text-(--qs-primary-fg) shadow-[0_10px_25px_-5px_rgba(var(--qs-primary),0.3)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 @sm:w-auto text-left"
             style={{
               background: "var(--qs-primary)",
               color: "var(--qs-primary-fg)",
@@ -398,7 +390,7 @@ const GradientVariant = ({
               linkConfig={content?.secondaryButtonLink}
               onLabelChange={(v) => onUpdate("secondaryButton", v)}
               onLinkChange={(cfg) => onUpdate("secondaryButtonLink", cfg)}
-              className="w-full rounded-xl border border-(--qs-border) bg-white/20 px-8 py-4 text-base font-semibold text-(--qs-text) backdrop-blur-xs transition-all duration-200 hover:bg-white/40 active:scale-95 dark:bg-black/20 dark:hover:bg-black/40 @sm:w-auto text-center"
+              className="w-full rounded-xl border border-(--qs-border) bg-white/20 px-8 py-4 text-base font-semibold text-(--qs-text) backdrop-blur-xs transition-all duration-200 hover:bg-white/40 active:scale-95 dark:bg-black/20 dark:hover:bg-black/40 @sm:w-auto text-left"
             />
           )}
         </div>
@@ -407,14 +399,13 @@ const GradientVariant = ({
   );
 };
 
-
 const None = () => null;
 
 // ─── Registry ─────────────────────────────────────────────────────────────────
 
 export const HeroVariants: VariantRegistry<HeroVariantKey> = {
   background: BackgroundVariant,
-  gradient: GradientVariant,
+  left: LeftVariant,
   split: SplitVariant,
   minimalist: MinimalistVariant,
   centered: CenteredVariant,
@@ -423,7 +414,7 @@ export const HeroVariants: VariantRegistry<HeroVariantKey> = {
 
 export const HeroVariantList: HeroVariantKey[] = [
   "background",
-  "gradient",
+  "left",
   "centered",
   "minimalist",
   "split",

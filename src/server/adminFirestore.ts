@@ -30,14 +30,40 @@ function serializeDoc(data: any): any {
 
 const USERS_PAGE_SIZE = 20;
 
-export async function getAllUsers(
-  cursor?: string,
+export async function getAllUsers({
+  cursor,
+  search,
+  planFilter,
   pageSize = USERS_PAGE_SIZE,
-): Promise<{ users: AdminUser[]; nextCursor: string | null }> {
-  let q = adminDb
-    .collection("users")
-    .orderBy("createdAt", "desc")
-    .limit(pageSize + 1);
+}: {
+  cursor?: string;
+  search?: string;
+  planFilter?: string;
+  pageSize?: number;
+} = {}): Promise<{ users: AdminUser[]; nextCursor: string | null }> {
+  let q: FirebaseFirestore.Query = adminDb.collection("users");
+
+  if (planFilter && planFilter !== "all") {
+    q = q.where("plan", "==", planFilter);
+  }
+
+  // Server-side search (prefix)
+  // Note: Firestore only supports range queries on one field at a time.
+  // We prioritize email search if it looks like an email, otherwise displayName.
+  if (search) {
+    const term = search.toLowerCase();
+    const end = term + "\uf8ff";
+    
+    // This is still limited because we can't easily search across both email and displayName
+    // efficiently in Firestore without composite indexes or a search service.
+    // For now, let's stick to email if it contains '@', otherwise displayName.
+    const field = term.includes("@") ? "email" : "displayName";
+    q = q.where(field, ">=", term).where(field, "<=", end);
+  } else {
+    q = q.orderBy("createdAt", "desc");
+  }
+
+  q = q.limit(pageSize + 1);
 
   if (cursor) {
     const cursorDoc = await adminDb.collection("users").doc(cursor).get();
@@ -69,6 +95,29 @@ export async function getAllUsers(
     users,
     nextCursor: hasMore ? docs[docs.length - 1].id : null,
   };
+}
+
+export async function getUsersByIds(uids: string[]): Promise<AdminUser[]> {
+  if (uids.length === 0) return [];
+  
+  // Firestore IN query limit is 30
+  const uniqueUids = Array.from(new Set(uids)).slice(0, 30);
+  const snap = await adminDb.collection("users").where("__name__", "in", uniqueUids).get();
+  
+  return snap.docs.map((d) => {
+    const data = serializeDoc(d.data());
+    return {
+      uid: d.id,
+      displayName: data.displayName || "",
+      email: data.email || "",
+      plan: data.plan || "free",
+      siteCount: data.siteCount || 0,
+      createdAt: data.createdAt || "",
+      updatedAt: data.updatedAt || "",
+      status: data.status || "active",
+      isAdmin: data.isAdmin || false,
+    } as AdminUser;
+  });
 }
 
 // Lightweight summary for overview stats only
@@ -119,9 +168,8 @@ export async function getOverviewStats(): Promise<OverviewStats> {
 
   // MRR computed from user plan counts (no full site scan needed)
   const mrr =
-    (planDist.basic ?? 0) * 1500 +
-    (planDist.growth ?? 0) * 4000 +
-    (planDist.pro ?? 0) * 10000;
+    (planDist.growth ?? 0) * 1000 +
+    (planDist.pro ?? 0) * 3000;
 
   // Cheap server-side counts via Firestore aggregation
   const [sitesCountSnap, domainsCountSnap, verifiedDomainsSnap] =

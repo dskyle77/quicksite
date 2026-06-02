@@ -50,22 +50,22 @@ function ConfirmDialog({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30">
-      <div className="bg-white rounded-2xl p-7 shadow-lg w-[90vw] max-w-sm border border-slate-200 flex flex-col items-stretch">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+      <div className="bg-card text-card-foreground rounded-2xl p-6 shadow-xl w-full max-w-sm border border-border flex flex-col items-stretch">
         <h2 className="font-bold text-lg mb-2">{title}</h2>
         {description && (
-          <p className="text-sm text-slate-600 mb-5">{description}</p>
+          <p className="text-sm text-muted-foreground mb-5">{description}</p>
         )}
         <div className="flex justify-end gap-2 mt-2">
           <button
             onClick={onCancel}
-            className="px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs uppercase tracking-wide transition-all"
+            className="px-4 py-2 rounded-lg bg-muted hover:bg-accent hover:text-accent-foreground text-muted-foreground font-bold text-xs uppercase tracking-wide transition-all cursor-pointer"
           >
             {cancelText}
           </button>
           <button
             onClick={onConfirm}
-            className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-bold text-xs uppercase tracking-wide transition-all"
+            className="px-4 py-2 rounded-lg bg-destructive hover:opacity-90 text-white font-bold text-xs uppercase tracking-wide transition-all cursor-pointer"
           >
             {confirmText}
           </button>
@@ -181,8 +181,6 @@ export default function DashboardDomainsScreen() {
 
       const data = await res.json();
 
-      // Optionally, handle DNS/data returned by API
-
       if (!res.ok || data?.isValid === false) {
         setStatus("invalid");
         throw new Error(data.error || "Registration failed");
@@ -194,7 +192,8 @@ export default function DashboardDomainsScreen() {
       setDomainInput("");
     } catch (error: any) {
       toast.error(error?.message || "Failed to connect domain.");
-    } finally {
+    }
+    checkFinally: {
       setIsSubmitting(false);
     }
   };
@@ -233,7 +232,6 @@ export default function DashboardDomainsScreen() {
   const handleUnlink = async (domain: string, siteId: string) => {
     if (!canUseDomains) return;
 
-    // Instead of confirm, show custom dialog
     setConfirmDialog({
       open: true,
       domain,
@@ -276,29 +274,29 @@ export default function DashboardDomainsScreen() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-10 px-4">
+    <div className="max-w-6xl mx-auto py-6 md:py-10 px-4 text-foreground bg-background">
       {/* Header */}
-      <div className="mb-10">
-        <h1 className="text-3xl font-black flex items-center gap-3">
+      <div className="mb-8 md:mb-10">
+        <h1 className="text-2xl md:text-3xl font-black flex items-center gap-3">
           <Globe className="text-primary" size={32} />
           Custom Domains
         </h1>
-        <p className="text-slate-500 mt-2">
+        <p className="text-muted-foreground text-sm mt-2">
           Point your own domain to your {SITE_STANDARD_NAME} projects.
         </p>
       </div>
 
       {/* Plan Gate Banner */}
       {!canUseDomains && (
-        <div className="mb-8 bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-3xl p-6 flex items-center gap-5">
-          <div className="bg-amber-100 p-3 rounded-2xl shrink-0">
-            <Lock className="text-amber-600" size={24} />
+        <div className="mb-8 bg-amber-500/10 dark:bg-amber-500/5 border border-amber-500/20 rounded-2xl p-5 md:p-6 flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-5">
+          <div className="bg-amber-500/20 dark:bg-amber-500/10 p-3 rounded-xl shrink-0">
+            <Lock className="text-amber-600 dark:text-amber-400" size={24} />
           </div>
           <div className="flex-1">
-            <p className="font-bold text-amber-900">
+            <p className="font-bold text-amber-900 dark:text-amber-200">
               Custom domains are a paid feature
             </p>
-            <p className="text-sm text-amber-700 mt-0.5">
+            <p className="text-sm text-amber-700 dark:text-amber-300 mt-0.5">
               Your current{" "}
               <span className="font-semibold capitalize">{userPlan}</span> plan
               doesn&apos;t include custom domains. Upgrade to Pro or higher to
@@ -307,7 +305,7 @@ export default function DashboardDomainsScreen() {
           </div>
           <a
             href="/pricing"
-            className="shrink-0 flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold px-5 py-3 rounded-2xl text-sm transition-colors"
+            className="w-full md:w-auto shrink-0 flex items-center justify-center gap-2 bg-secondary text-secondary-foreground hover:opacity-90 font-bold px-5 py-3 rounded-xl text-sm transition-all"
           >
             <Sparkles size={16} />
             Upgrade Plan
@@ -316,15 +314,15 @@ export default function DashboardDomainsScreen() {
       )}
 
       <div
-        className={`grid grid-cols-1 lg:grid-cols-3 gap-8 ${!canUseDomains ? "opacity-60 pointer-events-none select-none" : ""}`}
+        className={`grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-8 ${!canUseDomains ? "opacity-60 pointer-events-none select-none" : ""}`}
       >
         {/* LEFT: Connection Form */}
         <div className="lg:col-span-1 space-y-6">
-          <div className="bg-white border rounded-3xl p-6 shadow-sm">
-            <h2 className="font-bold mb-4 ml-1">Connect New Domain</h2>
+          <div className="bg-card border border-border rounded-2xl p-5 md:p-6 shadow-xs">
+            <h2 className="font-bold text-lg mb-4 ml-1">Connect New Domain</h2>
             <form onSubmit={handleConnectNew} className="space-y-4">
               <div>
-                <label className="text-[10px] uppercase font-black text-slate-400 mb-1 block ml-1">
+                <label className="text-[10px] uppercase font-black text-muted-foreground mb-1 block ml-1">
                   1. Select Target Site
                 </label>
                 <select
@@ -332,7 +330,7 @@ export default function DashboardDomainsScreen() {
                   value={selectedSiteId}
                   onChange={(e) => setSelectedSiteId(e.target.value)}
                   disabled={!canUseDomains}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none text-sm transition-all bg-slate-50 disabled:cursor-not-allowed"
+                  className="input"
                 >
                   <option value="">Choose a site...</option>
                   {sites.map((site) => (
@@ -344,7 +342,7 @@ export default function DashboardDomainsScreen() {
               </div>
 
               <div>
-                <label className="text-[10px] uppercase font-black text-slate-400 mb-1 block ml-1">
+                <label className="text-[10px] uppercase font-black text-muted-foreground mb-1 block ml-1">
                   2. Enter Domain
                 </label>
                 <input
@@ -357,20 +355,20 @@ export default function DashboardDomainsScreen() {
                     setDomainInput(e.target.value);
                     if (status !== "idle") setStatus("idle");
                   }}
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-primary outline-none text-sm bg-slate-50 disabled:cursor-not-allowed"
+                  className="input"
                 />
               </div>
 
               <button
                 disabled={isSubmitting || !canUseDomains}
-                className={`w-full py-4 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 ${
+                className={`w-full py-3.5 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-md cursor-pointer ${
                   status === "invalid"
-                    ? "bg-red-500 shadow-red-200"
-                    : "bg-primary hover:scale-[1.02]"
-                } disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100`}
+                    ? "bg-destructive shadow-destructive/20"
+                    : "bg-primary hover:opacity-90 shadow-primary/10"
+                } disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {isSubmitting ? (
-                  <Loader2 className="animate-spin" />
+                  <Loader2 className="animate-spin" size={18} />
                 ) : status === "invalid" ? (
                   "Retry Setup"
                 ) : (
@@ -380,9 +378,9 @@ export default function DashboardDomainsScreen() {
             </form>
 
             {status === "invalid" && (
-              <div className="mt-4 p-4 bg-red-50 border border-red-100 rounded-2xl flex gap-3">
-                <AlertCircle className="text-red-500 shrink-0" size={18} />
-                <p className="text-[10px] text-red-700 leading-tight">
+              <div className="mt-4 p-4 bg-destructive/10 border border-destructive/20 rounded-xl flex gap-3">
+                <AlertCircle className="text-destructive shrink-0" size={18} />
+                <p className="text-xs text-destructive dark:text-red-400 leading-tight">
                   DNS Check Failed. Found records:{" "}
                   {foundRecords.join(", ") || "None"}. Point your A Record to
                   76.76.21.21.
@@ -391,9 +389,9 @@ export default function DashboardDomainsScreen() {
             )}
           </div>
 
-          <div className="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex gap-3">
-            <AlertCircle className="text-blue-500 shrink-0" size={20} />
-            <p className="text-[10px] text-blue-700 leading-relaxed">
+          <div className="bg-primary/5 border border-primary/20 rounded-xl p-4 flex gap-3">
+            <AlertCircle className="text-primary shrink-0" size={20} />
+            <p className="text-xs text-muted-foreground leading-relaxed">
               Domain changes can take time to propagate. If your DNS is correct
               but verification fails, wait 5 minutes and try again.
             </p>
@@ -402,9 +400,9 @@ export default function DashboardDomainsScreen() {
 
         {/* RIGHT: DNS Instructions */}
         <div className="lg:col-span-2">
-          <div className="bg-slate-900 text-white rounded-3xl p-8 shadow-xl relative overflow-hidden">
+          <div className="bg-card text-card-foreground border border-border rounded-2xl p-6 md:p-8 shadow-xs relative overflow-hidden">
             <Globe
-              className="absolute -right-10 -bottom-10 text-white/5"
+              className="absolute -right-10 -bottom-10 text-muted/10 pointer-events-none"
               size={200}
             />
             <h2 className="text-xl font-bold flex items-center gap-2 mb-6 relative z-10">
@@ -434,16 +432,21 @@ export default function DashboardDomainsScreen() {
       </div>
 
       {/* BOTTOM: Domain Management List */}
-      <div className="mt-16">
+      <div className="mt-12 md:mt-16">
         <div className="flex items-center gap-4 mb-8">
-          <h2 className="text-2xl font-black">Your Managed Domains</h2>
-          <div className="h-px flex-1 bg-slate-100" />
+          <h2 className="text-xl md:text-2xl font-black whitespace-nowrap">
+            Your Managed Domains
+          </h2>
+          <div className="h-px flex-1 bg-border" />
         </div>
 
         {managedDomains.length === 0 ? (
-          <div className="bg-slate-50 border-2 border-dashed border-slate-200 rounded-4xl py-20 text-center">
-            <Globe size={48} className="mx-auto text-slate-200 mb-4" />
-            <p className="text-slate-400 font-medium">
+          <div className="bg-card border border-dashed border-border rounded-2xl py-16 md:py-20 text-center">
+            <Globe
+              size={48}
+              className="mx-auto text-muted-foreground/30 mb-4"
+            />
+            <p className="text-muted-foreground text-sm font-medium">
               No domains connected to your account yet.
             </p>
           </div>
@@ -452,35 +455,35 @@ export default function DashboardDomainsScreen() {
             {managedDomains.map((item) => (
               <div
                 key={item.id}
-                className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow group"
+                className="bg-card border border-border rounded-2xl p-5 shadow-xs hover:shadow-md transition-all group"
               >
-                <div className="flex justify-between items-start mb-6">
-                  <div className="bg-primary/5 p-3 rounded-2xl group-hover:bg-primary/10 transition-colors">
-                    <Globe className="text-primary" size={24} />
+                <div className="flex justify-between items-start mb-5">
+                  <div className="bg-primary/10 p-3 rounded-xl group-hover:bg-primary/20 transition-colors">
+                    <Globe className="text-primary" size={22} />
                   </div>
                   <button
                     onClick={() =>
                       window.open(`https://${item.domain}`, "_blank")
                     }
-                    className="p-2 text-slate-400 hover:text-primary transition-colors"
+                    className="p-2 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
                   >
-                    <ExternalLink size={20} />
+                    <ExternalLink size={18} />
                   </button>
                 </div>
 
-                <div className="space-y-1 mb-6">
-                  <h3 className="font-bold text-xl truncate">{item.domain}</h3>
-                  <div className="flex items-center gap-2 text-xs text-slate-500">
+                <div className="space-y-1 mb-5">
+                  <h3 className="font-bold text-lg truncate">{item.domain}</h3>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
                     <LinkIcon size={12} />
                     Linked to:{" "}
-                    <span className="font-bold text-slate-800">
+                    <span className="font-bold text-card-foreground">
                       {item.siteName}
                     </span>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  {/* Relink button — disabled on free plan */}
+                  {/* Relink button */}
                   {canUseDomains ? (
                     <button
                       disabled={
@@ -489,7 +492,7 @@ export default function DashboardDomainsScreen() {
                         item.siteId === selectedSiteId
                       }
                       onClick={() => handleRelink(item.domain)}
-                      className="w-full py-3 bg-slate-50 hover:bg-primary hover:text-white disabled:opacity-30 disabled:hover:bg-slate-50 disabled:hover:text-slate-900 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 uppercase tracking-tighter"
+                      className="w-full py-2.5 bg-muted hover:bg-primary hover:text-white dark:text-muted-foreground dark:hover:text-white disabled:opacity-30 disabled:hover:bg-muted disabled:hover:text-muted-foreground rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 uppercase tracking-tight cursor-pointer"
                     >
                       {isSubmitting ? (
                         <Loader2 size={14} className="animate-spin" />
@@ -501,7 +504,7 @@ export default function DashboardDomainsScreen() {
                   ) : (
                     <button
                       disabled
-                      className="w-full py-3 bg-slate-50 opacity-40 cursor-not-allowed rounded-2xl text-xs font-black flex items-center justify-center gap-2 uppercase tracking-tighter"
+                      className="w-full py-2.5 bg-muted opacity-40 cursor-not-allowed rounded-xl text-xs font-black flex items-center justify-center gap-2 uppercase tracking-tight"
                     >
                       <Lock size={14} />
                       Relink (Paid Only)
@@ -513,7 +516,7 @@ export default function DashboardDomainsScreen() {
                     <button
                       disabled={unlinkingDomain === item.domain}
                       onClick={() => handleUnlink(item.domain, item.siteId)}
-                      className="w-full py-3 bg-red-50 hover:bg-red-500 hover:text-white text-red-500 disabled:opacity-40 rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2 uppercase tracking-tighter"
+                      className="w-full py-2.5 bg-destructive/10 hover:bg-destructive hover:text-white text-destructive dark:text-red-400 dark:hover:text-white disabled:opacity-40 rounded-xl text-xs font-black transition-all flex items-center justify-center gap-2 uppercase tracking-tight cursor-pointer"
                     >
                       {unlinkingDomain === item.domain ? (
                         <Loader2 size={14} className="animate-spin" />
@@ -527,7 +530,7 @@ export default function DashboardDomainsScreen() {
                   ) : (
                     <button
                       disabled
-                      className="w-full py-3 bg-red-50 opacity-40 cursor-not-allowed rounded-2xl text-xs font-black flex items-center justify-center gap-2 uppercase tracking-tighter text-red-400"
+                      className="w-full py-2.5 bg-destructive/5 opacity-40 cursor-not-allowed rounded-xl text-xs font-black flex items-center justify-center gap-2 uppercase tracking-tight text-destructive"
                     >
                       <Lock size={14} />
                       Unlink (Paid Only)
@@ -536,7 +539,7 @@ export default function DashboardDomainsScreen() {
                 </div>
 
                 {!selectedSiteId && canUseDomains && (
-                  <p className="text-[9px] text-center mt-2 text-slate-400">
+                  <p className="text-[10px] text-center mt-3 text-muted-foreground">
                     Select a site above to enable relinking
                   </p>
                 )}
@@ -568,41 +571,46 @@ export default function DashboardDomainsScreen() {
 // Sub-component for individual DNS record cards
 function DNSRecordCard({ type, host, value, status, isA, onCopy }: any) {
   return (
-    <div className="bg-slate-800/40 border border-slate-700/50 backdrop-blur-sm rounded-2xl p-5 transition-all hover:border-primary/30">
+    <div className="bg-muted/30 border border-border rounded-xl p-4 md:p-5 transition-all hover:border-primary/40">
       <div className="flex justify-between items-start mb-3">
-        <span className="text-[10px] font-black uppercase tracking-widest text-primary/80">
+        <span className="text-[10px] font-black uppercase tracking-widest text-primary">
           {type}
         </span>
         {status === "verifying" ? (
           <RefreshCw size={16} className="text-primary animate-spin" />
         ) : status === "valid" ? (
-          <CheckCircle2 size={16} className="text-green-400" />
+          <CheckCircle2 size={16} className="text-green-500" />
         ) : status === "invalid" && isA ? (
-          <XCircle size={16} className="text-red-400" />
+          <XCircle size={16} className="text-destructive" />
         ) : (
-          <div className="w-1.5 h-1.5 rounded-full bg-slate-600" />
+          <div className="w-2 h-2 rounded-full bg-muted-foreground/40" />
         )}
       </div>
-      <div className="flex items-center justify-between bg-slate-950/50 rounded-xl p-4 border border-slate-700/50">
-        <div className="grid grid-cols-2 gap-10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-background rounded-xl p-3.5 border border-border gap-3 sm:gap-6">
+        <div className="flex gap-8 md:gap-12">
           <div>
-            <p className="text-[9px] text-slate-500 uppercase font-bold mb-1">
+            <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">
               Host
             </p>
-            <p className="font-mono text-sm">{host}</p>
+            <p className="font-mono text-sm break-all">{host}</p>
           </div>
           <div>
-            <p className="text-[9px] text-slate-500 uppercase font-bold mb-1">
+            <p className="text-[10px] text-muted-foreground uppercase font-bold mb-1">
               Value
             </p>
-            <p className="font-mono text-sm text-primary/90">{value}</p>
+            <p className="font-mono text-sm text-primary font-semibold break-all">
+              {value}
+            </p>
           </div>
         </div>
         <button
           onClick={() => onCopy(value)}
-          className="p-2 hover:bg-white/5 rounded-lg transition-colors group"
+          className="self-end sm:self-center p-2 hover:bg-muted rounded-lg transition-colors group cursor-pointer"
         >
-          <Copy size={18} className="text-slate-500 group-hover:text-white" />
+          <Copy
+            size={16}
+            className="text-muted-foreground group-hover:text-foreground"
+          />
         </button>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { getSitesPaginated, getAllUsers } from "@/server/adminFirestore";
+import { getSitesPaginated, getUsersByIds } from "@/server/adminFirestore";
 import SitesScreen from "@/screen/admin/SitesScreen";
 
 interface PageProps {
@@ -8,10 +8,11 @@ interface PageProps {
 export default async function AdminSitesPage({ searchParams }: PageProps) {
   const { cursor, search, status } = await searchParams;
 
-  const [{ sites, nextCursor }, { users }] = await Promise.all([
-    getSitesPaginated({ cursor, search, statusFilter: status }),
-    getAllUsers(),
-  ]);
+  const { sites, nextCursor } = await getSitesPaginated({ cursor, search, statusFilter: status });
+
+  // Fetch only the owners of the sites on the current page
+  const ownerUids = sites.map((s) => s.uid).filter(Boolean);
+  const users = ownerUids.length > 0 ? await getUsersByIds(ownerUids) : [];
 
   return (
     <SitesScreen

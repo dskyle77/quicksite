@@ -1,8 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import authFetch from "@/lib/authFetch";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 import {
   Search,
   RefreshCw,
@@ -50,40 +51,36 @@ export default function UserDomainsScreen({
   nextCursor?: string | null;
   currentSearch?: string;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [domains, setDomains] = useState<AdminDomain[]>(initial);
   const [search, setSearch] = useState(currentSearch ?? "");
   const [verifying, setVerifying] = useState<string | null>(null);
   const [removing, setRemoving] = useState<string | null>(null);
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
-  const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget | null>(null);
 
   // Pagination state
   const [cursorStack, setCursorStack] = useState<string[]>([]);
-  const [nextCursor, setNextCursor] = useState<string | null>(
-    initialNextCursor ?? null,
-  );
+  const [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor ?? null);
   const [loading, setLoading] = useState(false);
 
-  const showToast = (msg: string, ok = true) => {
-    setToast({ msg, ok });
-    setTimeout(() => setToast(null), 3000);
-  };
-
   const fetchPage = useCallback(
-    async (cursor?: string, searchQuery?: string) => {
+    async (cursor?: string, s?: string) => {
       setLoading(true);
       try {
         const params = new URLSearchParams();
         if (cursor) params.set("cursor", cursor);
-        if (searchQuery) params.set("search", searchQuery);
+        if (s) params.set("search", s);
         const res = await authFetch(`/api/admin/domains?${params.toString()}`);
         if (!res.ok) throw new Error("Failed to fetch");
         const data = await res.json();
         setDomains(data.domains);
         setNextCursor(data.nextCursor);
       } catch {
-        showToast("Failed to load domains", false);
+        toast.error("Failed to load domains");
       } finally {
         setLoading(false);
       }
@@ -91,11 +88,21 @@ export default function UserDomainsScreen({
     [],
   );
 
-  const handleSearch = (value: string) => {
-    setSearch(value);
-    setCursorStack([]);
-    fetchPage(undefined, value);
-  };
+  // Debounced search
+  useEffect(() => {
+    if (search === (currentSearch || "")) return;
+    const timer = setTimeout(() => {
+      setCursorStack([]);
+      fetchPage(undefined, search);
+      
+      const params = new URLSearchParams(searchParams.toString());
+      if (search) params.set("search", search);
+      else params.delete("search");
+      params.delete("cursor");
+      router.replace(`${pathname}?${params.toString()}`);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search, fetchPage, pathname, router, searchParams, currentSearch]);
 
   const goNext = async () => {
     if (!nextCursor) return;
@@ -106,12 +113,9 @@ export default function UserDomainsScreen({
   const goPrev = async () => {
     if (cursorStack.length === 0) return;
     const newStack = [...cursorStack];
-    newStack.pop();
+    const prevCursor = newStack.pop();
     setCursorStack(newStack);
-    await fetchPage(
-      newStack.length === 0 ? undefined : newStack[newStack.length - 1],
-      search,
-    );
+    await fetchPage(newStack.length === 0 ? undefined : prevCursor, search);
   };
 
   const verifyDomain = async (id: string, domain: string) => {
@@ -130,7 +134,7 @@ export default function UserDomainsScreen({
             d.id === id ? { ...d, dnsOk: true, vercelStatus: "ACTIVE" } : d,
           ),
         );
-        showToast("DNS verified successfully ✓");
+        toast.success("DNS verified successfully ✓");
       } else {
         setDomains((prev) =>
           prev.map((d) =>
@@ -139,20 +143,13 @@ export default function UserDomainsScreen({
               : d,
           ),
         );
-        showToast(
-          `DNS check failed. Found: ${data.found?.join(", ") || "no records"}`,
-          false,
-        );
+        toast.error(`DNS check failed. Found: ${data.found?.join(", ") || "no records"}`);
       }
     } catch {
-      showToast("Verification request failed", false);
+      toast.error("Verification request failed");
     } finally {
       setVerifying(null);
     }
-  };
-
-  const confirmRemove = (id: string, domain: string, siteId: string) => {
-    setDeleteTarget({ id, domain, siteId });
   };
 
   const removeDomain = async () => {
@@ -171,9 +168,9 @@ export default function UserDomainsScreen({
         throw new Error(data.error || "Remove failed");
       }
       setDomains((prev) => prev.filter((d) => d.id !== id));
-      showToast("Domain removed");
+      toast.success("Domain removed");
     } catch (err) {
-      showToast(err instanceof Error ? err.message : "Remove failed", false);
+      toast.error(err instanceof Error ? err.message : "Remove failed");
     } finally {
       setRemoving(null);
     }
@@ -309,7 +306,7 @@ export default function UserDomainsScreen({
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
         <input
           value={search}
-          onChange={(e) => handleSearch(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder="Search domains or sites…"
           className="w-full pl-8 pr-3 py-2.5 border border-slate-200 rounded-xl text-[13px] outline-none bg-white"
         />
@@ -456,7 +453,7 @@ export default function UserDomainsScreen({
                           </button>
                           <button
                             onClick={() =>
-                              confirmRemove(dom.id, dom.domain, dom.siteId)
+                              setDeleteTarget({ id: dom.id, domain: dom.domain, siteId: dom.siteId })
                             }
                             disabled={removing === dom.id}
                             className="flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 disabled:opacity-50"
@@ -499,19 +496,6 @@ export default function UserDomainsScreen({
           </div>
         </div>
       </div>
-
-      {toast && (
-        <div
-          className={cn(
-            "fixed bottom-6 right-6 border rounded-xl px-4 py-3 text-[13px] font-bold shadow-lg z-50",
-            toast.ok
-              ? "bg-emerald-50 text-emerald-700 border-emerald-200"
-              : "bg-red-50 text-red-700 border-red-200",
-          )}
-        >
-          {toast.msg}
-        </div>
-      )}
     </div>
   );
 }

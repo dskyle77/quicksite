@@ -10,6 +10,7 @@ import menuOne from "@/components/siteTemplates/menuOne";
 import eventSite from "@/components/siteTemplates/eventSite";
 import digitalStore from "@/components/siteTemplates/digitalStore";
 import landingPage from "@/components/siteTemplates/landingPage";
+import landingPage2 from "@/components/siteTemplates/landingPage2";
 import {
   schemaMap,
   starterMap,
@@ -56,6 +57,7 @@ export type TemplateContent = {
 
 export const templatesRegistry: TemplateContent[] = [
   landingPage,
+  landingPage2,
   menuOne,
   eventSite,
   digitalStore,

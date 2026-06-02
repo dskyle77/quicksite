@@ -14,9 +14,15 @@ export async function GET(req: Request) {
 
   const { searchParams } = new URL(req.url);
   const cursor = searchParams.get("cursor") ?? undefined;
+  const search = searchParams.get("search") ?? undefined;
+  const plan = searchParams.get("plan") ?? undefined;
 
   try {
-    const { users, nextCursor } = await getAllUsers(cursor);
+    const { users, nextCursor } = await getAllUsers({ 
+      cursor, 
+      search, 
+      planFilter: plan 
+    });
     return NextResponse.json({ users, nextCursor });
   } catch (error) {
     return NextResponse.json(

@@ -1,60 +1,94 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import authFetch from "@/lib/authFetch";
 import { Search, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import type { AdminUser, PlanType } from "./adminTypes";
 import { PLAN_COLORS, STATUS_COLORS } from "./adminTypes";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-const VALID_PLANS: PlanType[] = ["free", "growth", "pro"];
+const VALID_PLANS: PlanType[] = ["free", "basic", "growth", "pro"];
 
 export default function UsersScreen({
   users: initial,
   nextCursor: initialNextCursor,
+  currentSearch,
+  currentPlan,
 }: {
   users: AdminUser[];
   nextCursor: string | null;
+  currentSearch?: string;
+  currentPlan?: string;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const [users, setUsers] = useState<AdminUser[]>(initial);
-  const [search, setSearch] = useState("");
-  const [planFilter, setPlanFilter] = useState("all");
-  const [toast, setToast] = useState("");
+  const [search, setSearch] = useState(currentSearch || "");
+  const [planFilter, setPlanFilter] = useState(currentPlan || "all");
 
   // Pagination state
-  const [cursorStack, setCursorStack] = useState<string[]>([]); // stack of cursors for "prev"
-  const [nextCursor, setNextCursor] = useState<string | null>(
-    initialNextCursor,
-  );
+  const [cursorStack, setCursorStack] = useState<string[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | null>(initialNextCursor);
   const [loading, setLoading] = useState(false);
 
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(""), 3000);
-  };
-
-  const fetchPage = useCallback(async (cursor?: string) => {
+  const fetchPage = useCallback(async (cursor?: string, s?: string, p?: string) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
       if (cursor) params.set("cursor", cursor);
+      if (s) params.set("search", s);
+      if (p && p !== "all") params.set("plan", p);
+      
       const res = await authFetch(`/api/admin/users?${params.toString()}`);
       if (!res.ok) throw new Error("Failed to fetch");
       const data = await res.json();
       setUsers(data.users);
       setNextCursor(data.nextCursor);
     } catch {
-      showToast("Failed to load users");
+      toast.error("Failed to load users");
     } finally {
       setLoading(false);
     }
   }, []);
 
+  // Debounced search
+  useEffect(() => {
+    if (search === (currentSearch || "")) return;
+    const timer = setTimeout(() => {
+      setCursorStack([]);
+      fetchPage(undefined, search, planFilter);
+      
+      // Update URL
+      const params = new URLSearchParams(searchParams.toString());
+      if (search) params.set("search", search);
+      else params.delete("search");
+      params.delete("cursor");
+      router.replace(`${pathname}?${params.toString()}`);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [search, fetchPage, pathname, router, searchParams, currentSearch, planFilter]);
+
+  const handlePlanFilter = (p: string) => {
+    setPlanFilter(p);
+    setCursorStack([]);
+    fetchPage(undefined, search, p);
+    
+    // Update URL
+    const params = new URLSearchParams(searchParams.toString());
+    if (p !== "all") params.set("plan", p);
+    else params.delete("plan");
+    params.delete("cursor");
+    router.replace(`${pathname}?${params.toString()}`);
+  };
+
   const goNext = async () => {
     if (!nextCursor) return;
-    // Push current "first user id" as the back-cursor
     setCursorStack((prev) => [...prev, users[0]?.uid ?? ""]);
-    await fetchPage(nextCursor);
+    await fetchPage(nextCursor, search, planFilter);
   };
 
   const goPrev = async () => {
@@ -62,36 +96,38 @@ export default function UsersScreen({
     const newStack = [...cursorStack];
     const prevCursor = newStack.pop();
     setCursorStack(newStack);
-    // If stack is now empty, fetch the very first page (no cursor)
-    await fetchPage(newStack.length === 0 ? undefined : prevCursor);
+    await fetchPage(newStack.length === 0 ? undefined : prevCursor, search, planFilter);
   };
 
-  const filtered = users.filter(
-    (u) =>
-      (u.displayName.toLowerCase().includes(search.toLowerCase()) ||
-        u.email.toLowerCase().includes(search.toLowerCase())) &&
-      (planFilter === "all" || u.plan === planFilter),
-  );
-
   const changePlan = async (uid: string, plan: PlanType) => {
-    await authFetch(`/api/admin/users/${uid}/plan`, {
-      method: "PATCH",
-      body: JSON.stringify({ plan }),
-      headers: { "Content-Type": "application/json" },
-    });
-    setUsers((prev) => prev.map((u) => (u.uid === uid ? { ...u, plan } : u)));
-    showToast("Plan updated");
+    try {
+      const res = await authFetch(`/api/admin/users/${uid}/plan`, {
+        method: "PATCH",
+        body: JSON.stringify({ plan }),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) throw new Error("Update failed");
+      setUsers((prev) => prev.map((u) => (u.uid === uid ? { ...u, plan } : u)));
+      toast.success("Plan updated");
+    } catch {
+      toast.error("Failed to update plan");
+    }
   };
 
   const toggleStatus = async (uid: string, current: string) => {
     const status = current === "active" ? "suspended" : "active";
-    await authFetch(`/api/admin/users/${uid}/status`, {
-      method: "PATCH",
-      body: JSON.stringify({ status }),
-      headers: { "Content-Type": "application/json" },
-    });
-    setUsers((prev) => prev.map((u) => (u.uid === uid ? { ...u, status } : u)));
-    showToast("Status updated");
+    try {
+      const res = await authFetch(`/api/admin/users/${uid}/status`, {
+        method: "PATCH",
+        body: JSON.stringify({ status }),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!res.ok) throw new Error("Update failed");
+      setUsers((prev) => prev.map((u) => (u.uid === uid ? { ...u, status } : u)));
+      toast.success(`User ${status}`);
+    } catch {
+      toast.error("Failed to update status");
+    }
   };
 
   return (
@@ -109,7 +145,7 @@ export default function UsersScreen({
         </div>
         <select
           value={planFilter}
-          onChange={(e) => setPlanFilter(e.target.value)}
+          onChange={(e) => handlePlanFilter(e.target.value)}
           className="px-3 py-2 border border-slate-200 rounded-xl text-[13px] bg-white cursor-pointer"
         >
           <option value="all">All Plans</option>
@@ -146,7 +182,7 @@ export default function UsersScreen({
                     <Loader2 className="w-5 h-5 animate-spin text-slate-400 mx-auto" />
                   </td>
                 </tr>
-              ) : filtered.length === 0 ? (
+              ) : users.length === 0 ? (
                 <tr>
                   <td
                     colSpan={6}
@@ -156,11 +192,11 @@ export default function UsersScreen({
                   </td>
                 </tr>
               ) : (
-                filtered.map((user, i) => (
+                users.map((user, i) => (
                   <tr
                     key={user.uid}
                     className={cn(
-                      i < filtered.length - 1 && "border-b border-slate-50",
+                      i < users.length - 1 && "border-b border-slate-50",
                     )}
                   >
                     {/* User */}
@@ -249,9 +285,7 @@ export default function UsersScreen({
         <div className="border-t border-slate-100 px-4 py-3 flex items-center justify-between bg-slate-50">
           <p className="text-[12px] text-slate-500">
             Showing{" "}
-            <span className="font-bold text-slate-700">{filtered.length}</span>{" "}
-            of <span className="font-bold text-slate-700">{users.length}</span>{" "}
-            loaded users
+            <span className="font-bold text-slate-700">{users.length}</span> users
           </p>
           <div className="flex gap-2">
             <button
@@ -271,13 +305,6 @@ export default function UsersScreen({
           </div>
         </div>
       </div>
-
-      {/* Toast */}
-      {toast && (
-        <div className="fixed bottom-6 right-6 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-xl px-4 py-3 text-[13px] font-bold shadow-lg z-50">
-          {toast}
-        </div>
-      )}
     </div>
   );
 }

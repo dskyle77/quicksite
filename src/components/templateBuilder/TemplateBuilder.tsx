@@ -12,6 +12,7 @@ import { NavbarVariants } from "./variants/NavbarVariants";
 import { HeroVariants } from "./variants/HeroVariants";
 import { FooterVariants } from "./variants/FooterVariants";
 import { SectionVariants } from "./variants/sections/index";
+import { cn } from "@/lib/utils";
 
 type TemplateBuilderProps = Omit<TemplateComponentProps, "onUpdate"> & {
   onUpdate: (path: string, value: any) => void;
@@ -21,6 +22,7 @@ type TemplateBuilderProps = Omit<TemplateComponentProps, "onUpdate"> & {
 };
 
 type SectionWithMenuProps = {
+  enabled: boolean;
   sec: SectionConfig;
   content: Record<string, any>;
   isEditor: boolean;
@@ -34,6 +36,7 @@ type SectionWithMenuProps = {
 };
 
 const SectionWithMenu = ({
+  enabled,
   sec,
   content,
   isEditor,
@@ -52,14 +55,18 @@ const SectionWithMenu = ({
   const contentKey = `${sec.id}${sec.type}`;
   const sectionContent = content[contentKey] || {};
   return (
-    <div style={{ position: "relative" }}>
+    <div className={cn("relative", !enabled && "h-30")}>
+      {!enabled && (
+        <div className="absolute inset-0 z-10 pointer-events-none bg-gray-800/80" />
+      )}
+
       <SectionComponent
         variant={sec.variant as SectionVariantKey}
-        isEditor={isEditor}
+        isEditor={isEditor && enabled}
         content={sectionContent}
         onUpdate={makeHandleUpdates(contentKey)}
         slugs={slugs}
-        position={idx + 1}
+        position={idx}
         anchorName={sec.anchorName}
         path={contentKey}
       />
@@ -97,6 +104,7 @@ const SectionWithMenu = ({
             section={sec}
             index={idx}
             onChange={onConfigChange}
+            type="section"
           />
         </div>
       )}
@@ -203,7 +211,7 @@ export default function TemplateBuilder({
     FooterVariants[effectiveConfig.footer] ?? FooterVariants["classic"];
 
   const enabledSections = (effectiveConfig.sections || []).filter(
-    (s) => s.enabled,
+    (s) => (isEditor && !isPreview) || s.enabled,
   );
 
   return (
@@ -298,6 +306,7 @@ export default function TemplateBuilder({
             {enabledSections.map((sec, i) => (
               <Reveal key={sec.id + sec.type} variant="bottom">
                 <SectionWithMenu
+                  enabled={sec.enabled}
                   sec={sec}
                   content={content}
                   isEditor={isEditMode}

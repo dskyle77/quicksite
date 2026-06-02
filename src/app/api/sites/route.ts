@@ -6,7 +6,7 @@ import { getUserFromSession } from "@/server/auth";
 import {
   serverCreateSite,
   getUserPlan,
-  isIdentifierTaken,
+  isSlugTaken,
 } from "@/server/serverFirestore";
 import { generateSiteContentWithAI } from "@/server/ai/generateSiteContent";
 import { generateWhatsappMessages } from "@/server/ai/generateWhatsappMessages";
@@ -169,6 +169,8 @@ async function resolveContent(
   return {
     content: contentWithMessages,
     themeId: defaultTheme,
+    description,
+    tags: []
   };
 }
 
@@ -308,6 +310,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Slug is required." }, { status: 400 });
   }
 
-  const isAvailable = await isIdentifierTaken(slug, user.uid);
+  const isAvailable = await isSlugTaken(slug, user.uid);
   return NextResponse.json({ available: !isAvailable });
 }
