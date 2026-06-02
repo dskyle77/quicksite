@@ -15,6 +15,7 @@ import { ItemsItem, ItemsVariantList } from "./variants/sections/ItemsVariants";
 import { HeroVariantList } from "./variants/HeroVariants";
 import { ExperienceVariantList } from "./variants/sections/ExperienceVariants";
 import { SkillsVariantList } from "./variants/sections/SkillsVariants";
+import { GalleryVariantList } from "./variants/sections/GalleryVariants";
 
 import { makeWhatsappLink, year, img } from "../shared/helpers";
 import { PricingVariantList } from "./variants/sections/PricingVariants";
@@ -457,6 +458,27 @@ const ctaStarterContent = ({ whatsappNumber }: SchemaParams) => ({
   secondaryButtonLink: {},
 });
 
+// ─── GALLERY ─────────────────────────────────────────────────────────────────
+
+const gallerySchema = ({ defaultImage }: SchemaParams) => ({
+  heading: "",
+  subheading: "",
+  items: [
+    { image: img(defaultImage), imagePId: "", image2: img(defaultImage), image2PId: "", caption: "" },
+    { image: img(defaultImage), imagePId: "", image2: img(defaultImage), image2PId: "", caption: "" },
+  ],
+});
+
+const galleryStarterContent = ({ defaultImage }: SchemaParams) => ({
+  heading: "Our Gallery",
+  subheading: "A visual look into our world and what we do best.",
+  items: [
+    { image: img(defaultImage), imagePId: "", image2: img(defaultImage), image2PId: "", caption: "Workspace View" },
+    { image: img(defaultImage), imagePId: "", image2: img(defaultImage), image2PId: "", caption: "Team Collaboration" },
+    { image: img(defaultImage), imagePId: "", image2: img(defaultImage), image2PId: "", caption: "Project Showcase" },
+  ],
+});
+
 export const starterMap: Record<string, any> = {
   navbar: navbarStarterContent,
   hero: heroStarterContent,
@@ -471,6 +493,7 @@ export const starterMap: Record<string, any> = {
   pricing: pricingStarterContent,
   faq: faqStarterContent,
   cta: ctaStarterContent,
+  gallery: galleryStarterContent,
   footer: footerStarterContent,
 };
 
@@ -489,6 +512,7 @@ export const schemaMap: Record<string, any> = {
   pricing: pricingSchema,
   faq: faqSchema,
   cta: ctaSchema,
+  gallery: gallerySchema,
   footer: footerSchema,
 };
 
@@ -507,5 +531,6 @@ export const variantOptions: Record<string, string[]> = {
   pricing: PricingVariantList,
   faq: ["default", "accordion", "numbered"],
   cta: ["default", "banner", "simple"],
+  gallery: GalleryVariantList,
   footer: ["classic", "centered", "columns", "none"],
 };

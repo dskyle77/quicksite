@@ -113,6 +113,7 @@ export async function generateSiteContentWithAI({
   - Never return an array shorter than the template.
     | Array field context        | Min entries | Max entries |
     | projects / items / dishes  | 3           | 6           |
+    | gallery items              | 4           | 8           |
     | features / services        | 3           | 6           |
     | skills                     | 4           | 8           |
     | testimonials               | 2           | 3           |
@@ -159,6 +160,7 @@ export async function generateSiteContentWithAI({
   - hero: "split" or "centered" for visual brands (food, fashion); "minimalist" for consultants; "background" for general local businesses and events.
   - contact: "form" or "split" when booking/inquiries matter; "minimal" for simple WhatsApp-first pages.
   - projects: "card-grid" for visuals; "list" for services/menus.
+  - gallery: "grid" or "masonry" for portfolios; "carousel" for highlights; "before-after" for transformations (e.g., cleaning, weight loss, renovation, beauty results). For "before-after", use "image" for the AFTER result and "image2" for the BEFORE state.
   
   SITE THEME (top-level "theme" string — must be exactly one id from this list):
   Available themes: ${JSON.stringify(themeOptions)}
@@ -220,7 +222,6 @@ export async function generateSiteContentWithAI({
   }
 
   const {
-    __refused__: _refused, // strip internal flag from output
     theme,
     description: siteDescription,
     tags,
