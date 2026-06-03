@@ -120,7 +120,7 @@ const fashion: TemplateContent = {
   config: {
     type: "fashion",
     theme: "warm",
-    canCustomize: true,
+    hasCustomizeSidebar: true,
     isPremium: false,
   },
   contentConfig: fashionConfig,

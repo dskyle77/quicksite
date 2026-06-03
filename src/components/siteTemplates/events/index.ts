@@ -99,7 +99,7 @@ const events: TemplateContent = {
   config: {
     type: "event-rentals",
     theme: "classic",
-    canCustomize: true,
+    hasCustomizeSidebar: true,
     isPremium: false,
   },
   contentConfig: eventConfig,

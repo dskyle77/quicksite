@@ -310,7 +310,7 @@ const landingPage: TemplateContent = {
   config: {
     type: "landing-page",
     theme: "light",
-    canCustomize: false,
+    hasCustomizeSidebar: false,
     isPremium: false,
   },
   contentConfig: landingPageConfig,

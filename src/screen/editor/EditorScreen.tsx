@@ -37,7 +37,7 @@ export default function EditorScreen({
     onChange({ ...data, content: updated });
   };
 
-  const canCustomize = templateEntry.config.canCustomize;
+  const canCustomize = templateEntry.config.hasCustomizeSidebar;
   return (
     <div className={`w-full h-full ${theme.className}`}>
       <style>{theme.css}</style>

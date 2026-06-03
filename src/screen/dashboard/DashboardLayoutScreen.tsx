@@ -52,7 +52,7 @@ export default function DashboardLayoutScreen({
     { icon: Globe, label: "My Sites", href: "/dashboard/sites" },
     { icon: Link2, label: "Domains", href: "/dashboard/domains" },
     { icon: BarChart2, label: "Analytics", href: "/dashboard/analytics" },
-    { icon: Mail, label: "Messages", href: "/dashboard/messages" },
+    { icon: Mail, label: "Forms", href: "/dashboard/messages" },
     { icon: Settings, label: "Settings", href: "/dashboard/settings" },
   ];
 

@@ -328,7 +328,7 @@ const landingPage2: TemplateContent = {
   config: {
     type: "landing-page-2",
     theme: "dark",
-    canCustomize: false,
+    hasCustomizeSidebar: false,
     isPremium: false,
   },
   contentConfig: landingPage2Config,

@@ -21,6 +21,7 @@ import professional from "@/components/siteTemplates/professional";
 import events from "@/components/siteTemplates/events";
 import realEstate from "@/components/siteTemplates/real-estate";
 import store from "@/components/siteTemplates/store";
+import formTemplate from "@/components/siteTemplates/form";
 
 import {
   schemaMap,
@@ -57,7 +58,7 @@ export type TemplateContent = {
   config: {
     type: string;
     theme: string;
-    canCustomize: boolean;
+    hasCustomizeSidebar: boolean;
     isPremium: boolean;
   };
   contentConfig: any;
@@ -75,6 +76,7 @@ export const templatesRegistry: TemplateContent[] = [
   events,
   realEstate,
   store,
+  formTemplate,
   landingPage,
   landingPage2,
   menuOne,

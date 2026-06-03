@@ -9,6 +9,8 @@ import {
   ExperienceItem,
   TestimonialItem,
   ContactContent,
+  FormContent,
+  FormField,
   FooterContent,
   MenuItem,
   FooterVariantKey,
@@ -298,6 +300,77 @@ const contactStarterContent = ({
   secondaryButtonLink: makeWhatsappLink(whatsappNumber),
 });
 
+// ---- FORM --------------------------------------------------------------------
+const formSchema = (): FormContent => ({
+  title: "",
+  desc: "",
+  buttonLabel: "",
+  successMessage: "",
+  fields: [
+    {
+      id: "name",
+      label: "",
+      type: "text",
+      required: true,
+      placeholder: "",
+      helpText: "",
+    },
+    {
+      id: "email",
+      label: "",
+      type: "email",
+      required: true,
+      placeholder: "",
+      helpText: "",
+    },
+    {
+      id: "message",
+      label: "",
+      type: "textarea",
+      required: true,
+      placeholder: "",
+      helpText: "",
+    },
+  ] satisfies FormField[],
+});
+
+const formStarterContent = (): FormContent => ({
+  title: "Quick Form",
+  desc: "Collect responses, requests, registrations, or feedback in one simple form.",
+  buttonLabel: "Submit Response",
+  successMessage: "Thanks! Your response has been recorded.",
+  fields: [
+    {
+      id: "name",
+      label: "Full name",
+      type: "text",
+      required: true,
+      placeholder: "Enter your name",
+    },
+    {
+      id: "email",
+      label: "Email address",
+      type: "email",
+      required: true,
+      placeholder: "you@example.com",
+    },
+    {
+      id: "request_type",
+      label: "What is this about?",
+      type: "select",
+      required: true,
+      options: ["General inquiry", "Booking", "Order", "Feedback"],
+    },
+    {
+      id: "details",
+      label: "Tell us more",
+      type: "textarea",
+      required: true,
+      placeholder: "Share the important details...",
+    },
+  ] satisfies FormField[],
+});
+
 // ─── FOOTER ───────────────────────────────────────────────────────────────────
 
 const footerSchema = ({ selectedTitle }: SchemaParams): FooterContent => ({
@@ -535,6 +608,7 @@ export const starterMap: Record<string, any> = {
   experience: experienceStarterContent,
   testimonials: testimonialsStarterContent,
   contact: contactStarterContent,
+  form: formStarterContent,
   features: featuresStarterContent,
   pricing: pricingStarterContent,
   faq: faqStarterContent,
@@ -555,6 +629,7 @@ export const schemaMap: Record<string, any> = {
   experience: experienceSchema,
   testimonials: testimonialsSchema,
   contact: contactSchema,
+  form: formSchema,
   features: featuresSchema,
   pricing: pricingSchema,
   faq: faqSchema,
@@ -579,6 +654,7 @@ export const sectionVariantOptions = {
   experience: ExperienceVariantList,
   testimonials: ["grid", "carousel", "list"],
   contact: ["default", "split", "minimal", "form"],
+  form: ["default"],
   features: ["default", "list", "icons"],
   pricing: PricingVariantList,
   faq: ["default", "accordion", "numbered"],

@@ -216,7 +216,7 @@ const portfolioTwo: TemplateContent = {
   config: {
     type: "portfolio-2",
     theme: "mono",
-    canCustomize: false,
+    hasCustomizeSidebar: false,
     isPremium: false,
   },
   contentConfig: portfolioTwoConfig,

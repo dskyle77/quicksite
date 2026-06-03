@@ -12,7 +12,7 @@ const customContent: TemplateContent = {
   config: {
     type: "custom",
     theme: "warm",
-    canCustomize: true,
+    hasCustomizeSidebar: true,
     isPremium: false
 
   },

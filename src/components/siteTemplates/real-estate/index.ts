@@ -118,7 +118,7 @@ const realEstate: TemplateContent = {
   config: {
     type: "real-estate",
     theme: "mono",
-    canCustomize: true,
+    hasCustomizeSidebar: true,
     isPremium: false,
   },
   contentConfig: realEstateConfig,

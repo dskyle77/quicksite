@@ -225,7 +225,7 @@ const portfolio1: TemplateContent = {
   config: {
     type: "portfolio-1",
     theme: "terminal",
-    canCustomize: false,
+    hasCustomizeSidebar: false,
     isPremium: false
   },
   contentConfig: portfolioConfig,

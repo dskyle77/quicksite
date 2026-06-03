@@ -248,7 +248,7 @@ const digitalStore: TemplateContent = {
   config: {
     type: "digital-store",
     theme: "midnight",
-    canCustomize: false,
+    hasCustomizeSidebar: false,
     isPremium: false,
   },
   contentConfig: digitalStoreConfig,

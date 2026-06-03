@@ -99,7 +99,7 @@ const store: TemplateContent = {
   config: {
     type: "simple-store",
     theme: "mono",
-    canCustomize: true,
+    hasCustomizeSidebar: true,
     isPremium: false,
   },
   contentConfig: storeConfig,

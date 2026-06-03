@@ -160,7 +160,7 @@ const menu1: TemplateContent = {
   config: {
     type: "menu-one",
     theme: "warm",
-    canCustomize: false,
+    hasCustomizeSidebar: false,
     isPremium: false,
   },
   contentConfig: menuOneConfig,

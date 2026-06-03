@@ -119,7 +119,7 @@ const professional: TemplateContent = {
   config: {
     type: "professional",
     theme: "slate",
-    canCustomize: true,
+    hasCustomizeSidebar: true,
     isPremium: false,
   },
   contentConfig: professionalConfig,

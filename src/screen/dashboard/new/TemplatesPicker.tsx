@@ -74,15 +74,7 @@ export function TemplatePicker({
 
     let shownTemplates: typeof templatesRegistry = [];
     if (!cleanedSearch) {
-      shownTemplates = [];
-      if (selectedTemplate && selectedTemplate.config.type !== "template-builder") {
-        shownTemplates.push(selectedTemplate);
-      }
-      for (const t of others) {
-        if (!shownTemplates.find((tt) => tt.config.type === t.config.type) && shownTemplates.length < 6) {
-          shownTemplates.push(t);
-        }
-      }
+      shownTemplates = others;
     } else {
       if (builder && (
         builder.meta?.title?.toLowerCase().includes(cleanedSearch) ||
@@ -93,7 +85,7 @@ export function TemplatePicker({
       } else {
         builder = null;
       }
-      shownTemplates = others.slice(0, 6);
+      shownTemplates = others;
     }
 
     return { filteredTemplates: shownTemplates, templateBuilderTemplate: builder };
@@ -133,7 +125,8 @@ export function TemplatePicker({
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+      <div className="h-100 overflow-y-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {filteredTemplates.length > 0 ? (
           filteredTemplates.map((t) => {
             const type = t.config.type;
@@ -247,7 +240,7 @@ export function TemplatePicker({
             );
           })
         ) : (
-          <div className="col-span-full py-10 sm:py-12 text-center rounded-2xl sm:rounded-[2rem] border border-dashed border-slate-200 bg-slate-50">
+          <div className="col-span-full py-10 sm:py-12 text-center rounded-2xl sm:rounded-4xl border border-dashed border-slate-200 bg-slate-50">
             <p className="text-slate-400 font-medium text-sm">No templates match your search.</p>
             <button
               onClick={() => setSearch("")}
@@ -255,6 +248,7 @@ export function TemplatePicker({
             >Clear search</button>
           </div>
         )}
+      </div>
       </div>
 
       {templateBuilderTemplate && (

@@ -115,7 +115,7 @@ const beauty: TemplateContent = {
   config: {
     type: "beauty",
     theme: "coral",
-    canCustomize: true,
+    hasCustomizeSidebar: true,
     isPremium: false,
   },
   contentConfig: beautyConfig,

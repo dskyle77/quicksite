@@ -13,12 +13,22 @@ export type MessageRecord = {
   ownerId: string;
   siteSlug: string;
   siteName?: string;
+  messageType?: "contact" | "form";
+  formTitle?: string;
+  fields?: MessageField[];
   name?: string;
   email?: string;
   subject?: string;
   anchorName?: string;
   body: string;
   createdAt: string;
+};
+
+export type MessageField = {
+  id?: string;
+  label: string;
+  value: string | string[];
+  type?: string;
 };
 
 function serializeTimestamp(value: unknown): string {
@@ -36,6 +46,9 @@ function serializeTimestamp(value: unknown): string {
 
 export async function submitMessage(input: {
   siteSlug: string;
+  messageType?: "contact" | "form";
+  formTitle?: string;
+  fields?: MessageField[];
   name?: string;
   email?: string;
   subject?: string;
@@ -70,6 +83,9 @@ export async function submitMessage(input: {
     ownerId,
     siteSlug,
     siteName: siteData?.name ?? siteSlug,
+    messageType: input.messageType ?? "contact",
+    formTitle: input.formTitle?.trim() || null,
+    fields: input.fields ?? null,
     name: input.name?.trim() || null,
     email: input.email?.trim() || null,
     subject: input.subject?.trim() || null,
@@ -103,6 +119,9 @@ export async function getMessagesForUser(
       ownerId: data.ownerId,
       siteSlug: data.siteSlug,
       siteName: data.siteName,
+      messageType: data.messageType ?? "contact",
+      formTitle: data.formTitle ?? undefined,
+      fields: Array.isArray(data.fields) ? data.fields : undefined,
       name: data.name ?? undefined,
       email: data.email ?? undefined,
       subject: data.subject ?? undefined,

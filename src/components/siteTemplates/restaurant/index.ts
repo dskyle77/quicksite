@@ -151,7 +151,7 @@ const restaurant: TemplateContent = {
   config: {
     type: "restaurant",
     theme: "warm",
-    canCustomize: true,
+    hasCustomizeSidebar: true,
     isPremium: false,
   },
   contentConfig: restaurantConfig,

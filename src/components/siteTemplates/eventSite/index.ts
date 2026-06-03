@@ -259,7 +259,7 @@ const eventSite: TemplateContent = {
   config: {
     type: "event-site",
     theme: "midnight",
-    canCustomize: false,
+    hasCustomizeSidebar: false,
     isPremium: false,
   },
   contentConfig: eventSiteConfig,

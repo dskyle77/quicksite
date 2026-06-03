@@ -37,6 +37,9 @@ export async function GET() {
         email: msg.email,
         subject: msg.subject,
         body: msg.body,
+        messageType: msg.messageType ?? "contact",
+        formTitle: msg.formTitle,
+        fields: msg.fields,
         anchorName: msg.anchorName,
         createdAt: msg.createdAt,
         site: msg.siteName ?? msg.siteSlug,
@@ -77,20 +80,71 @@ export async function POST(req: Request) {
       subject,
       body: messageBody,
       message,
+      messageType,
+      formTitle,
+      fields,
       anchorName,
     } = body;
 
     const resolvedSlug = (siteSlug ?? slug) as string | undefined;
-    const resolvedBody = (messageBody ?? message) as string | undefined;
+    const normalizedType = messageType === "form" ? "form" : "contact";
+    const normalizedFields =
+      normalizedType === "form" && Array.isArray(fields)
+        ? fields
+            .slice(0, 50)
+            .map((field) => {
+              const label =
+                typeof field?.label === "string" ? field.label.trim() : "";
+              const rawValue = field?.value;
+              const value = Array.isArray(rawValue)
+                ? rawValue
+                    .filter((v) => typeof v === "string")
+                    .map((v) => v.trim())
+                    .filter(Boolean)
+                : typeof rawValue === "string"
+                  ? rawValue.trim()
+                  : "";
+
+              return {
+                id: typeof field?.id === "string" ? field.id.slice(0, 80) : "",
+                label: label.slice(0, 160),
+                value,
+                type:
+                  typeof field?.type === "string" ? field.type.slice(0, 40) : "",
+              };
+            })
+            .filter((field) => {
+              const hasValue = Array.isArray(field.value)
+                ? field.value.length > 0
+                : field.value.length > 0;
+              return field.label && hasValue;
+            })
+        : undefined;
+    const generatedFormBody =
+      normalizedFields && normalizedFields.length > 0
+        ? normalizedFields
+            .map((field) => {
+              const value = Array.isArray(field.value)
+                ? field.value.join(", ")
+                : field.value;
+              return `${field.label}: ${value}`;
+            })
+            .join("\n")
+        : undefined;
+    const resolvedBody = (messageBody ??
+      message ??
+      generatedFormBody) as string | undefined;
 
     // Limit for message length
     const MESSAGE_MAX_LENGTH = 2000;
 
-    if (
-      !resolvedBody ||
-      typeof resolvedBody !== "string" ||
-      resolvedBody.trim().length === 0
-    ) {
+    if (normalizedType === "form" && !normalizedFields?.length) {
+      return NextResponse.json(
+        { error: "At least one form answer is required." },
+        { status: 400 },
+      );
+    }
+    if (!resolvedBody || typeof resolvedBody !== "string" || resolvedBody.trim().length === 0) {
       return NextResponse.json(
         { error: "Message is required." },
         { status: 400 },
@@ -107,6 +161,9 @@ export async function POST(req: Request) {
 
     const result = await submitMessage({
       siteSlug: resolvedSlug ?? "",
+      messageType: normalizedType,
+      formTitle: typeof formTitle === "string" ? formTitle : undefined,
+      fields: normalizedFields,
       name,
       email,
       subject,

@@ -35,6 +35,7 @@ export type SectionType =
   | "experience"
   | "testimonials"
   | "contact"
+  | "form"
   | "faq"
   | "pricing"
   | "cta"
@@ -261,6 +262,33 @@ export interface ContactContent {
   secondaryButtonLink: Record<string, any>;
 }
 
+export interface FormField {
+  id: string;
+  label: string;
+  type: "text" | "email" | "phone" | "textarea" | "select" | "radio" | "checkbox";
+  required?: boolean;
+  placeholder?: string;
+  helpText?: string;
+  options?: string[];
+  step?: number; // For multi-step forms
+}
+
+export interface FormStep {
+  id: string;
+  title: string;
+  description?: string;
+}
+
+export interface FormContent {
+  title: string;
+  desc: string;
+  buttonLabel: string;
+  successMessage: string;
+  fields: FormField[];
+  steps?: FormStep[]; // For multi-step forms
+  showProgressBar?: boolean;
+  stepLayout?: "vertical" | "horizontal"; // Layout for step navigation
+}
 
 export interface FooterContent {
   brand: string;

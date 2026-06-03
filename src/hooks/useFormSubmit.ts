@@ -10,16 +10,33 @@ export default function useFormSubmit() {
     setSubmitError,
     siteSlug,
     anchorName,
+    messageType = "contact",
+    formTitle,
+    fields,
   }: {
     formData: { name: string; email: string; message: string };
-    setFormData: React.Dispatch<
-      React.SetStateAction<{ name: string; email: string; message: string }>
-    >;
+    setFormData: (
+      value:
+        | { name: string; email: string; message: string }
+        | ((previous: { name: string; email: string; message: string }) => {
+            name: string;
+            email: string;
+            message: string;
+          }),
+    ) => void;
     setSubmitting: React.Dispatch<React.SetStateAction<boolean>>;
     setSubmitSuccess: React.Dispatch<React.SetStateAction<boolean>>;
     setSubmitError: React.Dispatch<React.SetStateAction<string | null>>;
     siteSlug?: string;
     anchorName?: string;
+    messageType?: "contact" | "form";
+    formTitle?: string;
+    fields?: {
+      id?: string;
+      label: string;
+      value: string | string[];
+      type?: string;
+    }[];
   }) => {
     setSubmitting(true);
     setSubmitError(null);
@@ -41,7 +58,8 @@ export default function useFormSubmit() {
 
       // Additional checks: message must not be empty, and be a reasonable length
       const trimmedMessage = formData.message.trim();
-      if (!trimmedMessage) {
+      const isFormMessage = messageType === "form";
+      if (!trimmedMessage && !isFormMessage) {
         setSubmitError("Message is required.");
         return;
       }
@@ -50,16 +68,17 @@ export default function useFormSubmit() {
         return;
       }
       // Optional: check name/email
-      if (!formData.name.trim()) {
+      if (!isFormMessage && !formData.name.trim()) {
         setSubmitError("Name is required.");
         return;
       }
-      if (!formData.email.trim()) {
+      if (!isFormMessage && !formData.email.trim()) {
         setSubmitError("Email is required.");
         return;
       }
       // Very basic email format check
       if (
+        formData.email.trim() &&
         !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(formData.email.trim())
       ) {
         setSubmitError("Please provide a valid email address.");
@@ -71,7 +90,10 @@ export default function useFormSubmit() {
         name: formData.name.trim(),
         email: formData.email.trim(),
         message: trimmedMessage,
+        messageType,
       };
+      if (formTitle) payload.formTitle = formTitle;
+      if (fields) payload.fields = fields;
       // Send slugs/anchorName as required by API contract
       if (siteSlug) payload.siteSlug = siteSlug;
       if (anchorName) payload.anchorName = anchorName;
