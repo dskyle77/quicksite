@@ -354,7 +354,8 @@ export default function EditableLinkButton({
 
   const href = buildHref(linkConfig, messageOverride);
 
-  const { slugs, site } = useSiteContext();
+  const { value } = useSiteContext();
+  const { slugs, site } = value;
   const slug = slugs?.slug;
   const whatsappNumber = site?.whatsappNumber || "";
 

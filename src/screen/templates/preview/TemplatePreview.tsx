@@ -85,7 +85,7 @@ export default function TemplatesPreview({ type }: { type: string }) {
       >
         <style>{theme.css}</style>
 
-        <header className="h-16 border-b bg-white flex items-center justify-between px-6 shrink-0 z-50 shadow-sm">
+        <header className="h-16 border-b bg-white flex items-center justify-between px-2 sm:px-6 shrink-0 z-50 shadow-sm">
           <div className="flex items-center gap-4">
             <Link
               href={from}
@@ -113,7 +113,7 @@ export default function TemplatesPreview({ type }: { type: string }) {
               </select>
             </div>
             <Link href={useTemplateHref}>
-              <button className="flex items-center gap-2 bg-black text-white px-5 py-2 rounded-full font-bold text-sm transition-all shadow-md active:scale-95">
+              <button className="flex items-center gap-2 bg-black text-white px-2 sm:px-5 py-2 rounded-full font-bold text-xs sm:text-sm transition-all shadow-md active:scale-95">
                 Use Template
               </button>
             </Link>

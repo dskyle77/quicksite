@@ -46,7 +46,7 @@ const starterContent = ({
   navbar: {
     logo: "💼",
     title: selectedTitle,
-    ctaButton: "Get Consultation",
+    ctaButton: "Consult",
     ctaButtonLink: makeWhatsappLink(whatsappNumber, "Hi, I'd like to book a consultation."),
     links: [
       { label: "About", type: "anchor", anchor: "about", href: "" },

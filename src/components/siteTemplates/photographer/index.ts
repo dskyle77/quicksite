@@ -39,7 +39,7 @@ export const photoConfig = {
 };
 
 const starterContent = ({
-  selectedTitle = "Captured Moments",
+  selectedTitle = "Moments",
   whatsappNumber,
 }: SchemaParams) => ({
   builderConfig: photoConfig,

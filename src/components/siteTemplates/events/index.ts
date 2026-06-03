@@ -98,7 +98,7 @@ const events: TemplateContent = {
   },
   config: {
     type: "event-rentals",
-    theme: "classic",
+    theme: "ocean",
     hasCustomizeSidebar: true,
     isPremium: false,
   },

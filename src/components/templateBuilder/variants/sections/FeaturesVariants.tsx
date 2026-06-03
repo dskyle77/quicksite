@@ -150,9 +150,9 @@ export const FeaturesSection = ({
         id={anchorName}
         style={{ background: sectionBg }}
       >
-        <Container className="py-24">
+        <Container className="py-24 px-4 sm:px-6">
           <h2
-            className="text-4xl @md:text-5xl font-black text-center mb-5"
+            className="text-3xl @md:text-5xl font-black text-center mb-5"
             style={{ color: "var(--qs-text)" }}
             contentEditable={isEditor}
             suppressContentEditableWarning
@@ -165,7 +165,7 @@ export const FeaturesSection = ({
 
           {content?.subheading && (
             <p
-              className="text-center max-w-2xl mx-auto mb-16 text-lg"
+              className="text-center max-w-2xl mx-auto mb-16 text-base @md:text-lg"
               style={{ color: "var(--qs-text-muted)" }}
               contentEditable={isEditor}
               suppressContentEditableWarning
@@ -180,11 +180,11 @@ export const FeaturesSection = ({
             </p>
           )}
 
-          <div className="grid grid-cols-2 @md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 @sm:grid-cols-2 @md:grid-cols-4 gap-4 @md:gap-6">
             {items.map((feature, i) => (
               <div
                 key={i}
-                className="relative rounded-3xl border p-6 text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl bg-(--qs-card)"
+                className="relative rounded-3xl border p-5 @md:p-6 text-center transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl bg-(--qs-card)"
                 style={{
                   border: "1px solid var(--qs-border)",
                 }}
@@ -211,7 +211,7 @@ export const FeaturesSection = ({
                 </h3>
 
                 <p
-                  className="text-sm leading-relaxed"
+                  className="text-base @md:text-sm leading-relaxed"
                   style={{ color: "var(--qs-text-muted)" }}
                   contentEditable={isEditor}
                   suppressContentEditableWarning

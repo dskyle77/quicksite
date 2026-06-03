@@ -4,7 +4,7 @@ import { TemplateContent } from "@/lib/templates";
 
 export const realEstateConfig = {
   navbar: "classic",
-  hero: "background",
+  hero: "default",
   footer: "classic",
   sections: [
     {
@@ -89,7 +89,7 @@ const starterContent = ({
     subheading: "Take a closer look at our exclusive property tours.",
     items: [
       { image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&q=80&w=500", caption: "Kitchen Design" },
-      { image: "https://images.unsplash.com/photo-1600607687940-c52af09239b7?auto=format&fit=crop&q=80&w=500", caption: "Master Bedroom" },
+      { image: "https://images.unsplash.com/photo-1560185893-a55cbc8c57e8?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", caption: "Master Bedroom" },
       { image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&q=80&w=500", caption: "Luxury Pool" },
     ],
   },

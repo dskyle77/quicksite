@@ -4,12 +4,13 @@ import { TemplateComponentProps } from "@/lib/templates";
 import Container from "@/components/shared/Container";
 import EditableLinkButton from "@/components/shared/EditableLink";
 import TemplateImage from "@/components/shared/TemplateImage";
+import { cn } from "@/lib/utils";
 
 export type HeroVariantKey =
   | "background"
   | "split"
   | "minimalist"
-  | "left"
+  | "default"
   | "centered"
   | "none";
 
@@ -39,7 +40,11 @@ const BackgroundVariant = (props: TemplateComponentProps) => {
         <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-black/30" />
 
         {/* Inner Content Container */}
-        <div className="relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center justify-center px-4 py-16 @sm:px-8 @md:py-32">
+        <div
+          className={cn(
+            "relative z-10 mx-auto flex w-full max-w-5xl flex-col items-center justify-center px-4 py-16 @sm:px-8 @md:py-32 pt-20",
+          )}
+        >
           {/* Badge */}
           <div
             {...editableProps("badge")}
@@ -51,7 +56,7 @@ const BackgroundVariant = (props: TemplateComponentProps) => {
           {/* Heading */}
           <h1
             {...editableProps("title")}
-            className="mx-auto max-w-4xl text-4xl font-extrabold tracking-tight text-(--qs-bg-contrast,var(--qs-primary-fg,#fff)) drop-shadow-md leading-tight outline-none @sm:text-6xl @md:text-7xl"
+            className="mx-auto max-w-4xl text-4xl font-extrabold tracking-tight text-(--qs-bg-alt,var(--qs-primary-fg,#fff)) drop-shadow-md leading-tight outline-none @sm:text-6xl @md:text-7xl"
           >
             {content?.title ?? "Hi, I'm Alex"}
           </h1>
@@ -109,14 +114,14 @@ const SplitVariant = ({
 
   return (
     <section
-      className="px-4 @sm:px-6 py-12 pt-20 @sm:py-20 @md:py-32"
+      className="px-4 @sm:px-6 py-12 pt-16 @sm:py-20 @md:py-32"
       style={{
         background:
           "linear-gradient(130deg, var(--qs-bg) 50%, var(--qs-primary) 120%)",
       }}
     >
       <Container>
-        <div className="grid gap-10 @md:gap-16 grid-cols-1 @md:grid-cols-2 items-center">
+        <div className="grid gap-10 @md:gap-16 grid-cols-1 @md:grid-cols-2 items-center pt-10">
           <div className="text-center @md:text-left flex flex-col items-center @md:items-start">
             <span
               className="mb-4 block text-xs @sm:text-sm font-bold uppercase tracking-widest text-(--qs-primary)"
@@ -157,9 +162,7 @@ const SplitVariant = ({
               )}
             </div>
           </div>
-          <div
-            className="relative overflow-hidden rounded-2xl @sm:rounded-3xl border-4 @sm:border-0 shadow-2xl w-full max-w-lg @md:max-w-none mx-auto border-(--qs-bg-alt)"
-          >
+          <div className="relative overflow-hidden rounded-2xl @sm:rounded-3xl border-4 @sm:border-0 shadow-2xl w-full max-w-lg @md:max-w-none mx-auto border-(--qs-bg-alt)">
             <TemplateImage
               source={content?.image1}
               path={"hero.image1"}
@@ -308,8 +311,83 @@ const CenteredVariant = ({
   </section>
 );
 
-// ─── 5. Gradient ─────────────────────────────────────────────────────────────
-const LeftVariant = ({
+// ─── 5. Default ─────────────────────────────────────────────────────────────
+// const DefaultVariant = ({
+//   isEditor,
+//   content,
+//   onUpdate,
+// }: TemplateComponentProps) => {
+//   const editableProps = (field: string) => ({
+//     contentEditable: isEditor,
+//     suppressContentEditableWarning: true,
+//     onBlur: (e: React.FocusEvent<HTMLElement>) =>
+//       onUpdate(field, e.currentTarget.textContent?.trim() || ""),
+//   });
+
+//   return (
+//     <section
+//       className="relative flex min-h-[85vh] flex-col overflow-hidden px-4 py-20 text-left @sm:px-20 @md:py-32"
+//       style={{
+//          background:
+//           "linear-gradient(130deg, var(--qs-bg) 50%, var(--qs-primary) 120%)",
+//       }}
+//     >
+//       <div className="relative z-10 flex w-full max-w-3xl flex-col items-start">
+//         {/* Glassmorphism Badge */}
+//         {content?.badge && (
+//           <div
+//             {...editableProps("badge")}
+//             className="mb-8 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-(--qs-text) shadow-[0_2px_12px_rgba(0,0,0,0.03)] backdrop-blur-md outline-none transition-all duration-300 dark:border-white/10 dark:bg-black/30 @sm:text-sm"
+//           >
+//             {content.badge}
+//           </div>
+//         )}
+//         {/* Title */}
+//         <h1
+//           {...editableProps("title")}
+//           className="text-(--qs-text) py-2 text-4xl font-extrabold tracking-tight outline-none @sm:text-6xl @md:text-7xl leading-tight text-left w-full"
+//         >
+//           {content?.title}
+//         </h1>
+//         {/* Description */}
+//         <p
+//           {...editableProps("desc")}
+//           className="mt-6 max-w-2xl text-base leading-relaxed text-(--qs-text) opacity-80 outline-none @sm:text-xl text-left w-full"
+//         >
+//           {content?.desc}
+//         </p>
+//         {/* Dynamic CTAs */}
+//         <div className="mt-10 flex w-full flex-col items-start justify-start gap-4 @sm:w-auto @sm:flex-row">
+//           <EditableLinkButton
+//             isEditor={isEditor}
+//             label={content?.primaryButton ?? "Get Started"}
+//             linkConfig={content?.primaryButtonLink}
+//             onLabelChange={(v) => onUpdate("primaryButton", v)}
+//             onLinkChange={(cfg) => onUpdate("primaryButtonLink", cfg)}
+//             className="w-full rounded-xl bg-(--qs-primary) px-8 py-4 text-base font-bold text-(--qs-primary-fg) shadow-[0_10px_25px_-5px_rgba(var(--qs-primary),0.3)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 @sm:w-auto text-left"
+//             style={{
+//               background: "var(--qs-primary)",
+//               color: "var(--qs-primary-fg)",
+//             }}
+//           />
+
+//           {content?.secondaryButton && (
+//             <EditableLinkButton
+//               isEditor={isEditor}
+//               label={content.secondaryButton}
+//               linkConfig={content?.secondaryButtonLink}
+//               onLabelChange={(v) => onUpdate("secondaryButton", v)}
+//               onLinkChange={(cfg) => onUpdate("secondaryButtonLink", cfg)}
+//               className="w-full rounded-xl border border-(--qs-border) bg-white/20 px-8 py-4 text-base font-semibold text-(--qs-text) backdrop-blur-xs transition-all duration-200 hover:bg-white/40 active:scale-95 dark:bg-black/20 dark:hover:bg-black/40 @sm:w-auto text-left"
+//             />
+//           )}
+//         </div>
+//       </div>
+//     </section>
+//   );
+// };
+
+const DefaultVariant = ({
   isEditor,
   content,
   onUpdate,
@@ -323,63 +401,56 @@ const LeftVariant = ({
 
   return (
     <section
-      className="relative flex min-h-[85vh] flex-col overflow-hidden px-4 py-20 text-left @sm:px-20 @md:py-32"
+      className="px-4 @sm:px-6 py-12 pt-16 @sm:py-20 @md:py-32"
       style={{
         background:
-          "linear-gradient(130deg, var(--qs-bg) 30%, var(--qs-primary) 100%)",
+          "linear-gradient(130deg, var(--qs-bg) 50%, var(--qs-primary) 120%)",
       }}
     >
-      <div className="relative z-10 flex w-full max-w-3xl flex-col items-start">
-        {/* Glassmorphism Badge */}
-        {content?.badge && (
-          <div
-            {...editableProps("badge")}
-            className="mb-8 inline-flex items-center rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-(--qs-text) shadow-[0_2px_12px_rgba(0,0,0,0.03)] backdrop-blur-md outline-none transition-all duration-300 dark:border-white/10 dark:bg-black/30 @sm:text-sm"
-          >
-            {content.badge}
+      <Container>
+        <div className="grid gap-10 @md:gap-16 grid-cols-1 @md:grid-cols-2 items-center pt-10">
+          <div className="text-center @md:text-left flex flex-col items-center @md:items-start">
+            <span
+              className="mb-4 block text-xs @sm:text-sm font-bold uppercase tracking-widest text-(--qs-primary)"
+              {...editableProps("badge")}
+            >
+              {content?.badge}
+            </span>
+            <h1
+              className="text-3xl @sm:text-5xl @lg:text-6xl font-bold leading-tight tracking-tight text-(--qs-text)"
+              {...editableProps("title")}
+            >
+              {content?.title}
+            </h1>
+            <p
+              className="mt-6 text-base @sm:text-lg leading-relaxed max-w-xl text-(--qs-text-muted)"
+              {...editableProps("desc")}
+            >
+              {content?.desc}
+            </p>
+            <div className="mt-8 @sm:mt-10 flex flex-col @sm:flex-row gap-4 w-full @sm:w-auto justify-center @md:justify-start">
+              <EditableLinkButton
+                isEditor={isEditor}
+                label={content?.primaryButton}
+                className="w-full @sm:w-auto text-center rounded-lg px-8 py-4 font-bold shadow-lg bg-(--qs-primary) text-(--qs-primary-fg)"
+                onLabelChange={(v) => onUpdate("primaryButton", v)}
+                linkConfig={content?.primaryButtonLink}
+                onLinkChange={(cfg) => onUpdate("primaryButtonLink", cfg)}
+              />
+              {content?.secondaryButton && (
+                <EditableLinkButton
+                  isEditor={isEditor}
+                  label={content?.secondaryButton}
+                  className="w-full @sm:w-auto text-center rounded-lg px-8 py-4 font-bold border-2 border-(--qs-border) text-(--qs-text) bg-(--qs-bg-alt,transparent)"
+                  onLabelChange={(v) => onUpdate("secondaryButton", v)}
+                  linkConfig={content?.secondaryButtonLink}
+                  onLinkChange={(cfg) => onUpdate("secondaryButtonLink", cfg)}
+                />
+              )}
+            </div>
           </div>
-        )}
-        {/* Title */}
-        <h1
-          {...editableProps("title")}
-          className="text-(--qs-text) py-2 text-4xl font-extrabold tracking-tight outline-none @sm:text-6xl @md:text-7xl leading-tight text-left w-full"
-        >
-          {content?.title}
-        </h1>
-        {/* Description */}
-        <p
-          {...editableProps("desc")}
-          className="mt-6 max-w-2xl text-base leading-relaxed text-(--qs-text) opacity-80 outline-none @sm:text-xl text-left w-full"
-        >
-          {content?.desc}
-        </p>
-        {/* Dynamic CTAs */}
-        <div className="mt-10 flex w-full flex-col items-start justify-start gap-4 @sm:w-auto @sm:flex-row">
-          <EditableLinkButton
-            isEditor={isEditor}
-            label={content?.primaryButton ?? "Get Started"}
-            linkConfig={content?.primaryButtonLink}
-            onLabelChange={(v) => onUpdate("primaryButton", v)}
-            onLinkChange={(cfg) => onUpdate("primaryButtonLink", cfg)}
-            className="w-full rounded-xl bg-(--qs-primary) px-8 py-4 text-base font-bold text-(--qs-primary-fg) shadow-[0_10px_25px_-5px_rgba(var(--qs-primary),0.3)] transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 @sm:w-auto text-left"
-            style={{
-              background: "var(--qs-primary)",
-              color: "var(--qs-primary-fg)",
-            }}
-          />
-
-          {content?.secondaryButton && (
-            <EditableLinkButton
-              isEditor={isEditor}
-              label={content.secondaryButton}
-              linkConfig={content?.secondaryButtonLink}
-              onLabelChange={(v) => onUpdate("secondaryButton", v)}
-              onLinkChange={(cfg) => onUpdate("secondaryButtonLink", cfg)}
-              className="w-full rounded-xl border border-(--qs-border) bg-white/20 px-8 py-4 text-base font-semibold text-(--qs-text) backdrop-blur-xs transition-all duration-200 hover:bg-white/40 active:scale-95 dark:bg-black/20 dark:hover:bg-black/40 @sm:w-auto text-left"
-            />
-          )}
         </div>
-      </div>
+      </Container>
     </section>
   );
 };
@@ -390,7 +461,7 @@ const None = () => null;
 
 export const HeroVariants: VariantRegistry<HeroVariantKey> = {
   background: BackgroundVariant,
-  left: LeftVariant,
+  default: DefaultVariant,
   split: SplitVariant,
   minimalist: MinimalistVariant,
   centered: CenteredVariant,
@@ -399,7 +470,7 @@ export const HeroVariants: VariantRegistry<HeroVariantKey> = {
 
 export const HeroVariantList: HeroVariantKey[] = [
   "background",
-  "left",
+  "default",
   "centered",
   "minimalist",
   "split",

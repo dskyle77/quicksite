@@ -6,7 +6,8 @@ import Template from "@/components/siteTemplates/Template";
 import SiteTracker from "./SiteTracker";
 
 export default function SiteRenderer() {
-  const { isCustomDomain, site } = useSiteContext();
+  const { value } = useSiteContext();
+  const { isCustomDomain, site } = value;
 
   // Validate template exists
   const templateEntry = getTemplateByType(site?.type || "");

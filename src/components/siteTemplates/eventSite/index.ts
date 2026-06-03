@@ -75,7 +75,7 @@ const starterContent = ({
     type: "background",
     badge: "📅 Limited Seats Available",
     image1:
-      "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      "https://images.unsplash.com/photo-1522199710521-72d69614c702?auto=format&fit=crop&w=1200&q=80",
     image1PId: "",
     title: selectedTitle,
     desc: "Join us for an unforgettable experience. Book your seat now before they run out.",
@@ -258,7 +258,7 @@ const eventSite: TemplateContent = {
   },
   config: {
     type: "event-site",
-    theme: "midnight",
+    theme: "light",
     hasCustomizeSidebar: false,
     isPremium: false,
   },

@@ -1,40 +1,46 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useState, ReactNode } from "react";
 import { Site } from "@/lib/types";
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, Dispatch, SetStateAction } from "react";
 
-// 1. Define the shape of your context value.
-// You can extend this to include any site-level data you want accessible in children.
 export interface SiteContextValue {
   slugs?: Record<string, string>;
   isCustomDomain?: boolean;
   site?: Site;
-  // Add other properties as desired for your project, such as:
-  // siteId?: string;
-  // siteName?: string;
-  // [key: string]: any;
+  componentsGist?: any;
 }
 
-// 2. Create the context (supports undefined to allow no value by default).
-export const SiteContext = createContext<SiteContextValue | undefined>(
+export interface SiteContextType {
+  value: SiteContextValue;
+  setValue: Dispatch<SetStateAction<SiteContextValue>>;
+}
+
+export const SiteContext = createContext<SiteContextType | undefined>(
   undefined,
 );
 
-// 3. Custom hook to consume context (throws an error if used outside provider).
-export function useSiteContext(): SiteContextValue {
+export function useSiteContext(): SiteContextType {
   const ctx = useContext(SiteContext);
+
   if (!ctx) {
     throw new Error("useSiteContext must be used within a SiteProvider");
   }
+
   return ctx;
 }
 
-// 4. SiteProvider supports passing ALL site-level properties, not just slugs.
-// Usage: <SiteProvider value={{slug, subslug, siteId, etc}}>{children}</SiteProvider>
 export function SiteProvider({
-  value,
+  value: initialValue,
   children,
 }: {
   value: SiteContextValue;
   children: ReactNode;
 }) {
-  return <SiteContext.Provider value={value}>{children}</SiteContext.Provider>;
+  const [value, setValue] = useState(initialValue);
+
+  return (
+    <SiteContext.Provider value={{ value, setValue }}>
+      {children}
+    </SiteContext.Provider>
+  );
 }

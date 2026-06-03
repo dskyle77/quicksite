@@ -4,7 +4,7 @@ import { TemplateContent } from "@/lib/templates";
 
 export const storeConfig = {
   navbar: "classic",
-  hero: "split",
+  hero: "default",
   footer: "classic",
   sections: [
     {
@@ -55,7 +55,7 @@ const starterContent = ({
     primaryButtonLink: { type: "anchor", anchorId: "shop" },
     secondaryButton: "Track Order",
     secondaryButtonLink: makeWhatsappLink(whatsappNumber, "Hi, I'd like to track my order."),
-    image1: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=1000",
+    // image1: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=1000",
   },
   "shop-products": {
     heading: "Our Product Catalogue",
@@ -63,7 +63,7 @@ const starterContent = ({
     items: [
       { title: "Wireless Headphones", desc: "High-quality sound with noise cancellation.", price: "₦25,000", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&q=80&w=500", btnLabel: "Order on WhatsApp" },
       { title: "Smart Watch", desc: "Track your fitness and stay connected.", price: "₦18,500", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=500", btnLabel: "Order on WhatsApp" },
-      { title: "Portable Charger", desc: "Fast charging power bank for all devices.", price: "₦12,000", image: "https://images.unsplash.com/photo-1609592424086-4447376378c8?auto=format&fit=crop&q=80&w=500", btnLabel: "Order on WhatsApp" },
+      { title: "Portable Charger", desc: "Fast charging power bank for all devices.", price: "₦12,000", image: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", btnLabel: "Order on WhatsApp" },
     ],
   },
   "shop-features": {

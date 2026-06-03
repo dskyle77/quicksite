@@ -17,7 +17,8 @@ export default function Template({
     if (onUpdate) onUpdate(path, value);
   };
 
-  const { slugs } = useSiteContext();
+  const { value } = useSiteContext();
+  const { slugs } = value;
 
   // ── Main page ───────────────────────────────────────────────────────────────
   return (

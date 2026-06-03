@@ -29,6 +29,7 @@ const BeforeAfterSlider = ({
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   const handleMove = (e: React.MouseEvent | React.TouchEvent) => {
+    if (isEditor) return;
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x =
@@ -42,7 +43,7 @@ const BeforeAfterSlider = ({
   return (
     <div
       ref={containerRef}
-      className="relative aspect-video rounded-3xl overflow-hidden cursor-ew-resize group border border-(--qs-border) shadow-2xl"
+      className="relative rounded-3xl overflow-hidden cursor-ew-resize group border border-(--qs-border) shadow-2xl touch-none"
       onMouseMove={(e) => !("touches" in e) && handleMove(e)}
       onTouchMove={handleMove}
     >
@@ -51,19 +52,19 @@ const BeforeAfterSlider = ({
         source={after}
         path={afterPath}
         isEditor={isEditor}
-        className="absolute inset-0 w-full h-full object-cover"
+        className="inset-0 w-full h-full object-cover"
       />
 
       {/* Before Image (Clipped) */}
       <div
-        className="absolute inset-0 w-full h-full overflow-hidden transition-all duration-75"
+        className="absolute inset-0 w-full h-full overflow-hidden"
         style={{ clipPath: `inset(0 ${100 - sliderPos}% 0 0)` }}
       >
         <TemplateImage
           source={before}
           path={beforePath}
           isEditor={isEditor}
-          className="absolute inset-0 w-full h-full object-cover"
+          className="inset-0 w-full h-full object-cover"
         />
       </div>
 
@@ -137,9 +138,7 @@ export const GallerySection = ({
         style={{ color: "var(--qs-text)" }}
         contentEditable={isEditor}
         suppressContentEditableWarning
-        onBlur={(e) =>
-          onUpdate("heading", e.currentTarget.textContent?.trim())
-        }
+        onBlur={(e) => onUpdate("heading", e.currentTarget.textContent?.trim())}
       >
         {content?.heading ?? "Gallery"}
       </h2>
@@ -222,12 +221,19 @@ export const GallerySection = ({
 
   if (variant === "grid") {
     return (
-      <section id={anchorName} style={{ background: sectionBg }} className="py-24">
+      <section
+        id={anchorName}
+        style={{ background: sectionBg }}
+        className="py-24"
+      >
         <Container>
           {renderHeader()}
           <div className="grid grid-cols-1 @sm:grid-cols-2 @md:grid-cols-3 gap-4">
             {items.map((item, i) => (
-              <div key={i} className="relative group rounded-2xl overflow-hidden border border-(--qs-border) bg-(--qs-primary)">
+              <div
+                key={i}
+                className="relative group rounded-2xl overflow-hidden border border-(--qs-border) bg-(--qs-primary)"
+              >
                 <TemplateImage
                   source={item.image}
                   path={`${path}.items.${i}.image`}
@@ -240,16 +246,21 @@ export const GallerySection = ({
                   </div>
                 )}
                 {item.caption && (
-                   <div className="absolute inset-x-0 bottom-0 p-4 bg-linear-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                      <p 
-                        className="text-white text-sm font-medium"
-                        contentEditable={isEditor}
-                        suppressContentEditableWarning
-                        onBlur={(e) => onUpdate(`items.${i}.caption`, e.currentTarget.textContent?.trim())}
-                      >
-                        {item.caption}
-                      </p>
-                   </div>
+                  <div className="absolute inset-x-0 bottom-0 p-4 bg-linear-to-t from-black/70 to-transparent opacity-100 md:opacity-0 md:group-hover:opacity-100 transition-opacity">
+                    <p
+                      className="text-white text-sm font-medium"
+                      contentEditable={isEditor}
+                      suppressContentEditableWarning
+                      onBlur={(e) =>
+                        onUpdate(
+                          `items.${i}.caption`,
+                          e.currentTarget.textContent?.trim(),
+                        )
+                      }
+                    >
+                      {item.caption}
+                    </p>
+                  </div>
                 )}
               </div>
             ))}
@@ -270,12 +281,19 @@ export const GallerySection = ({
 
   if (variant === "masonry") {
     return (
-      <section id={anchorName} style={{ background: sectionBg }} className="py-24">
+      <section
+        id={anchorName}
+        style={{ background: sectionBg }}
+        className="py-24"
+      >
         <Container>
           {renderHeader()}
           <div className="columns-1 @sm:columns-2 @md:columns-3 gap-4 space-y-4">
             {items.map((item, i) => (
-              <div key={i} className="relative group break-inside-avoid rounded-2xl overflow-hidden border border-(--qs-border) bg-(--qs-bg-alt)">
+              <div
+                key={i}
+                className="relative group break-inside-avoid rounded-2xl overflow-hidden border border-(--qs-border) bg-(--qs-bg-alt)"
+              >
                 <TemplateImage
                   source={item.image}
                   path={`${path}.items.${i}.image`}
@@ -288,11 +306,16 @@ export const GallerySection = ({
                   </div>
                 )}
                 <div className="p-4 bg-(--qs-bg-alt)">
-                   <p 
+                  <p
                     className="text-(--qs-text) text-sm font-bold"
                     contentEditable={isEditor}
                     suppressContentEditableWarning
-                    onBlur={(e) => onUpdate(`items.${i}.caption`, e.currentTarget.textContent?.trim())}
+                    onBlur={(e) =>
+                      onUpdate(
+                        `items.${i}.caption`,
+                        e.currentTarget.textContent?.trim(),
+                      )
+                    }
                   >
                     {item.caption || "Image Caption"}
                   </p>
@@ -315,13 +338,18 @@ export const GallerySection = ({
   // ─────────────────────────────────────────────
 
   return (
-    <section id={anchorName} style={{ background: sectionBg }} className="py-24 overflow-hidden">
-      <Container>
-        {renderHeader()}
-      </Container>
+    <section
+      id={anchorName}
+      style={{ background: sectionBg }}
+      className="py-24 overflow-hidden"
+    >
+      <Container>{renderHeader()}</Container>
       <div className="flex gap-4 overflow-x-auto px-6 @md:px-20 pb-8 no-scrollbar snap-x">
         {items.map((item, i) => (
-          <div key={i} className="relative group min-w-70 @sm:min-w-100 rounded-3xl overflow-hidden border border-(--qs-border) snap-center bg-(--qs-primary)">
+          <div
+            key={i}
+            className="relative group min-w-[240px] @sm:min-w-[320px] rounded-3xl overflow-hidden border border-(--qs-border) snap-center bg-(--qs-primary)"
+          >
             <TemplateImage
               source={item.image}
               path={`${path}.items.${i}.image`}
@@ -334,11 +362,16 @@ export const GallerySection = ({
             )}
             <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors pointer-events-none" />
             <div className="absolute bottom-6 left-6 right-6">
-               <p 
+              <p
                 className="text-white text-lg font-black tracking-tight drop-shadow-md"
                 contentEditable={isEditor}
                 suppressContentEditableWarning
-                onBlur={(e) => onUpdate(`items.${i}.caption`, e.currentTarget.textContent?.trim())}
+                onBlur={(e) =>
+                  onUpdate(
+                    `items.${i}.caption`,
+                    e.currentTarget.textContent?.trim(),
+                  )
+                }
               >
                 {item.caption || "View Project"}
               </p>
@@ -355,4 +388,9 @@ export const GallerySection = ({
   );
 };
 
-export const GalleryVariantList = ["grid", "masonry", "carousel", "before-after"];
+export const GalleryVariantList = [
+  "grid",
+  "masonry",
+  "carousel",
+  "before-after",
+];

@@ -269,16 +269,7 @@ export const ContactSection = ({
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="
-                      flex
-                      items-center
-                      gap-3
-                      sm:gap-4
-                      rounded-2xl
-                      border
-                      px-4 sm:px-5
-                      py-3 sm:py-4
-                    "
+                    className=" flex items-center gap-3 sm:gap-4 rounded-2xl border px-4 sm:px-5 py-3 sm:py-4"
                     style={{
                       border: "1px solid var(--qs-border)",
                       background: "rgba(255,255,255,0.03)",

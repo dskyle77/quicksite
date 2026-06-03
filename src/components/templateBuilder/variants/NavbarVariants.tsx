@@ -24,10 +24,10 @@ const ClassicNavbar = ({
 }: TemplateComponentProps) => {
   return (
     <NavbarShell>
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-8">
-        {/* Brand / Logo */}
-        <div className="flex items-center gap-3 group cursor-pointer">
-          <div className="h-10 w-10 overflow-hidden rounded-2xl border border-(--qs-border)/30 bg-white/10 backdrop-blur-md shadow-sm transition-all duration-300 group-hover:scale-105 group-hover:bg-white/15 flex items-center justify-center">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 md:px-8">
+        {/* Brand */}
+        <div className="flex items-center gap-1 sm:gap-3 group cursor-pointer">
+          <div className="h-8 w-8 sm:h-10 sm:w-10 overflow-hidden rounded-xl border border-(--qs-border)/30 bg-white/10 backdrop-blur-md shadow-sm transition-all duration-300 group-hover:scale-105 flex items-center justify-center">
             <TemplateImage
               source={content?.logoImage}
               isEditor={isEditor}
@@ -36,7 +36,7 @@ const ClassicNavbar = ({
           </div>
 
           <span
-            className="text-2xl font-semibold tracking-tighter text-(--qs-primary) drop-shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-white/30 rounded px-1.5 py-0.5"
+            className="text-md sm:text-xl font-semibold tracking-tighter text-(--qs-primary-alt)"
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
@@ -47,18 +47,16 @@ const ClassicNavbar = ({
           </span>
         </div>
 
-        {/* CTA Button */}
-        <div>
-          <EditableLinkButton
-            isEditor={isEditor}
-            label={content?.ctaButton || "Get In Touch"}
-            linkConfig={content?.ctaButtonLink}
-            onLabelChange={(v) => onUpdate("ctaButton", v)}
-            onLinkChange={(v) => onUpdate("ctaButtonLink", v)}
-            noPreview
-            className="rounded-xl bg-(--qs-primary) px-6 py-2.5 text-sm font-semibold text-(--qs-bg-alt) shadow-lg shadow-black/10 transition-all duration-200 hover:bg-(--qs-secondary) hover:shadow-xl active:scale-[0.985]"
-          />
-        </div>
+        {/* CTA */}
+        <EditableLinkButton
+          isEditor={isEditor}
+          label={content?.ctaButton || "Get In Touch"}
+          linkConfig={content?.ctaButtonLink}
+          onLabelChange={(v) => onUpdate("ctaButton", v)}
+          onLinkChange={(v) => onUpdate("ctaButtonLink", v)}
+          noPreview
+          className="rounded-lg bg-(--qs-primary) px-2 py-2 text-xs sm:text-sm font-semibold text-(--qs-bg-alt)"
+        />
       </div>
     </NavbarShell>
   );
@@ -71,10 +69,10 @@ const MinimalNavbar = ({
 }: TemplateComponentProps) => {
   return (
     <NavbarShell>
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-10">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 md:px-10">
         {/* Brand */}
         <span
-          className="text-xl font-bold tracking-[3px] text-(--qs-text) uppercase transition-all hover:opacity-80 focus:outline-none focus:ring-1 focus:ring-(--qs-primary)/30 rounded px-2 py-1"
+          className="text-md sm:text-xl font-bold tracking-[2px] sm:tracking-[3px] text-(--qs-primary-alt) uppercase"
           contentEditable={isEditor}
           suppressContentEditableWarning
           onBlur={(e) => onUpdate("title", e.currentTarget.textContent?.trim())}
@@ -82,24 +80,24 @@ const MinimalNavbar = ({
           {content?.title || "STUDIO"}
         </span>
 
-        {/* Minimal CTA */}
-        <div>
-          <EditableLinkButton
-            isEditor={isEditor}
-            label={content?.ctaButton || "Let's Talk"}
-            linkConfig={content?.ctaButtonLink}
-            onLabelChange={(v) => onUpdate("ctaButton", v)}
-            onLinkChange={(v) => onUpdate("ctaButtonLink", v)}
-            noPreview
-            className="text-base font-medium text-(--qs-text) transition-all hover:opacity-80 relative after:absolute after:bottom-[-2px] after:left-0 after:h-[1.5px] after:w-0 after:bg-(--qs-primary) after:transition-all hover:after:w-full"
-          />
-        </div>
+        {/* CTA */}
+        <EditableLinkButton
+          isEditor={isEditor}
+          label={content?.ctaButton || "Let's Talk"}
+          linkConfig={content?.ctaButtonLink}
+          onLabelChange={(v) => onUpdate("ctaButton", v)}
+          onLinkChange={(v) => onUpdate("ctaButtonLink", v)}
+          noPreview
+          className="text-sm sm:text-base font-medium text-(--qs-primary-alt) relative after:absolute after:-bottom-0.5 after:left-0 after:h-[1.5px] after:w-0 after:bg-(--qs-primary-alt) after:transition-all hover:after:w-full"
+        />
       </div>
     </NavbarShell>
   );
 };
 
-const None = () => null;
+const None = () => {
+  return null;
+};
 
 export const NavbarVariants = {
   classic: ClassicNavbar,

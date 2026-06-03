@@ -4,7 +4,8 @@ import { useEffect } from "react";
 import { useSiteContext } from "@/context/SiteContext";
 
 export default function SiteTracker() {
-  const { slugs } = useSiteContext();
+  const { value } = useSiteContext();
+  const { slugs } = value;
   const slug = slugs?.slug;
 
   useEffect(() => {

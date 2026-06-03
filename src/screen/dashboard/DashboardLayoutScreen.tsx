@@ -251,7 +251,7 @@ export default function DashboardLayoutScreen({
         <header className="sticky top-0 z-20 bg-background/80 dark:bg-[#050505]/80 backdrop-blur-md border-b border-border/50 px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2 sm:gap-4">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <button
-              className="lg:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors flex-shrink-0"
+              className="lg:hidden p-2 -ml-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-xl transition-colors shrink-0"
               onClick={() => setSidebarOpen(true)}
               aria-label="Open sidebar menu"
             >
