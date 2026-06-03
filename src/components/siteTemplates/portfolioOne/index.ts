@@ -16,31 +16,31 @@ export const portfolioConfig = {
   footer: "classic",
   sections: [
     {
-      id: "ab_",
+      id: "about",
       type: "about",
       variant: "split",
       enabled: true,
     },
     {
-      id: "sk_",
+      id: "skills",
       type: "skills",
       variant: "tags" as SkillsSectionVariants,
       enabled: true,
     },
     {
-      id: "i_",
+      id: "items",
       type: "items",
       variant: "grid" as ItemsSectionVariant,
       enabled: true,
     },
     {
-      id: "ex_",
+      id: "experience",
       type: "experience",
       variant: "default" as ExperienceSectionVariant,
       enabled: true,
     },
     {
-      id: "c_",
+      id: "contact",
       type: "contact",
       variant: "default",
       enabled: true,
@@ -77,7 +77,7 @@ const starterContent = ({
   },
 
   // ABOUT
-  ab_about: {
+  about: {
     label: "About Me",
     title: "Turning Ideas Into Reality",
     desc: "I'm a passionate full-stack developer with over 4 years of experience building scalable web applications. I love clean architecture, beautiful UI, and solving real-world problems.",
@@ -97,7 +97,7 @@ const starterContent = ({
   },
 
   // SKILLS
-  sk_skills: {
+  skills: {
     heading: "Skills & Expertise",
     subheading: "Technologies and tools I use to bring ideas to life.",
     items: [
@@ -121,7 +121,7 @@ const starterContent = ({
   },
 
   // PROJECTS
-  i_items: {
+  items: {
     heading: "Featured Projects",
     subheading: "A selection of work I'm proud of.",
     items: [
@@ -155,7 +155,7 @@ const starterContent = ({
   } as ItemsSectionContent,
 
   // EXPERIENCE
-  ex_experience: {
+  experience: {
     heading: "Work Experience",
     subheading: "My professional journey and the impact I've made.",
     items: [
@@ -175,7 +175,7 @@ const starterContent = ({
   },
 
   // CONTACT
-  c_contact: {
+  contact: {
     title: "Let's Work Together",
     desc: "Have an exciting project in mind? I'm currently available for freelance opportunities and full-time roles.",
     email: "hello@alexmorgan.dev",

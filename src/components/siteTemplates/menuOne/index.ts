@@ -9,25 +9,25 @@ export const menuOneConfig = {
   footer: "none",
   sections: [
     {
-      id: "tx_",
+      id: "text",
       type: "text",
       variant: "card",
       enabled: true,
     },
     {
-      id: "i_",
+      id: "items",
       type: "items",
       variant: "grid",
       enabled: true,
     },
     {
-      id: "ts_",
+      id: "testimonials",
       type: "testimonials",
       variant: "list",
       enabled: true,
     },
     {
-      id: "c_",
+      id: "contact",
       type: "contact",
       variant: "minimal",
       enabled: true,
@@ -60,13 +60,13 @@ const starterContent = ({
     }) as LinkConfig,
   },
 
-  tx_text: {
+  text: {
     label: "About Us",
     title: `Why People Love ${selectedTitle}`,
     desc: "We prepare tasty meals using fresh ingredients and deliver quickly so you can enjoy every bite without stress.",
   },
 
-  i_items: {
+  items: {
     heading: "Our Menu",
     subheading: "Fresh meals made daily. Order instantly on WhatsApp.",
     items: [
@@ -115,7 +115,7 @@ const starterContent = ({
     ],
   },
 
-  ts_testimonials: {
+  testimonials: {
     heading: "Customer Reviews",
     subheading: "People love our meals ❤️",
     items: [
@@ -133,7 +133,7 @@ const starterContent = ({
     ],
   },
 
-  c_contact: {
+  contact: {
     title: "Place Your Order",
     email: "hello@example.com",
     phone: whatsappNumber,
@@ -151,9 +151,9 @@ const starterContent = ({
 
 const menu1: TemplateContent = {
   meta: {
-    title: "Menu One",
+    title: "Menu",
     image: "/ti/menu-one.png",
-    category: "menu",
+    category: "food",
     description:
       "A modern, minimalist menu-focused site template ideal for restaurants, cafes, or portfolios needing a clean showcase.",
   },

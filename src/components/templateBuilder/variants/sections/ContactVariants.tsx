@@ -219,17 +219,7 @@ export const ContactSection = ({
       >
         <div className="max-w-2xl md:max-w-6xl mx-auto px-2 sm:px-4">
           <div
-            className="
-              grid
-              grid-cols-1
-              md:grid-cols-2
-              gap-6
-              md:gap-10
-              rounded-2xl
-              md:rounded-[36px]
-              border
-              overflow-hidden
-            "
+            className=" grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10 rounded-2xl md:rounded-[36px] border overflow-hidden"
             style={{
               background: cardBg,
               border: "1px solid var(--qs-border)",
@@ -272,9 +262,10 @@ export const ContactSection = ({
 
               <div className="mt-7 sm:mt-10 space-y-4 sm:space-y-5">
                 {[
-                  content.email || "hello@example.com",
-                  content.phone || "+234 000 000 0000",
-                  content.location || "Lagos, Nigeria",
+                  { label: content.email || "hello@example.com", icon: "@", key: "email" },
+                  { label: content.phone || "+234 000 000 0000", icon: "☎", key: "phone" },
+                  { label: content.location || "Lagos, Nigeria", icon: "⌂", key: "location" },
+                  { label: content.hours || "Mon - Sat: 9am - 6pm", icon: "◔", key: "hours" },
                 ].map((item, i) => (
                   <div
                     key={i}
@@ -300,7 +291,7 @@ export const ContactSection = ({
                         color: "var(--qs-primary-fg)",
                       }}
                     >
-                      {i === 0 ? "@" : i === 1 ? "☎" : "⌂"}
+                      {item.icon}
                     </div>
 
                     <div
@@ -309,29 +300,13 @@ export const ContactSection = ({
                       contentEditable={isEditor}
                       suppressContentEditableWarning
                       onBlur={(e) => {
-                        if (i === 0) {
-                          onUpdate(
-                            "email",
-                            e.currentTarget.textContent?.trim(),
-                          );
-                        }
-
-                        if (i === 1) {
-                          onUpdate(
-                            "phone",
-                            e.currentTarget.textContent?.trim(),
-                          );
-                        }
-
-                        if (i === 2) {
-                          onUpdate(
-                            "location",
-                            e.currentTarget.textContent?.trim(),
-                          );
-                        }
+                        onUpdate(
+                          item.key,
+                          e.currentTarget.textContent?.trim(),
+                        );
                       }}
                     >
-                      {item}
+                      {item.label}
                     </div>
                   </div>
                 ))}

@@ -11,6 +11,17 @@ import eventSite from "@/components/siteTemplates/eventSite";
 import digitalStore from "@/components/siteTemplates/digitalStore";
 import landingPage from "@/components/siteTemplates/landingPage";
 import landingPage2 from "@/components/siteTemplates/landingPage2";
+
+// New Templates
+import restaurant from "@/components/siteTemplates/restaurant";
+import fashion from "@/components/siteTemplates/fashion";
+import beauty from "@/components/siteTemplates/beauty";
+import photographer from "@/components/siteTemplates/photographer";
+import professional from "@/components/siteTemplates/professional";
+import events from "@/components/siteTemplates/events";
+import realEstate from "@/components/siteTemplates/real-estate";
+import store from "@/components/siteTemplates/store";
+
 import {
   schemaMap,
   starterMap,
@@ -56,6 +67,14 @@ export type TemplateContent = {
 /* ---------------- REGISTRY ---------------- */
 
 export const templatesRegistry: TemplateContent[] = [
+  restaurant,
+  fashion,
+  beauty,
+  photographer,
+  professional,
+  events,
+  realEstate,
+  store,
   landingPage,
   landingPage2,
   menuOne,

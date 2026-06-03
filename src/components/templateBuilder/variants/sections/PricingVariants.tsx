@@ -12,8 +12,10 @@ type PricingPlan = {
   desc?: string;
   features?: string[];
   cta?: string;
+  ctaLabel?: string;
   ctaLink?: any;
   featured?: boolean;
+  highlighted?: boolean;
 };
 
 export const PricingSection = ({
@@ -75,8 +77,8 @@ export const PricingSection = ({
   const handleSetFeatured = (planIdx: number) => {
     const nextPlans = plans.map((plan, i) =>
       i === planIdx
-        ? { ...plan, featured: true }
-        : { ...plan, featured: false },
+        ? { ...plan, featured: true, highlighted: true }
+        : { ...plan, featured: false, highlighted: false },
     );
     onUpdate("plans", nextPlans);
   };
@@ -114,7 +116,7 @@ export const PricingSection = ({
   // ─────────────────────────────────────────────
 
     if (variant === "highlight-top") {
-      const anyFeatured = plans.some((plan) => plan.featured);
+      const anyFeatured = plans.some((plan) => plan.featured ?? plan.highlighted);
 
       return (
         <section className={`py-24 ${sectionBgClass}`} id={anchorName}>
@@ -124,7 +126,7 @@ export const PricingSection = ({
             <div className="grid gap-8 grid-cols-1 @sm:grid-cols-2 @lg:grid-cols-3 justify-center">
 
               {plans.map((plan, i) => {
-                const featured = anyFeatured ? !!plan.featured : i === 1;
+                const featured = anyFeatured ? !!(plan.featured ?? plan.highlighted) : i === 1;
 
                 return (
                   <div
@@ -246,9 +248,9 @@ export const PricingSection = ({
                     <div className="mt-10">
                       <EditableLinkButton
                         isEditor={isEditor}
-                        label={plan.cta ?? "Choose Plan"}
+                        label={plan.ctaLabel ?? plan.cta ?? "Choose Plan"}
                         linkConfig={plan.ctaLink}
-                        onLabelChange={(v) => onUpdate(`plans.${i}.cta`, v)}
+                        onLabelChange={(v) => onUpdate(`plans.${i}.ctaLabel`, v)}
                         onLinkChange={(cfg) =>
                           onUpdate(`plans.${i}.ctaLink`, cfg)
                         }
@@ -378,9 +380,9 @@ export const PricingSection = ({
                 <div className="mt-10">
                   <EditableLinkButton
                     isEditor={isEditor}
-                    label={plan.cta ?? "Choose Plan"}
+                    label={plan.ctaLabel ?? plan.cta ?? "Choose Plan"}
                     linkConfig={plan.ctaLink}
-                    onLabelChange={(v) => onUpdate(`plans.${i}.cta`, v)}
+                    onLabelChange={(v) => onUpdate(`plans.${i}.ctaLabel`, v)}
                     onLinkChange={(cfg) => onUpdate(`plans.${i}.ctaLink`, cfg)}
                     className="w-full rounded-2xl px-6 py-4 text-center font-bold bg-(--qs-primary) text-(--qs-primary-fg)"
                   />

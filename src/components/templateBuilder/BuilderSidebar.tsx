@@ -4,10 +4,11 @@
 
 import React, { useEffect } from "react";
 import { X } from "lucide-react";
-import { variantOptions } from "./contentBlocks";
+import { sectionVariantOptions, variantOptions } from "./contentBlocks";
 import {
   BuilderConfig,
   SectionConfig,
+  SectionVariantKey,
   SectionType,
 } from "./types";
 
@@ -278,7 +279,9 @@ export const SectionMenu: React.FC<{
         <Select
           value={section.variant}
           options={variants}
-          onChange={(v) => updateSection(section.id, { variant: v })}
+          onChange={(v) =>
+            updateSection(section.id, { variant: v as SectionVariantKey })
+          }
           disabled={isDisabled}
         />
       </div>
@@ -313,14 +316,14 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
   onClose,
 }) => {
   const addSection = (type: string) => {
-    if (!Object.keys(variantOptions).includes(type)) return;
+    if (!Object.hasOwn(sectionVariantOptions, type)) return;
     const stype = type as SectionType;
-    const variants = variantOptions[stype] as readonly string[];
+    const variants = sectionVariantOptions[stype] as readonly string[];
     const newSectionId = crypto.randomUUID();
     const newSection: SectionConfig = {
       id: newSectionId,
       type: stype,
-      variant: variants[0],
+      variant: variants[0] as SectionVariantKey,
       enabled: true,
       anchorName: newSectionId + stype,
     };
@@ -400,7 +403,7 @@ export const BuilderSidebar: React.FC<BuilderSidebarProps> = ({
                   }}
                 >
                   <option value="">+ Add section</option>
-                  {Object.keys(variantOptions).map((k) => (
+                  {Object.keys(sectionVariantOptions).map((k) => (
                     <option key={k} value={k}>
                       {k}
                     </option>

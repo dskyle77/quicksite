@@ -10,12 +10,17 @@ import {
   TestimonialItem,
   ContactContent,
   FooterContent,
+  MenuItem,
+  FooterVariantKey,
+  NavbarVariantKey,
+  SectionType,
 } from "./types";
 import { ItemsItem, ItemsVariantList } from "./variants/sections/ItemsVariants";
 import { HeroVariantList } from "./variants/HeroVariants";
 import { ExperienceVariantList } from "./variants/sections/ExperienceVariants";
 import { SkillsVariantList } from "./variants/sections/SkillsVariants";
 import { GalleryVariantList } from "./variants/sections/GalleryVariants";
+import { MenuVariantList } from "./variants/sections/MenuVariants";
 
 import { makeWhatsappLink, year, img } from "../shared/helpers";
 import { PricingVariantList } from "./variants/sections/PricingVariants";
@@ -479,12 +484,53 @@ const galleryStarterContent = ({ defaultImage }: SchemaParams) => ({
   ],
 });
 
+// ─── MENU ────────────────────────────────────────────────────────────────────
+
+const menuSchema = ({ defaultImage }: SchemaParams) => ({
+  heading: "",
+  subheading: "",
+  items: [
+    {
+      title: "",
+      desc: "",
+      price: "",
+      image: img(defaultImage),
+      imagePId: "",
+      btnLabel: "",
+    },
+  ] as MenuItem[],
+});
+
+const menuStarterContent = ({ defaultImage }: SchemaParams) => ({
+  heading: "Our Menu",
+  subheading: "Delicious meals prepared with love and the finest ingredients.",
+  items: [
+    {
+      title: "Jollof Rice Special",
+      desc: "Authentic Nigerian Jollof served with fried plantain and your choice of protein.",
+      price: "₦3,500",
+      image: img(defaultImage),
+      imagePId: "",
+      btnLabel: "Order Now",
+    },
+    {
+      title: "Grilled Chicken Salad",
+      desc: "Fresh greens, cherry tomatoes, cucumbers, and perfectly grilled chicken breast.",
+      price: "₦4,000",
+      image: img(defaultImage),
+      imagePId: "",
+      btnLabel: "Order Now",
+    },
+  ] as MenuItem[],
+});
+
 export const starterMap: Record<string, any> = {
   navbar: navbarStarterContent,
   hero: heroStarterContent,
   about: aboutStarterContent,
   skills: skillsStarterContent,
-  projects: itemsStarterContent,
+  items: itemsStarterContent,
+  menu: menuStarterContent,
   text: textStarterContent,
   experience: experienceStarterContent,
   testimonials: testimonialsStarterContent,
@@ -504,6 +550,7 @@ export const schemaMap: Record<string, any> = {
   about: aboutSchema,
   skills: skillsSchema,
   items: itemsSchema,
+  menu: menuSchema,
   text: textSchema,
   experience: experienceSchema,
   testimonials: testimonialsSchema,
@@ -517,12 +564,17 @@ export const schemaMap: Record<string, any> = {
 };
 
 /** Allowed layout variants — must match variant component registries */
-export const variantOptions: Record<string, string[]> = {
-  navbar: ["classic", "minimal", "none"],
+export const globalVariantOptions = {
+  navbar: ["classic", "minimal", "none"] satisfies NavbarVariantKey[],
   hero: HeroVariantList,
+  footer: ["classic", "centered", "columns", "none"] satisfies FooterVariantKey[],
+};
+
+export const sectionVariantOptions = {
   about: ["split", "card-stats", "centered"],
   skills: SkillsVariantList,
   items: ItemsVariantList,
+  menu: MenuVariantList,
   text: ["card", "minimal", "minimal-left", "default"],
   experience: ExperienceVariantList,
   testimonials: ["grid", "carousel", "list"],
@@ -532,5 +584,9 @@ export const variantOptions: Record<string, string[]> = {
   faq: ["default", "accordion", "numbered"],
   cta: ["default", "banner", "simple"],
   gallery: GalleryVariantList,
-  footer: ["classic", "centered", "columns", "none"],
+} satisfies Record<SectionType, readonly string[]>;
+
+export const variantOptions = {
+  ...globalVariantOptions,
+  ...sectionVariantOptions,
 };

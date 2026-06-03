@@ -10,49 +10,49 @@ export const landingPage2Config = {
   footer: "centered",
   sections: [
     {
-      id: "ab_",
+      id: "lp_about",
       type: "about",
       variant: "card-stats",
       enabled: true,
       anchorName: "about",
     },
     {
-      id: "ft_",
+      id: "lp_features",
       type: "features",
       variant: "icons",
       enabled: true,
       anchorName: "features",
     },
     {
-      id: "ts_",
+      id: "lp_testimonials",
       type: "testimonials",
       variant: "grid",
       enabled: true,
       anchorName: "testimonials",
     },
     {
-      id: "pr_",
+      id: "lp_pricing",
       type: "pricing",
       variant: "default",
       enabled: true,
       anchorName: "pricing",
     },
     {
-      id: "fq_",
+      id: "lp_faq",
       type: "faq",
       variant: "numbered",
       enabled: true,
       anchorName: "faq",
     },
     {
-      id: "ct_",
+      id: "lp_cta",
       type: "cta",
       variant: "banner",
       enabled: true,
       anchorName: "cta",
     },
     {
-      id: "c_",
+      id: "lp_contact",
       type: "contact",
       variant: "minimal",
       enabled: true,
@@ -93,7 +93,7 @@ const starterContent = ({
     secondaryButtonLink: makeCtaLink({ type: "anchor", anchorId: "features" }),
   },
 
-  ab_about: {
+  lp_about: {
     label: "Who We Are",
     title: "A Team That Gets Results",
     desc: "We are a Nigerian creative agency specialising in branding, web design, and digital marketing. Since 2018, we've helped hundreds of businesses look premium and grow revenue through smart strategy and bold design.",
@@ -109,7 +109,7 @@ const starterContent = ({
     stat4Label: "Client Satisfaction",
   },
 
-  ft_features: {
+  lp_features: {
     heading: "Our Services",
     subheading:
       "Everything you need to build a brand people trust and a business that grows.",
@@ -157,7 +157,7 @@ const starterContent = ({
     ],
   },
 
-  ts_testimonials: {
+  lp_testimonials: {
     heading: "What Our Clients Say",
     subheading: "Don't just take our word for it.",
     items: [
@@ -188,7 +188,7 @@ const starterContent = ({
     ],
   },
 
-  pr_pricing: {
+  lp_pricing: {
     heading: "Transparent Pricing",
     subheading: "One-time or monthly — choose what works for your business.",
     plans: [
@@ -255,7 +255,7 @@ const starterContent = ({
     ],
   },
 
-  fq_faq: {
+  lp_faq: {
     heading: "Frequently Asked Questions",
     items: [
       {
@@ -286,7 +286,7 @@ const starterContent = ({
     ],
   },
 
-  ct_cta: {
+  lp_cta: {
     heading: "Ready to Build Something Great?",
     subheading: "Let's talk about your brand, your goals, and how we can help.",
     primaryButton: "Start a Conversation",
@@ -296,7 +296,7 @@ const starterContent = ({
     ),
   },
 
-  c_contact: {
+  lp_contact: {
     title: "Get in Touch",
     desc: "Send us a message on WhatsApp and we'll respond within 2 hours during business hours (Mon–Sat, 8am–8pm).",
     email: "hello@example.com",

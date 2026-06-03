@@ -227,10 +227,10 @@ export const GallerySection = ({
           {renderHeader()}
           <div className="grid grid-cols-1 @sm:grid-cols-2 @md:grid-cols-3 gap-4">
             {items.map((item, i) => (
-              <div key={i} className="relative group aspect-square rounded-2xl overflow-hidden border border-(--qs-border)">
+              <div key={i} className="relative group rounded-2xl overflow-hidden border border-(--qs-border) bg-(--qs-primary)">
                 <TemplateImage
                   source={item.image}
-                  path={`items.${i}.image`}
+                  path={`${path}.items.${i}.image`}
                   isEditor={isEditor}
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
@@ -240,7 +240,7 @@ export const GallerySection = ({
                   </div>
                 )}
                 {item.caption && (
-                   <div className="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                   <div className="absolute inset-x-0 bottom-0 p-4 bg-linear-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                       <p 
                         className="text-white text-sm font-medium"
                         contentEditable={isEditor}
@@ -278,7 +278,7 @@ export const GallerySection = ({
               <div key={i} className="relative group break-inside-avoid rounded-2xl overflow-hidden border border-(--qs-border) bg-(--qs-bg-alt)">
                 <TemplateImage
                   source={item.image}
-                  path={`items.${i}.image`}
+                  path={`${path}.items.${i}.image`}
                   isEditor={isEditor}
                   className="w-full h-auto object-cover"
                 />
@@ -321,12 +321,11 @@ export const GallerySection = ({
       </Container>
       <div className="flex gap-4 overflow-x-auto px-6 @md:px-20 pb-8 no-scrollbar snap-x">
         {items.map((item, i) => (
-          <div key={i} className="relative group min-w-[280px] @sm:min-w-[400px] aspect-[4/3] rounded-3xl overflow-hidden border border-(--qs-border) snap-center shadow-lg">
+          <div key={i} className="relative group min-w-70 @sm:min-w-100 rounded-3xl overflow-hidden border border-(--qs-border) snap-center bg-(--qs-primary)">
             <TemplateImage
               source={item.image}
-              path={`items.${i}.image`}
+              path={`${path}.items.${i}.image`}
               isEditor={isEditor}
-              className="w-full h-full object-cover"
             />
             {isEditor && (
               <div className="absolute top-4 right-4 z-20">

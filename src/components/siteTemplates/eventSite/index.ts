@@ -11,37 +11,37 @@ export const eventSiteConfig = {
   footer: "classic",
   sections: [
     {
-      id: "tx_",
+      id: "events_text",
       type: "text",
       variant: "minimal",
       enabled: true,
     },
     {
-      id: "ft_",
+      id: "events_features",
       type: "features",
       variant: "icons",
       enabled: true,
     },
     {
-      id: "pr_",
+      id: "events_pricing",
       type: "pricing",
       variant: "highlight-top",
       enabled: true,
     },
     {
-      id: "ts_",
+      id: "events_testimonials",
       type: "testimonials",
       variant: "grid",
       enabled: true,
     },
     {
-      id: "fq_",
+      id: "events_faq",
       type: "faq",
       variant: "accordion",
       enabled: true,
     },
     {
-      id: "c_",
+      id: "events_contact",
       type: "contact",
       variant: "split",
       enabled: true,
@@ -88,13 +88,13 @@ const starterContent = ({
     secondaryButtonLink: makeCtaLink({ type: "anchor", anchorId: "about" }),
   },
 
-  tx_text: {
+  events_text: {
     label: "About The Event",
     title: `Why You Can't Miss ${selectedTitle}`,
     desc: "This is a once-in-a-season experience designed to inspire, connect, and entertain. Whether you're coming for networking, fun, or learning — there's something here for you.",
   },
 
-  ft_features: {
+  events_features: {
     heading: "What to Expect",
     subheading: "Everything has been planned to give you the best experience.",
     items: [
@@ -121,7 +121,7 @@ const starterContent = ({
     ],
   },
 
-  pr_pricing: {
+  events_pricing: {
     heading: "Ticket Options",
     subheading: "Choose the experience that fits you.",
     plans: [
@@ -177,7 +177,7 @@ const starterContent = ({
     ],
   },
 
-  ts_testimonials: {
+  events_testimonials: {
     heading: "Past Attendees Say",
     subheading: "Don't take our word for it.",
     items: [
@@ -196,7 +196,7 @@ const starterContent = ({
     ],
   },
 
-  fq_faq: {
+  events_faq: {
     heading: "Frequently Asked Questions",
     subheading: "Everything you need to know before attending.",
     items: [
@@ -223,7 +223,7 @@ const starterContent = ({
     ],
   },
 
-  c_contact: {
+  events_contact: {
     title: "Still Have Questions?",
     desc: "Reach us on WhatsApp for the fastest response. We reply within minutes.",
     email: "events@example.com",
@@ -252,7 +252,7 @@ const eventSite: TemplateContent = {
   meta: {
     title: "Event Site",
     image: "/ti/event-site.png",
-    category: "events",
+    category: "Event and Rentals",
     description:
       "A high-converting event landing page with ticket tiers, countdown, FAQ and WhatsApp ticket delivery. Perfect for concerts, conferences, and meetups.",
   },

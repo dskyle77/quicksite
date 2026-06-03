@@ -12,6 +12,7 @@ import EditableLinkButton, {
 export type ItemsItem = {
   title: string;
   desc: string;
+  price?: string;
   tags?: string[];
   image?: string;
   imagePId?: string;
@@ -62,6 +63,7 @@ export const ItemsSection = ({
       {
         title: "New Item",
         desc: "Item description...",
+        price: "₦0",
         tags: ["Tag"],
         image:
           "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
@@ -218,18 +220,34 @@ export const ItemsSection = ({
                 </div>
 
                 <div className="flex flex-col justify-center mt-4 sm:mt-0">
-                  <h3
-                    className="text-xl sm:text-2xl md:text-3xl font-bold"
-                    contentEditable={isEditor}
-                    suppressContentEditableWarning
-                    onBlur={(e) =>
-                      updateOne(i, {
-                        title: e.currentTarget.textContent?.trim() || p.title,
-                      })
-                    }
-                  >
-                    {p.title}
-                  </h3>
+                  <div className="flex items-center justify-between gap-4">
+                    <h3
+                      className="text-xl sm:text-2xl md:text-3xl font-bold"
+                      contentEditable={isEditor}
+                      suppressContentEditableWarning
+                      onBlur={(e) =>
+                        updateOne(i, {
+                          title: e.currentTarget.textContent?.trim() || p.title,
+                        })
+                      }
+                    >
+                      {p.title}
+                    </h3>
+                    {p.price && (
+                      <span
+                        className="text-xl font-black text-[var(--qs-primary)]"
+                        contentEditable={isEditor}
+                        suppressContentEditableWarning
+                        onBlur={(e) =>
+                          updateOne(i, {
+                            price: e.currentTarget.textContent?.trim() || p.price,
+                          })
+                        }
+                      >
+                        {p.price}
+                      </span>
+                    )}
+                  </div>
 
                   <p
                     className="mt-2 sm:mt-4 leading-6 sm:leading-7 opacity-70 text-sm sm:text-base"
@@ -292,17 +310,33 @@ export const ItemsSection = ({
                 />
 
                 <div className="flex h-full flex-col p-4 sm:p-6">
-                  <h3
-                    className="text-base sm:text-lg md:text-xl font-bold"
-                    contentEditable={isEditor}
-                    suppressContentEditableWarning={true}
-                    onBlur={(e) =>
-                      isEditor &&
-                      updateOne(i, { title: e.currentTarget.textContent || "" })
-                    }
-                  >
-                    {p.title}
-                  </h3>
+                  <div className="flex items-start justify-between gap-2">
+                    <h3
+                      className="text-base sm:text-lg md:text-xl font-bold"
+                      contentEditable={isEditor}
+                      suppressContentEditableWarning={true}
+                      onBlur={(e) =>
+                        isEditor &&
+                        updateOne(i, { title: e.currentTarget.textContent || "" })
+                      }
+                    >
+                      {p.title}
+                    </h3>
+                    {p.price && (
+                      <span
+                        className="text-base font-black text-[var(--qs-primary)] whitespace-nowrap"
+                        contentEditable={isEditor}
+                        suppressContentEditableWarning
+                        onBlur={(e) =>
+                          updateOne(i, {
+                            price: e.currentTarget.textContent?.trim() || p.price,
+                          })
+                        }
+                      >
+                        {p.price}
+                      </span>
+                    )}
+                  </div>
 
                   <p
                     className="mt-2 sm:mt-3 text-xs sm:text-sm opacity-70"
@@ -362,17 +396,33 @@ export const ItemsSection = ({
               />
 
               <div className="flex h-full flex-col p-4 sm:p-6">
-                <h3
-                  className="text-base sm:text-lg md:text-xl font-bold"
-                  contentEditable={isEditor}
-                  suppressContentEditableWarning={true}
-                  onBlur={(e) =>
-                    isEditor &&
-                    updateOne(i, { title: e.currentTarget.textContent || "" })
-                  }
-                >
-                  {p.title}
-                </h3>
+                <div className="flex items-start justify-between gap-2">
+                  <h3
+                    className="text-base sm:text-lg md:text-xl font-bold"
+                    contentEditable={isEditor}
+                    suppressContentEditableWarning={true}
+                    onBlur={(e) =>
+                      isEditor &&
+                      updateOne(i, { title: e.currentTarget.textContent || "" })
+                    }
+                  >
+                    {p.title}
+                  </h3>
+                  {p.price && (
+                    <span
+                      className="text-base font-black text-[var(--qs-primary)] whitespace-nowrap"
+                      contentEditable={isEditor}
+                      suppressContentEditableWarning
+                      onBlur={(e) =>
+                        updateOne(i, {
+                          price: e.currentTarget.textContent?.trim() || p.price,
+                        })
+                      }
+                    >
+                      {p.price}
+                    </span>
+                  )}
+                </div>
 
                 <p
                   className="mt-2 sm:mt-3 text-xs sm:text-sm opacity-70"

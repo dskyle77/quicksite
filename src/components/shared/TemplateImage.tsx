@@ -12,6 +12,7 @@ type TemplateImageProps = {
   alt?: string;
   path: string;
   variant?: "default" | "background";
+  className?: string;
   children?: React.ReactNode;
 };
 
@@ -22,6 +23,7 @@ export default function TemplateImage({
   variant = "default",
   children,
   path,
+  className
 }: TemplateImageProps) {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -67,13 +69,13 @@ export default function TemplateImage({
   // ───────────── BACKGROUND VARIANT ─────────────
   if (variant === "background") {
     return (
-      <div className="relative w-full overflow-hidden min-h-[600px] flex items-center">
-        ={effectiveSource && (
+      <div className="relative w-full overflow-hidden min-h-150 flex items-center">
+        {effectiveSource && (
           <div className="absolute inset-0 z-0 w-full h-full">
             <NextImage
               src={effectiveSource}
               alt={alt || ""}
-              className="w-full h-full object-cover"
+              className={["w-full h-full object-cover", className].filter(Boolean).join(" ")}
               placeholder="empty"
               fill
               sizes="100vw"
@@ -137,17 +139,20 @@ export default function TemplateImage({
   let showImage: React.ReactNode = null;
 
   if (effectiveSource) {
+    const imageClassName = [
+      "object-cover w-full h-full rounded-2x",
+      className,
+      isEditor ? "hover:brightness-75" : "",
+      uploading ? "opacity-50 grayscale" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
     showImage = (
       <img
         alt={alt || ""}
         src={effectiveSource}
-        className={[
-          "object-cover w-full h-full rounded-2xl",
-          isEditor ? "hover:brightness-75" : "",
-          uploading ? "opacity-50 grayscale" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        className={imageClassName}
         loading="eager"
         style={{ display: "block" }}
       />
@@ -168,7 +173,7 @@ export default function TemplateImage({
 
   return (
     <div
-      className="relative flex items-center justify-center min-h-[120px] rounded-2xl overflow-hidden bg-(--qs-bg-alt)"
+      className="relative flex items-center justify-center min-h-30 rounded-2xl overflow-hidden bg-(--qs-bg-alt)"
       onClick={handleUploadClick}
       tabIndex={isEditor ? 0 : -1}
       style={{

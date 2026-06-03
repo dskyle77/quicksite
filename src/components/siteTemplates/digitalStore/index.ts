@@ -10,37 +10,37 @@ export const digitalStoreConfig = {
   footer: "classic",
   sections: [
     {
-      id: "tx_",
+      id: "dig_text",
       type: "text",
       variant: "card",
       enabled: true,
     },
     {
-      id: "i_",
+      id: "dig_items",
       type: "items",
       variant: "grid",
       enabled: true,
     },
     {
-      id: "ft_",
+      id: "dig_features",
       type: "features",
       variant: "default",
       enabled: true,
     },
     {
-      id: "ts_",
+      id: "dig_testimonials",
       type: "testimonials",
       variant: "list",
       enabled: true,
     },
     {
-      id: "fq_",
+      id: "dig_faq",
       type: "faq",
       variant: "accordion",
       enabled: true,
     },
     {
-      id: "c_",
+      id: "dig_contact",
       type: "contact",
       variant: "minimal",
       enabled: true,
@@ -84,13 +84,13 @@ const starterContent = ({
     ),
   },
 
-  tx_text: {
+  dig_text: {
     label: "What We Offer",
     title: "High-Quality Digital Products, Delivered Instantly",
     desc: "No waiting, no shipping, no logistics. Pay, and receive your file immediately via WhatsApp or email. All products are created by experts and ready to use.",
   },
 
-  i_items: {
+  dig_items: {
     heading: "Our Products",
     subheading: "Click any product to purchase directly on WhatsApp.",
     items: [
@@ -139,7 +139,7 @@ const starterContent = ({
     ],
   },
 
-  ft_features: {
+  dig_features: {
     heading: "Why Buy From Us?",
     subheading: "We make it easy, fast, and risk-free.",
     items: [
@@ -166,7 +166,7 @@ const starterContent = ({
     ],
   },
 
-  ts_testimonials: {
+  dig_testimonials: {
     heading: "Customer Reviews",
     subheading: "Real people, real results.",
     items: [
@@ -185,7 +185,7 @@ const starterContent = ({
     ],
   },
 
-  fq_faq: {
+  dig_faq: {
     heading: "FAQ",
     subheading: "Common questions answered.",
     items: [
@@ -212,7 +212,7 @@ const starterContent = ({
     ],
   },
 
-  c_contact: {
+  dig_contact: {
     title: "Need Help Choosing?",
     desc: "Chat with us on WhatsApp and we'll recommend the best product for your needs.",
     email: "hello@example.com",
@@ -241,7 +241,7 @@ const digitalStore: TemplateContent = {
   meta: {
     title: "Digital Store",
     image: "/ti/digital-store.png",
-    category: "digital",
+    category: "store",
     description:
       "A sleek digital product store with instant WhatsApp delivery. Perfect for selling eBooks, templates, guides, and downloadable files.",
   },

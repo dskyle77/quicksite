@@ -1,6 +1,4 @@
-
-
-
+import type { BuilderConfig } from "./types";
 
 export const builderConfig = {
   navbar: "classic",
@@ -30,15 +28,15 @@ export const builderConfig = {
     },
     {
       id: "init-projects",
-      type: "projects",
-      variant: "card-grid",
+      type: "items",
+      variant: "grid",
       enabled: true,
       anchorName: "projects",
     },
     {
       id: "init-menu",
       type: "menu",
-      variant: "card-grid",
+      variant: "grid",
       enabled: true,
       anchorName: "menu",
     },
@@ -92,4 +90,4 @@ export const builderConfig = {
       anchorName: "cta",
     },
   ],
-};
+} satisfies BuilderConfig;

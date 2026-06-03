@@ -23,7 +23,7 @@ export type SectionProps = TemplateComponentProps & {
 // Each union represents the available style variants for that block.
 // Extend these as you add new variants to the variant files.
 
-export type NavbarVariantKey = "classic" | "minimal";
+export type NavbarVariantKey = "classic" | "minimal" | "none";
 
 export type FooterVariantKey = "classic" | "centered" | "none" | "columns";
 
@@ -40,8 +40,33 @@ export type SectionType =
   | "cta"
   | "text"
   | "features"
-  | "team"
   | "gallery";
+
+export type SectionVariantKey =
+  | "accordion"
+  | "banner"
+  | "before-after"
+  | "card"
+  | "card-stack"
+  | "card-stats"
+  | "carousel"
+  | "centered"
+  | "default"
+  | "form"
+  | "grid"
+  | "grid-small"
+  | "highlight-top"
+  | "icons"
+  | "icons-list"
+  | "list"
+  | "masonry"
+  | "minimal"
+  | "minimal-left"
+  | "numbered"
+  | "simple"
+  | "split"
+  | "tags"
+  | "timeline";
 
 // export type string =
 //   | "default"
@@ -75,9 +100,9 @@ export interface SectionConfig {
   /** Unique ID — used as React key and for reordering */
   id: string;
   /** Which section component to render */
-  type: string;
+  type: SectionType;
   /** Which visual variant of that section to render */
-  variant: string;
+  variant: SectionVariantKey;
   /** Toggle visibility without removing from config */
   enabled: boolean;
   /** Optional override title shown in the editor sidebar */
@@ -124,19 +149,11 @@ export type VariantRegistry<K extends string = string> = Record<
 
 export type SectionVariants = {
   pricing: PricingSectionVariants;
-  [key: string]: string; 
 };
 
 // Registry mapping SectionType to component, with specific variant type per section.
 export type SectionVariantRegistry = {
-  [K in keyof SectionVariants]: React.FC<
-    TemplateComponentProps & {
-      variant: string;
-      position: number;
-      anchorName: string;
-      path: string;
-    }
-  >;
+  [K in SectionType]: React.FC<SectionProps>;
 };
 
 // ─── Schema / Starter Content Helpers ────────────────────────────────────────
@@ -237,11 +254,13 @@ export interface ContactContent {
   email: string;
   phone?: string;
   location: string;
+  hours?: string;
   primaryButton: string;
   primaryButtonLink: Record<string, any>;
   secondaryButton?: string;
-  secondaryButtonLink?: Record<string, any>;
+  secondaryButtonLink: Record<string, any>;
 }
+
 
 export interface FooterContent {
   brand: string;

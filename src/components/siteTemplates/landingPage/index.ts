@@ -6,53 +6,53 @@ import { TemplateContent } from "@/lib/templates";
 
 export const landingPageConfig = {
   navbar: "classic",
-  hero: "gradient",
+  hero: "centered",
   footer: "columns",
   sections: [
     {
-      id: "ft_",
+      id: "lp_features",
       type: "features",
       variant: "default",
       enabled: true,
       anchorName: "features",
     },
     {
-      id: "tx_",
+      id: "lp_text",
       type: "text",
       variant: "minimal",
       enabled: true,
       anchorName: "about",
     },
     {
-      id: "pr_",
+      id: "lp_pricing",
       type: "pricing",
-      variant: "highlight",
+      variant: "highlight-top",
       enabled: true,
       anchorName: "pricing",
     },
     {
-      id: "ts_",
+      id: "lp_testimonials",
       type: "testimonials",
       variant: "carousel",
       enabled: true,
       anchorName: "testimonials",
     },
     {
-      id: "fq_",
+      id: "lp_faq",
       type: "faq",
       variant: "accordion",
       enabled: true,
       anchorName: "faq",
     },
     {
-      id: "ct_",
+      id: "lp_cta",
       type: "cta",
       variant: "banner",
       enabled: true,
       anchorName: "cta",
     },
     {
-      id: "c_",
+      id: "lp_contact",
       type: "contact",
       variant: "split",
       enabled: true,
@@ -93,7 +93,7 @@ const starterContent = ({
     secondaryButtonLink: makeCtaLink({ type: "anchor", anchorId: "features" }),
   },
 
-  ft_features: {
+  lp_features: {
     heading: "Everything You Need to Succeed",
     subheading:
       "Built for Nigerian entrepreneurs who want results, not complexity.",
@@ -131,13 +131,13 @@ const starterContent = ({
     ],
   },
 
-  tx_text: {
+  lp_text: {
     label: "Why It Works",
     title: "Your Customers Are Already on WhatsApp. Meet Them There.",
     desc: "Over 90% of Nigerians actively use WhatsApp every day. Instead of fighting for attention on social media, put your business directly in their hands with a professional site that funnels every visitor straight to your inbox.",
   },
 
-  pr_pricing: {
+  lp_pricing: {
     heading: "Simple, Honest Pricing",
     subheading: "No hidden fees. No surprises. Just great value.",
     plans: [
@@ -203,7 +203,7 @@ const starterContent = ({
     ],
   },
 
-  ts_testimonials: {
+  lp_testimonials: {
     heading: "Loved by Nigerian Entrepreneurs",
     subheading: "Real businesses. Real results.",
     items: [
@@ -228,7 +228,7 @@ const starterContent = ({
     ],
   },
 
-  fq_faq: {
+  lp_faq: {
     heading: "Frequently Asked Questions",
     subheading: "Everything you want to know before signing up.",
     items: [
@@ -260,7 +260,7 @@ const starterContent = ({
     ],
   },
 
-  ct_cta: {
+  lp_cta: {
     heading: "Ready to Take Your Business Online?",
     subheading:
       "Join thousands of Nigerian entrepreneurs already growing with us.",
@@ -273,7 +273,7 @@ const starterContent = ({
     ),
   },
 
-  c_contact: {
+  lp_contact: {
     title: "Still Have Questions?",
     desc: "Our team is available on WhatsApp from 8am – 10pm daily. We typically reply within minutes.",
     email: "hello@example.com",

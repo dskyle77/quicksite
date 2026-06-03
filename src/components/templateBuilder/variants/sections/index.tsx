@@ -1,7 +1,8 @@
-import { SectionProps } from "../../types";
+import { SectionVariantRegistry } from "../../types";
 import { AboutSection } from "./AboutVariants";
 import { SkillsSection } from "./SkillsVariants";
 import { ItemsSection } from "./ItemsVariants";
+import { MenuSection } from "./MenuVariants";
 import { TextSection } from "./TextSection";
 import { ExperienceSection } from "./ExperienceVariants";
 import { TestimonialsSection } from "./TestimonialsVariants";
@@ -12,10 +13,11 @@ import { FaqSection } from "./FaqVariants";
 import { CtaSection } from "./CtaVariants";
 import { GallerySection } from "./GalleryVariants";
 
-export const SectionVariants: Record<string, React.FC<SectionProps>> = {
+export const SectionVariants: SectionVariantRegistry = {
   about: AboutSection,
   skills: SkillsSection,
   items: ItemsSection,
+  menu: MenuSection,
   experience: ExperienceSection,
   testimonials: TestimonialsSection,
   contact: ContactSection,

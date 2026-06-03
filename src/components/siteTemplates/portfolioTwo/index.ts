@@ -10,31 +10,31 @@ export const portfolioTwoConfig = {
   footer: "centered",
   sections: [
     {
-      id: "ab_",
+      id: "about",
       type: "about",
       variant: "card-stats",
       enabled: true,
     },
     {
-      id: "sk_",
+      id: "skills",
       type: "skills",
       variant: "tags",
       enabled: true,
     },
     {
-      id: "i_",
+      id: "items",
       type: "items",
       variant: "list",
       enabled: true,
     },
     {
-      id: "ts_",
+      id: "testimonials",
       type: "testimonials",
       variant: "carousel",
       enabled: true,
     },
     {
-      id: "c_",
+      id: "contact",
       type: "contact",
       variant: "form",
       enabled: true,
@@ -80,7 +80,7 @@ const starterContent = ({
     ),
   },
 
-  ab_about: {
+  about: {
     label: "About Me",
     title: "Crafting Digital Experiences with Purpose",
     desc: "I'm a creative professional based in Lagos, Nigeria. I combine strategy with craft to produce work that not only looks beautiful but actually performs.",
@@ -99,7 +99,7 @@ const starterContent = ({
     stat4Label: "Awards Won",
   },
 
-  sk_skills: {
+  skills: {
     heading: "Skills & Tools",
     subheading: "Technologies and tools I use every day.",
     items: [
@@ -121,7 +121,7 @@ const starterContent = ({
     ],
   },
 
-  i_items: {
+  items: {
     heading: "Selected Work",
     subheading: "A curated selection of projects I'm proud of.",
     items: [
@@ -154,7 +154,7 @@ const starterContent = ({
     ],
   },
 
-  ts_testimonials: {
+  testimonials: {
     heading: "What Clients Say",
     subheading: "Words from people I've worked with.",
     items: [
@@ -179,7 +179,7 @@ const starterContent = ({
     ],
   },
 
-  c_contact: {
+  contact: {
     title: "Let's Build Something",
     desc: "Have a project in mind? Let's talk about it.",
     email: "hello@example.com",

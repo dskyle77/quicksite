@@ -161,7 +161,7 @@ const SectionWithMenu = ({
   if (!SectionComponent) return null;
 
   // Generate unique key: e.g., "7z9xprojects"
-  const contentKey = `${sec.id}${sec.type}`;
+  const contentKey = `${sec.id}`;
   const sectionContent = content[contentKey] || {};
   return (
     <div className={cn("relative", !enabled && "h-40")} onClick={() => scs()}>
@@ -455,11 +455,11 @@ export default function TemplateBuilder({
           <main>
             {enabledSections.map((sec, i) => {
               const isSelected =
-                currentSection === sec.id + sec.type &&
+                currentSection === sec.id &&
                 sec.enabled &&
                 isEditMode;
               return (
-                <Reveal key={sec.id + sec.type} variant="bottom">
+                <Reveal key={sec.id} variant="bottom">
                   <SectionWithMenu
                     enabled={sec.enabled}
                     sec={sec}
@@ -471,7 +471,7 @@ export default function TemplateBuilder({
                     idx={i}
                     config={config}
                     cs={isSelected}
-                    scs={() => setCurrentSection(sec.id + sec.type)}
+                    scs={() => setCurrentSection(sec.id)}
                   />
                 </Reveal>
               );
