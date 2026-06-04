@@ -82,8 +82,9 @@ const starterContent = ({
 
   hero: {
     badge: "✦ Trusted by 500+ Businesses",
+    // Premium, high-contrast creative workspace setting the agency tone
     image1:
-      "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80",
     image1PId: "",
     title: `We Build Brands That People Remember`,
     desc: `${selectedTitle} is a creative agency helping Nigerian businesses stand out, grow faster, and connect with the right customers — online and offline.`,
@@ -97,8 +98,9 @@ const starterContent = ({
     label: "Who We Are",
     title: "A Team That Gets Results",
     desc: "We are a Nigerian creative agency specialising in branding, web design, and digital marketing. Since 2018, we've helped hundreds of businesses look premium and grow revenue through smart strategy and bold design.",
+    // Dynamic, professional team collaboration and strategy session
     image1:
-      "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80",
     stat1Value: "500+",
     stat1Label: "Clients Served",
     stat2Value: "₦2B+",

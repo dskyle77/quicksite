@@ -197,7 +197,7 @@ export default function SiteManageScreen() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto py-6 px-2 sm:px-4 md:py-10 space-y-6">
+    <div className="max-w-2xl mx-auto py-6 sm:px-4 md:py-10 space-y-6">
       {/* Toolbar link */}
       <Link
         href="/dashboard/sites"
@@ -503,7 +503,7 @@ export default function SiteManageScreen() {
         {!confirmDelete ? (
           <button
             onClick={() => setConfirmDelete(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-destructive/10 text-destructive text-sm font-semibold hover:bg-destructive hover:text-white transition w-full sm:w-auto justify-center"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-destructive text-white text-sm font-semibold hover:bg-destructive hover:text-white transition w-full sm:w-auto justify-center"
           >
             <Trash2 className="h-4 w-4" /> Delete Site
           </button>
@@ -512,14 +512,14 @@ export default function SiteManageScreen() {
             <button
               disabled={deleting}
               onClick={() => setConfirmDelete(false)}
-              className="flex-1 h-10 rounded-lg border border-border text-sm font-medium hover:bg-muted transition"
+              className="flex-1 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition"
             >
               Cancel
             </button>
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="flex-1 h-10 rounded-lg bg-destructive text-white text-sm font-semibold hover:opacity-90 transition disabled:opacity-60 flex items-center justify-center gap-2"
+              className="flex-1 py-2 rounded-lg bg-destructive text-white text-sm font-semibold hover:opacity-90 transition disabled:opacity-60 flex items-center justify-center gap-2"
             >
               {deleting ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

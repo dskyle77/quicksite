@@ -32,6 +32,7 @@ export const portfolioConfig = {
       type: "items",
       variant: "grid" as ItemsSectionVariant,
       enabled: true,
+      anchorName: "projects"
     },
     {
       id: "experience",
@@ -57,137 +58,144 @@ const starterContent = ({
   // HERO
   hero: {
     type: "background",
-    badge: "Available for Freelance",
+    badge: "✦ Open for Freelance & Contracts",
+    // Hyper-minimalist dark workspace setup with ambient code illumination
     image1:
-      "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      "https://images.unsplash.com/photo-1618477388954-7852f32655ec?auto=format&fit=crop&w=1200&q=80",
     image1PId: "",
-    title: "Hi, I'm Alex Morgan",
-    desc: "Full-Stack Developer crafting exceptional digital experiences with clean code and thoughtful design.",
+    title: `Hi, I'm ${selectedTitle}`,
+    desc: "Full-Stack Engineer specializing in architectural clean code, high-performance web applications, and intuitive user experiences.",
     primaryButton: "Get In Touch",
     primaryButtonLink: makeWhatsappLink(
       whatsappNumber,
-      "Hi Alex, I'd like to discuss a project.",
+      "Hi Alex, I'd like to discuss an engineering project.",
     ) as LinkConfig,
 
     secondaryButton: "View My Work",
     secondaryButtonLink: makeCtaLink({
       type: "anchor",
-      anchorId: "projects",
+      anchorId: "projects", 
     }) as LinkConfig,
   },
 
   // ABOUT
   about: {
     label: "About Me",
-    title: "Turning Ideas Into Reality",
-    desc: "I'm a passionate full-stack developer with over 4 years of experience building scalable web applications. I love clean architecture, beautiful UI, and solving real-world problems.",
+    title: "Engineering Scalable Digital Architecture",
+    desc: "I am a passionate full-stack developer with over 4 years of experience crafting reliable web applications. My core methodologies revolve around clean architecture, type safety, and solving performance bottlenecks.",
     desc2:
-      "When I'm not coding, you'll find me exploring new technologies, contributing to open source, or enjoying a good cup of coffee.",
+      "When I am not deep in code review or optimizing database queries, I actively contribute to open-source toolkits, architect side systems, or refine my developmental environment workflow.",
+    // Crisp macro shot of high-contrast modern IDE terminal output
     image1:
-      "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      "https://images.unsplash.com/photo-1607799279861-4dd421887fb3?auto=format&fit=crop&w=1200&q=80",
     image1PId: "",
     stat1Value: "25+",
-    stat1Label: "Projects Completed",
+    stat1Label: "Deployments Active",
     stat2Value: "18+",
-    stat2Label: "Happy Clients",
+    stat2Label: "Global Clients",
     stat3Value: "4+",
     stat3Label: "Years Experience",
-    stat4Value: "7",
-    stat4Label: "Technologies",
+    stat4Value: "12+",
+    stat4Label: "Core Technologies",
   },
 
   // SKILLS
   skills: {
-    heading: "Skills & Expertise",
-    subheading: "Technologies and tools I use to bring ideas to life.",
+    heading: "Core Stack & Expertise",
+    subheading: "Production-ready technologies used daily to build production applications.",
     items: [
-      { name: "React / Next.js", level: "95" },
-      { name: "TypeScript", level: "92" },
-      { name: "Node.js & Express", level: "88" },
-      { name: "Tailwind CSS", level: "90" },
-      { name: "PostgreSQL", level: "85" },
+      { name: "React / Next.js 14+", level: "95" },
+      { name: "TypeScript Ecosystem", level: "92" },
+      { name: "Node.js & Distributed Systems", level: "88" },
+      { name: "Tailwind CSS & Design Ops", level: "90" },
+      { name: "PostgreSQL / Prisma ORM", level: "85" },
     ] as any,
     skillTags: [
       "JavaScript",
+      "TypeScript",
       "React",
       "Next.js",
-      "TypeScript",
       "Node.js",
-      "Tailwind",
+      "Express",
+      "GraphQL",
+      "Tailwind CSS",
       "PostgreSQL",
-      "Git",
+      "MongoDB",
       "Docker",
+      "Git Architecture",
     ],
   },
 
   // PROJECTS
   items: {
-    heading: "Featured Projects",
-    subheading: "A selection of work I'm proud of.",
+    heading: "Featured Infrastructure",
+    subheading: "A curated collection of production applications engineered from concept to launch.",
     items: [
       {
-        title: "E-Commerce Platform",
-        desc: "A full-stack online store with real-time inventory, payment integration, and admin dashboard.",
-        tags: ["Next.js", "Stripe", "PostgreSQL", "Tailwind"],
+        title: "Enterprise E-Commerce Engine",
+        desc: "A full-stack, high-conversion commercial platform featuring asynchronous inventory indexing, webhooks, dynamic multi-tenant stripe gateways, and an analytical control board.",
+        tags: ["Next.js", "TypeScript", "PostgreSQL", "Tailwind"],
+        // Moody tech dashboard interface visualizing data and system metrics
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+          "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
         imagePId: "",
         projectBtnLink: makeWhatsappLink(
           whatsappNumber,
-          "Hi, I want to learn more about your E-Commerce Platform project!",
+          "Hi, I want to review the source code/case study for the E-Commerce Platform project!",
         ),
-        btnLabel: "View Project",
+        btnLabel: "View Case Study",
       },
       {
-        title: "TaskFlow - Project Management",
-        desc: "Collaborative productivity app with real-time updates, drag-and-drop, and team workspaces.",
-        tags: ["React", "Node.js", "Socket.io", "MongoDB"],
+        title: "TaskFlow — Synchronous Project Space",
+        desc: "Real-time task synchronization environment utilizing full-duplex socket pipes, optimistic UI state rendering, layered drag-and-drop mechanics, and workspace segmentation.",
+        tags: ["React.js", "Node.js", "Socket.io", "MongoDB"],
+        // High-contrast clean close-up of structural IDE software code script
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+          "https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=800&q=80",
         imagePId: "",
         projectBtnLink: makeWhatsappLink(
           whatsappNumber,
-          "Hi, I'm interested in the TaskFlow project management app!",
+          "Hi, I am interested in exploring the system architecture for your TaskFlow workspace application!",
         ),
-        btnLabel: "View Project",
+        btnLabel: "View Case Study",
       },
     ],
   } as ItemsSectionContent,
 
   // EXPERIENCE
   experience: {
-    heading: "Work Experience",
-    subheading: "My professional journey and the impact I've made.",
+    heading: "Engineering Timeline",
+    subheading: "A record of corporate impact and systemic technical growth.",
     items: [
       {
-        role: "Senior Frontend Developer",
+        role: "Senior Frontend Engineer",
         company: "TechVenture Inc.",
         period: "2023 – Present",
-        desc: "Leading frontend architecture and UI/UX improvements. Increased user engagement by 45% through modern design systems.",
+        desc: "Directing UI architecture and design systems configuration. Optimized core Web Vitals, increasing total interactive user retention scores by 45% utilizing specialized memoization layers and component splitting.",
       },
       {
         role: "Full-Stack Developer",
         company: "StartupSphere",
         period: "2022 – 2023",
-        desc: "Built and scaled multiple client projects from MVP to production. Implemented CI/CD pipelines and improved performance by 60%.",
+        desc: "Architected scalable minimum viable products (MVPs) into secure enterprise systems. Engineered internal automated CI/CD staging runs and boosted database indexing speed metrics by up to 60%.",
       },
     ],
   },
 
   // CONTACT
   contact: {
-    title: "Let's Work Together",
-    desc: "Have an exciting project in mind? I'm currently available for freelance opportunities and full-time roles.",
+    title: "Initialize a Project",
+    desc: "Have a complex engineering challenge, application architecture requirements, or a freelance development contract in mind? Let us open a technical review.",
     email: "hello@alexmorgan.dev",
     phone: whatsappNumber,
     location: "Lagos, Nigeria",
-    primaryButton: "Send a Message",
+    primaryButton: "Send Message",
     primaryButtonLink: makeCtaLink({
       type: "whatsapp",
       phone: whatsappNumber,
-      message: "Hello, I'm reaching out regarding your portfolio!",
+      message: "Hello Alex, I checked out your developer portfolio and want to discuss an engineering pipeline!",
     }),
-    secondaryButton: "Schedule a Call",
+    secondaryButton: "Copy Email Address",
     secondaryButtonLink: {},
   },
 
@@ -217,7 +225,7 @@ const starterContent = ({
 const portfolio1: TemplateContent = {
   meta: {
     title: "Portfolio One",
-    image: "/ti/builder.png",
+    image: "/ti/portfolio-1.png",
     category: "portfolio",
     description:
       "A clean, professional portfolio template perfect for developers, designers, and creative professionals.",
@@ -226,7 +234,7 @@ const portfolio1: TemplateContent = {
     type: "portfolio-1",
     theme: "terminal",
     hasCustomizeSidebar: false,
-    isPremium: false
+    isPremium: false,
   },
   contentConfig: portfolioConfig,
   starterContent,

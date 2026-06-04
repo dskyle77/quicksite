@@ -36,14 +36,14 @@ const ClassicNavbar = ({
           </div>
 
           <span
-            className="text-md sm:text-xl font-semibold tracking-tighter text-(--qs-primary-alt)"
+            className="text-md sm:text-xl font-semibold tracking-tighter text-neutral-900 bg-white/80 dark:text-white dark:bg-black/40 backdrop-blur-sm px-2 py-0.5 rounded-md"
             contentEditable={isEditor}
             suppressContentEditableWarning
             onBlur={(e) =>
               onUpdate("title", e.currentTarget.textContent?.trim())
             }
           >
-            {content?.title || "Portfolio"}
+            {content?.title}
           </span>
         </div>
 
@@ -70,26 +70,32 @@ const MinimalNavbar = ({
   return (
     <NavbarShell>
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 md:px-10">
-        {/* Brand */}
-        <span
-          className="text-md sm:text-xl font-bold tracking-[2px] sm:tracking-[3px] text-(--qs-primary-alt) uppercase"
-          contentEditable={isEditor}
-          suppressContentEditableWarning
-          onBlur={(e) => onUpdate("title", e.currentTarget.textContent?.trim())}
-        >
-          {content?.title || "STUDIO"}
-        </span>
+        
+        {/* Brand Pill */}
+        <div className="rounded-full bg-neutral-900/10 dark:bg-white/10 hover:bg-neutral-900/15 dark:hover:bg-white/15 border border-neutral-900/5 dark:border-white/10 backdrop-blur-md px-4 py-1.5 transition-all">
+          <span
+            className="text-sm sm:text-lg font-bold tracking-[2px] sm:tracking-[3px] text-[var(--qs-primary-alt)] uppercase block outline-none"
+            contentEditable={isEditor}
+            suppressContentEditableWarning
+            onBlur={(e) => onUpdate("title", e.currentTarget.textContent?.trim())}
+          >
+            {content?.title || "STUDIO"}
+          </span>
+        </div>
 
-        {/* CTA */}
-        <EditableLinkButton
-          isEditor={isEditor}
-          label={content?.ctaButton || "Let's Talk"}
-          linkConfig={content?.ctaButtonLink}
-          onLabelChange={(v) => onUpdate("ctaButton", v)}
-          onLinkChange={(v) => onUpdate("ctaButtonLink", v)}
-          noPreview
-          className="text-sm sm:text-base font-medium text-(--qs-primary-alt) relative after:absolute after:-bottom-0.5 after:left-0 after:h-[1.5px] after:w-0 after:bg-(--qs-primary-alt) after:transition-all hover:after:w-full"
-        />
+        {/* CTA Pill */}
+        <div className="rounded-full bg-neutral-900/10 dark:bg-white/10 hover:bg-neutral-900/15 dark:hover:bg-white/15 border border-neutral-900/5 dark:border-white/10 backdrop-blur-md px-5 py-1.5 transition-all">
+          <EditableLinkButton
+            isEditor={isEditor}
+            label={content?.ctaButton || "Let's Talk"}
+            linkConfig={content?.ctaButtonLink}
+            onLabelChange={(v) => onUpdate("ctaButton", v)}
+            onLinkChange={(v) => onUpdate("ctaButtonLink", v)}
+            noPreview
+            className="text-xs sm:text-sm font-semibold tracking-wide text-[var(--qs-primary-alt)] relative block after:absolute after:-bottom-0.5 after:left-0 after:h-[1.5px] after:w-0 after:bg-[var(--qs-primary-alt)] after:transition-all hover:after:w-full"
+          />
+        </div>
+
       </div>
     </NavbarShell>
   );

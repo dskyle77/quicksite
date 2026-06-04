@@ -12,12 +12,14 @@ interface EditorScreenProps {
   onChange: (updated: Site) => void;
   slugs: Record<string, any>;
   canEdit: boolean;
+  isSimpleMode?: boolean;
 }
 
 export default function EditorScreen({
   data,
   onChange,
   canEdit,
+  isSimpleMode = false,
 }: EditorScreenProps) {
   const templateEntry = getTemplateByType(data.type);
   const theme = getTheme(data.theme);
@@ -37,7 +39,7 @@ export default function EditorScreen({
     onChange({ ...data, content: updated });
   };
 
-  const canCustomize = templateEntry.config.hasCustomizeSidebar;
+  const canCustomize = isSimpleMode ? false : templateEntry.config.hasCustomizeSidebar;
   return (
     <div className={`w-full h-full ${theme.className}`}>
       <style>{theme.css}</style>

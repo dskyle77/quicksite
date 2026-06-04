@@ -348,7 +348,7 @@ export const GallerySection = ({
         {items.map((item, i) => (
           <div
             key={i}
-            className="relative group min-w-[240px] @sm:min-w-[320px] rounded-3xl overflow-hidden border border-(--qs-border) snap-center bg-(--qs-primary)"
+            className="relative group min-w-60 @sm:min-w-[320px] rounded-3xl overflow-hidden border border-(--qs-border) snap-center bg-(--qs-primary)"
           >
             <TemplateImage
               source={item.image}

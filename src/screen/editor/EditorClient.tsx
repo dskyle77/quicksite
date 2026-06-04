@@ -26,6 +26,7 @@ interface EditorClientProps {
 
 export default function EditorClient({ slug, subslug }: EditorClientProps) {
   const [isPreview, setIsPreview] = useState(false);
+  const [isSimpleMode, setIsSimpleMode] = useState(true);
   const [canEdit, setCanEdit] = useState(true);
   const { user, loading: authLoading } = useAuth();
 
@@ -119,7 +120,7 @@ export default function EditorClient({ slug, subslug }: EditorClientProps) {
             <ArrowLeft size={18} className="text-slate-600 sm:w-5 sm:h-5" />
           </Link>
           <div className="min-w-0 flex flex-col">
-            <h1 className="font-bold text-slate-900 truncate text-xs sm:text-base leading-tight max-w-[120px] sm:max-w-[200px] md:max-w-none">
+            <h1 className="font-bold text-slate-900 truncate text-xs sm:text-base leading-tight max-w-30 sm:max-w-50 md:max-w-none">
               {siteData?.name || "Untitled Site"}
             </h1>
             <div className="flex items-center gap-1">
@@ -144,24 +145,50 @@ export default function EditorClient({ slug, subslug }: EditorClientProps) {
 
         {/* Right Section / Controls */}
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-          {/* Theme Dropdown */}
-          <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 bg-slate-100 rounded-lg max-w-[100px] sm:max-w-none">
-            <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase hidden md:inline">
-              Theme
-            </span>
-            <select
-              className="bg-transparent text-[11px] sm:text-xs font-bold text-slate-900 outline-none cursor-pointer max-w-full"
-              value={siteData?.theme}
-              onChange={(e) => updateSite({ theme: e.target.value })}
-              disabled={isSaving}
+          {/* Editor Mode Toggle */}
+          <div className="hidden md:flex items-center bg-slate-100 p-1 rounded-xl">
+            <button
+              onClick={() => setIsSimpleMode(true)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                isSimpleMode
+                  ? "bg-white text-primary shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
             >
-              {getAllThemes().map(({ id }) => (
-                <option key={id} value={id}>
-                  {id}
-                </option>
-              ))}
-            </select>
+              Quick Edit
+            </button>
+            <button
+              onClick={() => setIsSimpleMode(false)}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                !isSimpleMode
+                  ? "bg-white text-primary shadow-sm"
+                  : "text-slate-500 hover:text-slate-700"
+              }`}
+            >
+              Design
+            </button>
           </div>
+
+          {/* Theme Dropdown - Hidden in Simple Mode */}
+          {!isSimpleMode && (
+            <div className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 bg-slate-100 rounded-lg max-w-25 sm:max-w-none">
+              <span className="text-[10px] sm:text-[11px] font-bold text-slate-400 uppercase hidden md:inline">
+                Theme
+              </span>
+              <select
+                className="bg-transparent text-[11px] sm:text-xs font-bold text-slate-900 outline-none cursor-pointer max-w-full"
+                value={siteData?.theme}
+                onChange={(e) => updateSite({ theme: e.target.value })}
+                disabled={isSaving}
+              >
+                {getAllThemes().map(({ id }) => (
+                  <option key={id} value={id}>
+                    {id}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
           {/* Preview Toggle Button */}
           <button
@@ -201,13 +228,14 @@ export default function EditorClient({ slug, subslug }: EditorClientProps) {
       </header>
 
       <main className="flex-1 overflow-y-auto">
-        <div className="max-w-[1400px] mx-auto min-h-full">
+        <div className="max-w-350 mx-auto min-h-full">
           <SiteProvider value={{ site: siteData }}>
             <EditorScreen
               canEdit={canEdit}
               data={siteData!}
               onChange={(updated) => updateSite(updated)}
               slugs={{ slug, subslug }}
+              isSimpleMode={isSimpleMode}
             />
           </SiteProvider>
         </div>

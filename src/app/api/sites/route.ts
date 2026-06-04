@@ -195,12 +195,17 @@ async function resolveContent(
 
 export async function POST(req: Request) {
   try {
+    console.log("POST /api/sites - Starting site creation...");
+    
     const user = await getUserFromSession();
+    console.log("User session retrieved:", user?.uid);
     if (!user) {
+      console.warn("Unauthorized: No user session found");
       return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
     }
 
     const formData = await req.formData();
+    console.log("Form data parsed");
     const {
       name,
       slug,
@@ -210,31 +215,39 @@ export async function POST(req: Request) {
       generateWithAI,
       image,
     } = parseFormFields(formData);
+    console.log("Form fields extracted:", { name, slug, type, generateWithAI, hasImage: !!image });
 
     if (!name || !slug || !type) {
+      console.error("Validation failed: Missing required fields", { name, slug, type });
       return NextResponse.json(
         { error: "name, slug, and type are required." },
         { status: 400 },
       );
     }
     if (!description && generateWithAI) {
+      console.error("Validation failed: Description required for AI generation");
       return NextResponse.json(
         { error: "Description is required to generate with AI." },
         { status: 400 },
       );
     }
 
+    console.log("Retrieving template for type:", type);
     const templateEntry = getTemplateByType(type);
     if (!templateEntry) {
+      console.error("Invalid template type:", type);
       return NextResponse.json(
         { error: "Invalid template type." },
         { status: 400 },
       );
     }
 
+    console.log("Fetching user plan for:", user.uid);
     const plan = (await getUserPlan(user.uid)) as Plan;
+    console.log("User plan:", plan);
 
     if (isPremiumTemplate(type) && !(plan === "growth" || plan === "pro")) {
+      console.warn("Premium template access denied for plan:", plan);
       return NextResponse.json(
         {
           error:
@@ -246,11 +259,15 @@ export async function POST(req: Request) {
 
     const normalizedName = name.trim();
     const normalizedSlug = slug.trim();
+    console.log("Normalized inputs:", { normalizedName, normalizedSlug });
 
+    console.log("Uploading OG image...");
     const imageUrl = image
       ? await uploadOgImage(image, user.uid, normalizedSlug)
       : undefined;
+    console.log("OG image URL:", imageUrl);
 
+    console.log("Resolving content...");
     const contentResult = await resolveContent(
       generateWithAI,
       description,
@@ -261,8 +278,10 @@ export async function POST(req: Request) {
       whatsappNumber,
       type,
     );
+    console.log("Content resolved, has error:", "error" in contentResult);
 
     if ("error" in contentResult) {
+      console.error("Content resolution error:", contentResult.error);
       return NextResponse.json(
         { error: contentResult.error },
         {
@@ -274,6 +293,7 @@ export async function POST(req: Request) {
       );
     }
 
+    console.log("Creating site in database...");
     const siteId = await serverCreateSite(
       user.uid,
       (user.plan ?? "free") as Plan,
@@ -290,6 +310,7 @@ export async function POST(req: Request) {
         ogImage: imageUrl,
       },
     );
+    console.log("Site created successfully with ID:", siteId);
 
     return NextResponse.json({
       success: true,
@@ -298,9 +319,11 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Server error.";
+    console.error("POST /api/sites error:", { message, stack: err instanceof Error ? err.stack : "" });
 
     // Safety refusal from preflightCheck or AI __refused__ flag
     if (message === "AI_REFUSAL") {
+      console.warn("AI refusal triggered");
       return NextResponse.json(
         { error: "This type of business is not supported." },
         { status: 400 },
@@ -309,6 +332,7 @@ export async function POST(req: Request) {
 
     // Input validation errors from preflightCheck
     if (message.startsWith("INVALID_INPUT:")) {
+      console.warn("Input validation error:", message);
       return NextResponse.json(
         { error: message.replace("INVALID_INPUT: ", "") },
         { status: 400 },
@@ -320,6 +344,7 @@ export async function POST(req: Request) {
       message.toLowerCase().includes("plan upgrade") ||
       message.toLowerCase().includes("upgrade your plan");
 
+    console.error("Returning error response:", { isPlanError, message });
     return NextResponse.json(
       {
         error: isPlanError

@@ -82,7 +82,7 @@ export default function TemplateImage({
               priority
               style={{ objectFit: "cover" }}
             />
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
+            <div className="absolute inset-0 bg-black/50 backdrop-blur-[2px]" />
           </div>
         )}
         <div className="relative z-10 w-full">{children}</div>

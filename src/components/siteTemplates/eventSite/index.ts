@@ -251,13 +251,13 @@ const starterContent = ({
 const eventSite: TemplateContent = {
   meta: {
     title: "Event Site",
-    image: "/ti/event-site.png",
+    image: "/ti/event.png",
     category: "Event and Rentals",
     description:
       "A high-converting event landing page with ticket tiers, countdown, FAQ and WhatsApp ticket delivery. Perfect for concerts, conferences, and meetups.",
   },
   config: {
-    type: "event-site",
+    type: "event",
     theme: "light",
     hasCustomizeSidebar: false,
     isPremium: false,

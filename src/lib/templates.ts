@@ -6,7 +6,7 @@
 import templateBuilder from "@/components/siteTemplates/custom";
 import portfolio1 from "@/components/siteTemplates/portfolioOne";
 import portfolioTwo from "@/components/siteTemplates/portfolioTwo";
-import menuOne from "@/components/siteTemplates/menuOne";
+import menuOne from "@/components/siteTemplates/menu";
 import eventSite from "@/components/siteTemplates/eventSite";
 import digitalStore from "@/components/siteTemplates/digitalStore";
 import landingPage from "@/components/siteTemplates/landingPage";
@@ -22,6 +22,8 @@ import events from "@/components/siteTemplates/events";
 import realEstate from "@/components/siteTemplates/real-estate";
 import store from "@/components/siteTemplates/store";
 import formTemplate from "@/components/siteTemplates/form";
+import barber from "@/components/siteTemplates/barber";
+import barber2 from "@/components/siteTemplates/barber2";
 
 import {
   schemaMap,
@@ -35,7 +37,7 @@ export interface TemplateProps {
   canCustomize: boolean;
   onUpdate?: (path: string, value: any) => void;
   isCustomDomain?: boolean;
-  hasNavbar: boolean
+  hasNavbar: boolean;
 }
 
 export interface TemplateComponentProps {
@@ -71,6 +73,8 @@ export const templatesRegistry: TemplateContent[] = [
   restaurant,
   fashion,
   beauty,
+  barber,
+  barber2,
   photographer,
   professional,
   events,
@@ -84,7 +88,7 @@ export const templatesRegistry: TemplateContent[] = [
   digitalStore,
   portfolio1,
   portfolioTwo,
-  templateBuilder,
+  // templateBuilder,
 ];
 
 export const premiumTemplates: TemplateContent[] = [templateBuilder];
@@ -96,6 +100,8 @@ export const templatesCategories = Array.from(
       .filter((category) => !!category),
   ),
 );
+export const getTemplatesByCategory = (cat: string) =>
+  templatesRegistry.filter((t) => cat === t.meta.category);
 
 export const getTemplateByType = (type: string) =>
   templatesRegistry.find((t) => t.config.type === type);
@@ -124,8 +130,7 @@ export const buildStarterContent = (
   config.sections.forEach((sec: any) => {
     const starterFn = starterMap[sec.type];
     if (starterFn) {
-      const contentKey = `${sec.id}${sec.type}`;
-      content[contentKey] = starterFn(params);
+      content[sec.id] = starterFn(params);
     }
   });
 
@@ -154,8 +159,7 @@ export const buildSchema = (
     config.sections.forEach((sec: any) => {
       const schemaFn = schemaMap[sec.type];
       if (schemaFn) {
-        const contentKey = `${sec.id}${sec.type}`;
-        schema[contentKey] = schemaFn(params);
+        schema[sec.id] = schemaFn(params);
       }
     });
   }

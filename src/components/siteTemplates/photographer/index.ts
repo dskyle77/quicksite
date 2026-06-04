@@ -108,7 +108,7 @@ const starterContent = ({
 const photographer: TemplateContent = {
   meta: {
     title: "Photographer / Creative",
-    image: "/ti/photo.png",
+    image: "/ti/photographer.png",
     category: "creative",
     description: "A portfolio-first template for photographers, videographers, and designers.",
   },

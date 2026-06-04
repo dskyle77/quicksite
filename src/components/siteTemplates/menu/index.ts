@@ -43,8 +43,9 @@ const starterContent = ({
   hero: {
     type: "minimalist",
     badge: "Fresh meals daily 🍽️",
+    // Vibrant, appetizing dynamic top-down restaurant table layout
     image1:
-      "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=1200&q=80",
     image1PId: "",
     title: selectedTitle,
     desc: "Fresh meals, quick delivery, and easy ordering on WhatsApp.",
@@ -75,8 +76,9 @@ const starterContent = ({
         desc: "Juicy chicken wrapped with fresh veggies and creamy sauce.",
         price: "₦4,500",
         tags: ["Best Seller", "Spicy"],
+        // Crisp, tightly wrapped chicken shawarma cross-section
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+          "https://images.unsplash.com/photo-1662116765994-1e4200c43589?q=80&w=1032&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         imagePId: "",
         btnLabel: "Order Now",
         menuBtnLink: makeWhatsappLink(
@@ -89,8 +91,9 @@ const starterContent = ({
         desc: "Smoky Nigerian jollof rice served with grilled chicken.",
         price: "₦3,000",
         tags: ["Popular"],
+        // Rich, smoky Jollof rice dish with roasted plantain and chicken pieces
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+          "https://images.unsplash.com/photo-1665332195309-9d75071138f0?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
         imagePId: "",
         btnLabel: "Order Now",
         menuBtnLink: makeWhatsappLink(
@@ -103,8 +106,9 @@ const starterContent = ({
         desc: "Juicy beef burger served with crispy fries.",
         price: "₦5,500",
         tags: ["Hot Deal"],
+        // Gourmet beef burger stacked high with a side of golden-brown fries
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+          "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=800&q=80",
         imagePId: "",
         btnLabel: "Order Now",
         menuBtnLink: makeWhatsappLink(
@@ -152,13 +156,13 @@ const starterContent = ({
 const menu1: TemplateContent = {
   meta: {
     title: "Menu",
-    image: "/ti/menu-one.png",
+    image: "/ti/menu.png",
     category: "food",
     description:
       "A modern, minimalist menu-focused site template ideal for restaurants, cafes, or portfolios needing a clean showcase.",
   },
   config: {
-    type: "menu-one",
+    type: "menu",
     theme: "warm",
     hasCustomizeSidebar: false,
     isPremium: false,

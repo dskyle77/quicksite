@@ -203,14 +203,8 @@ export async function serverDeleteSite(
 
   await batch.commit();
 
-  // Also delete the Cloudinary images folder for this site
-  // Here, siteId acts as the slug (used as id in sites collection)
-  // Path: quicksite/users/${uid}/${siteId}/images
   const folderPath = `quicksite/users/${uid}/${slug}`;
-  try {
-    await deleteFolderForce(folderPath);
-  } catch (e) {
-    // Log but don't throw to avoid breaking DB deletion for Cloudinary errors
+  deleteFolderForce(folderPath).catch((e) => {
     console.error(`Failed to force delete Cloudinary folder: ${folderPath}`, e);
-  }
+  });
 }

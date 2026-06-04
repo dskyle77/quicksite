@@ -58,21 +58,22 @@ const starterContent = ({
     ),
     links: [
       { label: "About", type: "anchor", anchor: "about", href: "" },
-      { label: "Work", type: "anchor", anchor: "projects", href: "" },
+      { label: "Work", type: "anchor", anchor: "items", href: "" },
       { label: "Contact", type: "anchor", anchor: "contact", href: "" },
     ],
   },
 
   hero: {
     type: "minimalist",
-    badge: "Available for Freelance",
+    badge: "✦ Available for Commissions",
+    // Minimalist, high-contrast creative studio workspace setup
     image1:
-      "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=1200&q=80",
     image1PId: "",
-    title: `Hi, I'm ${selectedTitle}`,
-    desc: "I build things that people love. Creative, strategic, and obsessed with quality.",
+    title: `Hi, I'm David`,
+    desc: "I engineer high-fidelity digital interfaces and premium brand systems. Blending intentional strategy with meticulous execution.",
     primaryButton: "See My Work",
-    primaryButtonLink: makeCtaLink({ type: "anchor", anchorId: "projects" }),
+    primaryButtonLink: makeCtaLink({ type: "anchor", anchorId: "items" }),
     secondaryButton: "Let's Talk",
     secondaryButtonLink: makeWhatsappLink(
       whatsappNumber,
@@ -82,113 +83,116 @@ const starterContent = ({
 
   about: {
     label: "About Me",
-    title: "Crafting Digital Experiences with Purpose",
-    desc: "I'm a creative professional based in Lagos, Nigeria. I combine strategy with craft to produce work that not only looks beautiful but actually performs.",
+    title: "Crafting Digital Experiences with Rigid Purpose",
+    desc: "I am a multi-disciplinary creative specialist operating out of Lagos, Nigeria. I align product architecture with graphic craftsmanship to produce systemic designs that look striking and maximize engagement.",
     desc2:
-      "When I'm not designing or building, I'm exploring new ideas, mentoring others, or finding inspiration in everyday Nigerian culture.",
+      "Outside the design terminal, I study historical design typographies, archive local urban patterns, and build open-source web assets.",
+    // Architectural close-up with dramatic light and geometric shadows
     image1:
-      "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1200&q=80",
     image1PId: "",
     stat1Value: "30+",
-    stat1Label: "Projects Done",
+    stat1Label: "Systems Launched",
     stat2Value: "20+",
-    stat2Label: "Happy Clients",
-    stat3Value: "5+",
-    stat3Label: "Years Experience",
+    stat2Label: "Retained Partners",
+    stat3Value: "5+ yrs",
+    stat3Label: "Active Experience",
     stat4Value: "4",
-    stat4Label: "Awards Won",
+    stat4Label: "Industry Mentions",
   },
 
   skills: {
-    heading: "Skills & Tools",
-    subheading: "Technologies and tools I use every day.",
+    heading: "Expertise & Toolkits",
+    subheading: "Advanced core competencies utilized to transform logic into physical assets.",
     items: [
-      { name: "UI/UX Design", level: "92" },
-      { name: "React / Next.js", level: "88" },
-      { name: "Brand Identity", level: "90" },
+      { name: "UI/UX Architecture", level: "92" },
+      { name: "Interactive Engineering", level: "88" },
+      { name: "Brand Systems Design", level: "90" },
     ],
     skillTags: [
       "Figma",
       "Webflow",
       "React",
       "Next.js",
-      "Tailwind",
-      "Framer",
-      "Illustrator",
-      "Canva",
-      "Notion",
+      "Tailwind CSS",
+      "Framer Motion",
+      "Adobe Suite",
       "TypeScript",
+      "Design Systems",
+      "Typography",
     ],
   },
 
   items: {
-    heading: "Selected Work",
-    subheading: "A curated selection of projects I'm proud of.",
+    heading: "Selected Case Studies",
+    subheading: "A curated exhibition of architectural development and creative direction.",
     items: [
       {
-        title: "Branding for Lagos Food Brand",
-        desc: "Complete brand identity — logo, color palette, typography, and social media templates for a fast-growing food delivery startup in Lagos.",
-        tags: ["Branding", "Figma", "Canva"],
+        title: "Brand Systems for Lagos Food Space",
+        desc: "A comprehensive operational visual identity—encompassing bespoke packaging vectors, palettes, brand guides, and digital frameworks for a premium dark kitchen startup.",
+        tags: ["Branding", "Identity", "Figma"],
+        // Clean minimal packaging array with dynamic shadows
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+          "https://images.unsplash.com/photo-1530587191325-3db32d826c18?auto=format&fit=crop&w=800&q=80",
         imagePId: "",
-        btnLabel: "View Project",
+        btnLabel: "View Case Study",
         projectBtnLink: makeWhatsappLink(
           whatsappNumber,
-          `Hi! I saw your Lagos Food Brand project and I'd love to discuss something similar.`,
+          `Hi! I saw your Lagos Food Space project and I'd love to discuss something similar.`,
         ),
       },
       {
-        title: "E-Commerce Website for Fashion Brand",
-        desc: "A mobile-first online store built with Next.js and Paystack integration. Focused on conversion optimization and fast load times.",
-        tags: ["Web Dev", "Next.js", "Paystack"],
+        title: "E-Commerce System for House of Label",
+        desc: "A premium, mobile-first retail architecture engineered with rapid headless rendering pipelines and fully integrated Paystack localized multi-currency gateways.",
+        tags: ["Web Engineering", "Next.js", "Paystack"],
+        // High-contrast, editorial studio apparel portrait
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+          "https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80",
         imagePId: "",
-        btnLabel: "View Project",
+        btnLabel: "View Case Study",
         projectBtnLink: makeWhatsappLink(
           whatsappNumber,
-          `Hi! I saw your E-Commerce project and I'm interested in a similar build.`,
+          `Hi! I saw your E-Commerce framework and I'm interested in a similar retail build.`,
         ),
       },
     ],
   },
 
   testimonials: {
-    heading: "What Clients Say",
-    subheading: "Words from people I've worked with.",
+    heading: "Client Endorsements",
+    subheading: "Evaluations from product founders and technical directors.",
     items: [
       {
         quote:
-          "The best creative I've worked with in Nigeria. Delivered beyond expectations, on time, every time.",
+          "One of the absolute sharpest creatives in the West African design space. Delivered meticulous UI architectures, entirely ahead of schedule.",
         name: "Ngozi Eze",
-        role: "CEO, StyleHouse Lagos",
+        role: "Creative Director, StyleHouse Lagos",
       },
       {
         quote:
-          "My website traffic tripled after the redesign. The attention to detail and strategy behind every decision was impressive.",
+          "Our platforms experienced massive functional metrics growth immediately following the rewrite. The deep technical strategy behind every pixel is undeniable.",
         name: "Emeka Okafor",
-        role: "Founder, TechNaija",
+        role: "Product Principal, TechNaija",
       },
       {
         quote:
-          "Professional, communicative, and incredibly talented. I won't hire anyone else for my brand work.",
+          "Articulate, highly methodical, and exceptionally organized. An absolute asset for any corporate team seeking premium system design.",
         name: "Fatima Aliyu",
-        role: "Brand Manager, Lagos",
+        role: "Global Brand Manager",
       },
     ],
   },
 
   contact: {
-    title: "Let's Build Something",
-    desc: "Have a project in mind? Let's talk about it.",
+    title: "Initiate A Dialogue",
+    desc: "Have an architectural problem requiring design precision or technical deployment? Let us evaluate your parameters.",
     email: "hello@example.com",
     phone: whatsappNumber,
     location: "Lagos, Nigeria",
-    primaryButton: "Send a Message",
+    primaryButton: "Send Message",
     primaryButtonLink: makeWhatsappLink(
       whatsappNumber,
-      `Hi! I'd like to discuss a project with you.`,
+      `Hi! I'd like to initiate a design review for an upcoming project.`,
     ),
     secondaryButton: "",
     secondaryButtonLink: {},
@@ -208,7 +212,7 @@ const starterContent = ({
 const portfolioTwo: TemplateContent = {
   meta: {
     title: "Portfolio Two",
-    image: "/ti/portfolio-two.png",
+    image: "/ti/portfolio-2.png",
     category: "portfolio",
     description:
       "A bold, editorial portfolio for creatives, designers, and developers. Minimalist hero, stats, skill tags, and a contact form.",

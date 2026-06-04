@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Link from "next/link";
 import { Layout, CheckCircle2, Eye, Lock, Search } from "lucide-react";
-import { templatesRegistry } from "@/lib/templates";
+import { getTemplatesByCategory, getTemplateByType } from "@/lib/templates";
 import { CUSTOM_TEMPLATE_TYPE } from "@/lib/plans";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 const themeVars = {
   border: "var(--color-border)",
@@ -33,6 +33,7 @@ interface TemplatePickerProps {
   slugForPreview: string;
   nameForPreview: string;
   canUsePremiumTemplate?: boolean;
+  category:string;
 }
 
 export function TemplatePicker({
@@ -41,55 +42,50 @@ export function TemplatePicker({
   slugForPreview,
   nameForPreview,
   canUsePremiumTemplate = false,
+  category
 }: TemplatePickerProps) {
   const [search, setSearch] = useState("");
+  const catTemplates = getTemplatesByCategory(category)
+  const builder = getTemplateByType("template-builder")
 
-  const { filteredTemplates, templateBuilderTemplate } = useMemo(() => {
-    const cleanedSearch = search.trim().toLowerCase();
-    let builder: any = null;
-    const others: typeof templatesRegistry = [];
-    let selectedTemplate: any = null;
+  // const { filteredTemplates, templateBuilderTemplate } = useMemo(() => {
+  //   const cleanedSearch = search.trim().toLowerCase();
+  //   const others: typeof catTemplates = [];
 
-    for (const t of templatesRegistry) {
-      const isSelected = t.config.type === selectedType;
-      if (t.config.type === "template-builder") {
-        builder = t;
-        if (isSelected) selectedTemplate = t;
-        continue;
-      }
-      if (isSelected) selectedTemplate = t;
+  //   for (const t of catTemplates) {
+  //     const isSelected = t.config.type === selectedType;
 
-      if (cleanedSearch) {
-        if (
-          t.meta?.title?.toLowerCase().includes(cleanedSearch) ||
-          t.meta?.category?.toLowerCase().includes(cleanedSearch) ||
-          t.meta?.description?.toLowerCase().includes(cleanedSearch)
-        ) {
-          others.push(t);
-        }
-      } else {
-        others.push(t);
-      }
-    }
+  //     if (cleanedSearch) {
+  //       if (
+  //         t.meta?.title?.toLowerCase().includes(cleanedSearch) ||
+  //         t.meta?.category?.toLowerCase().includes(cleanedSearch) ||
+  //         t.meta?.description?.toLowerCase().includes(cleanedSearch)
+  //       ) {
+  //         others.push(t);
+  //       }
+  //     } else {
+  //       others.push(t);
+  //     }
+  //   }
 
-    let shownTemplates: typeof templatesRegistry = [];
-    if (!cleanedSearch) {
-      shownTemplates = others;
-    } else {
-      if (builder && (
-        builder.meta?.title?.toLowerCase().includes(cleanedSearch) ||
-        builder.meta?.category?.toLowerCase().includes(cleanedSearch) ||
-        builder.meta?.description?.toLowerCase().includes(cleanedSearch)
-      )) {
-        // builder matches
-      } else {
-        builder = null;
-      }
-      shownTemplates = others;
-    }
+  //   let shownTemplates: typeof catTemplates = [];
+  //   if (!cleanedSearch) {
+  //     shownTemplates = others;
+  //   } else {
+  //     if (builder && (
+  //       builder.meta?.title?.toLowerCase().includes(cleanedSearch) ||
+  //       builder.meta?.category?.toLowerCase().includes(cleanedSearch) ||
+  //       builder.meta?.description?.toLowerCase().includes(cleanedSearch)
+  //     )) {
+  //       // builder matches
+  //     } else {
+  //       builder = null;
+  //     }
+  //     shownTemplates = others;
+  //   }
 
-    return { filteredTemplates: shownTemplates, templateBuilderTemplate: builder };
-  }, [search, selectedType]);
+  //   return { filteredTemplates: shownTemplates, templateBuilderTemplate: builder };
+  // }, [search, selectedType]);
 
   return (
     <div className="space-y-6">
@@ -125,10 +121,10 @@ export function TemplatePicker({
         </Link>
       </div>
 
-      <div className="h-100 overflow-y-auto">
+      <div className="max-h-80 h-auto min-h-30 overflow-y-auto">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-        {filteredTemplates.length > 0 ? (
-          filteredTemplates.map((t) => {
+        {catTemplates.length > 0 ? (
+          catTemplates.map((t) => {
             const type = t.config.type;
             const selected = selectedType === type;
             const isLocked = t.config.isPremium && !canUsePremiumTemplate;
@@ -251,7 +247,7 @@ export function TemplatePicker({
       </div>
       </div>
 
-      {templateBuilderTemplate && (
+      {builder && (
         <div className="pt-2">
           <div className="relative py-4">
             <div className="absolute inset-0 flex items-center">
@@ -330,7 +326,7 @@ export function TemplatePicker({
                       : themeVars.foreground,
                   }}
                 >
-                  {templateBuilderTemplate.meta?.title ?? "Custom Builder"}
+                  {builder.meta?.title ?? "Custom Builder"}
                 </h3>
                 <p
                   className="text-[11px] sm:text-[0.85rem] leading-tight"
@@ -342,7 +338,7 @@ export function TemplatePicker({
                 >
                   {!canUsePremiumTemplate
                     ? "Upgrade to Growth or Pro to unlock the full power of our builder."
-                    : (templateBuilderTemplate.meta?.description ?? "Build your site exactly how you want it with modular sections.")}
+                    : (builder.meta?.description ?? "Build your site exactly how you want it with modular sections.")}
                 </p>
               </div>
               {selectedType === CUSTOM_TEMPLATE_TYPE && canUsePremiumTemplate && (

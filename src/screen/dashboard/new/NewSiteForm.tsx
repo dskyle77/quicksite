@@ -116,48 +116,25 @@ export function NewSiteForm({
   if (step === 1) {
     return (
       <div className="space-y-5">
-        {/* Site Name */}
+        {/* Business Name */}
         <div className="space-y-1.5">
-          <label className="text-sm font-bold ml-1 text-slate-700">Site Name</label>
+          <label className="text-sm font-bold ml-1 text-foreground">Business Name</label>
           <input
             required
             type="text"
-            className={`w-full px-4 py-3.5 rounded-2xl border ${errors.name ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all shadow-sm`}
+            className={`w-full px-4 py-4 rounded-2xl border ${errors.name ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all shadow-sm text-lg`}
             placeholder="e.g. Blossom Bakery"
             value={formData.name}
             onChange={handleNameChange}
             onBlur={() => setTouchedFields((prev) => ({ ...prev, name: true }))}
           />
           {errors.name && <p className="text-red-500 text-xs ml-1 font-medium">{errors.name}</p>}
-        </div>
-
-        {/* URL Slug */}
-        <div className="space-y-1.5">
-          <label className="text-sm font-bold ml-1 text-slate-700">Desired URL</label>
-          <div className="flex group">
-            <span className={`inline-flex items-center px-3 sm:px-4 rounded-l-2xl border border-r-0 ${errors.slug ? 'border-red-500 bg-red-50 text-red-400' : 'border-slate-200 bg-slate-50 text-slate-400'} text-[10px] sm:text-xs font-medium transition-colors group-focus-within:border-primary group-focus-within:bg-primary/5 whitespace-nowrap overflow-hidden text-ellipsis max-w-[120px] sm:max-w-none`}>
-              {SITE_SHORT_NAME}{DOMAIN_NAME}/
-            </span>
-            <input
-              required
-              type="text"
-              className={`flex-1 min-w-0 px-3 sm:px-4 py-3 sm:py-3.5 rounded-r-2xl border ${errors.slug ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all text-sm shadow-sm`}
-              placeholder="blossom-bakery"
-              value={formData.slug}
-              onChange={onSlugChange}
-              onBlur={() => setTouchedFields((prev) => ({ ...prev, slug: true }))}
-            />
-          </div>
-          {errors.slug ? (
-            <p className="text-red-500 text-xs ml-1 font-medium">{errors.slug}</p>
-          ) : (
-            <p className="text-[10px] text-slate-400 ml-1 italic">You can&apos;t change this URL later.</p>
-          )}
+          <p className="text-[10px] text-foreground/60 ml-1 italic">We&apos;ll use this to create your website address.</p>
         </div>
 
         {/* Whatsapp Number */}
         <div className="space-y-1.5">
-          <label className="text-sm font-bold ml-1 text-slate-700">WhatsApp Number</label>
+          <label className="text-sm font-bold ml-1 text-foreground">WhatsApp Number (to receive orders)</label>
           <div className="flex group">
             <span className={`inline-flex items-center px-4 rounded-l-2xl border border-r-0 ${errors.whatsappNumber ? 'border-red-500 bg-red-50 text-red-400' : 'border-slate-200 bg-slate-50 text-slate-400'} text-xs font-medium transition-colors group-focus-within:border-primary group-focus-within:bg-primary/5`}>
               +234
@@ -165,7 +142,7 @@ export function NewSiteForm({
             <input
               required
               type="tel"
-              className={`flex-1 min-w-0 px-3 sm:px-4 py-3 sm:py-3.5 rounded-r-2xl border ${errors.whatsappNumber ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all text-sm shadow-sm`}
+              className={`flex-1 min-w-0 px-3 sm:px-4 py-3 sm:py-4 rounded-r-2xl border ${errors.whatsappNumber ? 'border-red-500 focus:ring-red-500' : 'border-slate-200 focus:ring-primary'} focus:ring-2 outline-none transition-all text-sm shadow-sm`}
               placeholder="8012345678"
               value={formData.whatsappNumber}
               onChange={(e) => {
@@ -189,7 +166,7 @@ export function NewSiteForm({
       <div className="space-y-6">
         {/* Image Upload */}
         <div className="space-y-1.5">
-          <label className="text-sm font-bold ml-1 text-slate-700">Site Logo / Main Image</label>
+          <label className="text-sm font-bold ml-1 text-foreground">Site Logo / Main Image</label>
           <div
             onClick={() => setShowImageModal(true)}
             onDragOver={handleDragOver}

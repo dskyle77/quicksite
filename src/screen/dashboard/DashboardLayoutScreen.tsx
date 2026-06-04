@@ -298,7 +298,7 @@ export default function DashboardLayoutScreen({
         </header>
    
 
-        <main className="flex-1 p-6 sm:p-8 overflow-y-auto no-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+        <main className="flex-1 p-4 sm:p-8 overflow-y-auto no-scrollbar animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
           <div className="max-w-7xl mx-auto w-full">{children}</div>
         </main>
       </div>

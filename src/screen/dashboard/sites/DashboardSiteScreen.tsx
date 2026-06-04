@@ -286,7 +286,7 @@ export default function DashboardSiteScreen() {
           ))}
         </div>
       ) : (
-        <div className="bg-card border border-border/50 rounded-[2.5rem] p-20 flex flex-col items-center justify-center text-center gap-8 shadow-inner relative overflow-hidden group">
+        <div className="bg-card border border-border/50 rounded-[2.5rem] px-6 py-8 md:p-20 flex flex-col items-center justify-center text-center gap-8 shadow-inner relative overflow-hidden group">
           <div className="absolute top-0 right-0 -mr-20 -mt-20 h-64 w-64 bg-primary/5 rounded-full blur-[80px] group-hover:scale-150 transition-transform duration-1000" />
           
           <div className="h-24 w-24 rounded-3xl bg-muted/50 flex items-center justify-center relative">

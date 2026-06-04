@@ -113,7 +113,7 @@ export default function DashboardAnalyticsScreen() {
                <p className="text-xs font-bold text-muted-foreground animate-pulse">Calculating metrics...</p>
             </div>
           ) : sites.length === 0 ? (
-            <div className="p-20 flex flex-col items-center justify-center text-center gap-4 group">
+            <div className="px-6 py-8 md:p-20 flex flex-col items-center justify-center text-center gap-4 group">
                <div className="h-16 w-16 rounded-2xl bg-muted/50 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform duration-500">
                   <Globe className="h-8 w-8 text-muted-foreground/30" />
                </div>

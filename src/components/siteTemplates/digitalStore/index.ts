@@ -30,13 +30,7 @@ export const digitalStoreConfig = {
     {
       id: "dig_testimonials",
       type: "testimonials",
-      variant: "list",
-      enabled: true,
-    },
-    {
-      id: "dig_faq",
-      type: "faq",
-      variant: "accordion",
+      variant: "carousel",
       enabled: true,
     },
     {
@@ -58,25 +52,26 @@ const starterContent = ({
     logo: "🛍️",
     title: selectedTitle,
     ctaButton: "Browse Products",
-    ctaButtonLink: makeCtaLink({ type: "anchor", anchorId: "products" }),
+    ctaButtonLink: makeCtaLink({ type: "anchor", anchorId: "dig_items" }),
     links: [
-      { label: "Products", type: "anchor", anchor: "products", href: "" },
-      { label: "Why Us", type: "anchor", anchor: "why-us", href: "" },
-      { label: "FAQ", type: "anchor", anchor: "faq", href: "" },
-      { label: "Contact", type: "anchor", anchor: "contact", href: "" },
+      { label: "Products", type: "anchor", anchor: "dig_items", href: "" },
+      { label: "Why Us", type: "anchor", anchor: "dig_features", href: "" },
+      { label: "Reviews", type: "anchor", anchor: "dig_testimonials", href: "" },
+      { label: "Contact", type: "anchor", anchor: "dig_contact", href: "" },
     ],
   },
 
   hero: {
     type: "split",
     badge: "✨ Instant Digital Delivery",
+    // Modern, high-contrast digital device interface showcasing e-commerce success
     image1:
-      "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+      "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1200&q=80",
     image1PId: "",
     title: selectedTitle,
-    desc: "Premium digital products delivered instantly to your WhatsApp or email the moment payment is confirmed.",
+    desc: "Premium digital tools, strategies, and resources delivered directly to your WhatsApp or email the exact moment payment is confirmed.",
     primaryButton: "Shop Now",
-    primaryButtonLink: makeCtaLink({ type: "anchor", anchorId: "products" }),
+    primaryButtonLink: makeCtaLink({ type: "anchor", anchorId: "dig_items" }),
     secondaryButton: "Chat with Us",
     secondaryButtonLink: makeWhatsappLink(
       whatsappNumber,
@@ -87,20 +82,21 @@ const starterContent = ({
   dig_text: {
     label: "What We Offer",
     title: "High-Quality Digital Products, Delivered Instantly",
-    desc: "No waiting, no shipping, no logistics. Pay, and receive your file immediately via WhatsApp or email. All products are created by experts and ready to use.",
+    desc: "Skip the logistics, shipping delays, and delivery fees. Pay securely and receive your assets instantly. Every asset is premium, battle-tested, and ready to fast-track your progress.",
   },
 
   dig_items: {
     heading: "Our Products",
-    subheading: "Click any product to purchase directly on WhatsApp.",
+    subheading: "Click any asset to purchase directly and securely via WhatsApp.",
     items: [
       {
         title: "Starter Business Pack",
-        desc: "Everything a new business needs — logo templates, social media graphics, and a brand guide. Ready to customize.",
+        desc: "Everything a new brand needs to look premium: customizable logo templates, sleek social media grids, and a comprehensive styling guide.",
         price: "₦3,500",
         tags: ["Templates", "Branding", "Best Seller"],
+        // Sleek tablet/mockup displaying clean corporate branding and design guidelines
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+          "https://images.unsplash.com/photo-1626785774573-4b799315345d?auto=format&fit=crop&w=800&q=80",
         imagePId: "",
         btnLabel: "Buy Now — ₦3,500",
         projectBtnLink: makeWhatsappLink(
@@ -110,11 +106,12 @@ const starterContent = ({
       },
       {
         title: "Content Calendar Template",
-        desc: "A 90-day social media content calendar built in Google Sheets. Pre-filled with post ideas, hashtags, and scheduling tips.",
+        desc: "A 90-day interactive social media system built in Google Sheets. Pre-filled with high-conversion hooks, local trending hashtags, and visual scheduling dashboards.",
         price: "₦2,000",
         tags: ["Social Media", "Templates"],
+        // Vibrant, aesthetic smartphone display showcasing neat content curation elements
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+          "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=800&q=80",
         imagePId: "",
         btnLabel: "Buy Now — ₦2,000",
         projectBtnLink: makeWhatsappLink(
@@ -124,11 +121,12 @@ const starterContent = ({
       },
       {
         title: "Business Plan PDF Guide",
-        desc: "A step-by-step workbook for writing a bankable business plan. Includes real examples for Nigerian businesses.",
+        desc: "A step-by-step master workbook designed for writing bankable corporate plans. Includes real structural financial models adapted for local scale.",
         price: "₦5,000",
         tags: ["Business", "PDF Guide"],
+        // Clean desktop office environment featuring data charts and planning analytical workbooks
         image:
-          "https://res.cloudinary.com/dbfkzc5an/image/upload/v1777996367/default-image_blgwid.jpg",
+          "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=800&q=80",
         imagePId: "",
         btnLabel: "Buy Now — ₦5,000",
         projectBtnLink: makeWhatsappLink(
@@ -141,27 +139,27 @@ const starterContent = ({
 
   dig_features: {
     heading: "Why Buy From Us?",
-    subheading: "We make it easy, fast, and risk-free.",
+    subheading: "We make it easy, secure, and instant.",
     items: [
       {
         icon: "⚡",
         title: "Instant Delivery",
-        desc: "Receive your file immediately after payment is confirmed on WhatsApp.",
+        desc: "Automated fulfillment system drops the file right into your active chat instantly.",
       },
       {
         icon: "🔒",
-        title: "Secure Payment",
-        desc: "Pay safely via Paystack — cards, bank transfer, or USSD all accepted.",
+        title: "Secure Checkout",
+        desc: "Processed safely through trusted modern gateways like Paystack. Cards, transfers, or USSD.",
       },
       {
         icon: "💬",
-        title: "WhatsApp Support",
-        desc: "Got a question about a product? Chat with us and get a reply in minutes.",
+        title: "Dedicated Support",
+        desc: "Have a configuration question? Message us and a live representative will guide you through.",
       },
       {
         icon: "♾️",
         title: "Lifetime Access",
-        desc: "Once purchased, the file is yours forever. Download it as many times as you need.",
+        desc: "Buy once, own it forever. Download backups as many times as you require at no extra fee.",
       },
     ],
   },
@@ -172,49 +170,22 @@ const starterContent = ({
     items: [
       {
         quote:
-          "I downloaded the business pack and set up my brand identity in one afternoon. Absolutely worth it!",
+          "I downloaded the business pack and completely updated my corporate identity in one afternoon. Absolutely brilliant value!",
         name: "Adaeze Nwosu",
         role: "Small Business Owner, Enugu",
       },
       {
         quote:
-          "The content calendar changed my Instagram game. I finally have a posting schedule that actually works.",
+          "The content calendar transformed our posting architecture. We went from random posts to a highly strategic workflow.",
         name: "Babatunde Ojo",
         role: "Content Creator, Lagos",
       },
     ],
   },
 
-  dig_faq: {
-    heading: "FAQ",
-    subheading: "Common questions answered.",
-    items: [
-      {
-        question: "How do I receive my file?",
-        answer:
-          "After we confirm your payment, the file is sent directly to your WhatsApp number or email — usually within 5 minutes.",
-      },
-      {
-        question: "What payment methods do you accept?",
-        answer:
-          "We accept bank transfer, Paystack card payments, and USSD. We'll send you the details on WhatsApp.",
-      },
-      {
-        question: "Can I get a refund?",
-        answer:
-          "Because these are digital products delivered instantly, we do not offer refunds. If you have an issue, contact us and we'll resolve it.",
-      },
-      {
-        question: "Are these products editable?",
-        answer:
-          "Yes! Most products come in editable formats like Google Docs, Sheets, or Canva so you can customize them for your business.",
-      },
-    ],
-  },
-
   dig_contact: {
     title: "Need Help Choosing?",
-    desc: "Chat with us on WhatsApp and we'll recommend the best product for your needs.",
+    desc: "Unsure which digital bundle fits your current growth stage? Drop us a line on WhatsApp and we will map out the ideal toolkit for you.",
     email: "hello@example.com",
     phone: whatsappNumber,
     location: "Lagos, Nigeria",

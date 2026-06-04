@@ -36,8 +36,7 @@ const BackgroundVariant = (props: TemplateComponentProps) => {
         path="hero.image1"
         isEditor={isEditor}
       >
-        {/* Ambient Gradient Overlay for Text Legibility */}
-        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-black/30" />
+ 
 
         {/* Inner Content Container */}
         <div
@@ -56,9 +55,9 @@ const BackgroundVariant = (props: TemplateComponentProps) => {
           {/* Heading */}
           <h1
             {...editableProps("title")}
-            className="mx-auto max-w-4xl text-4xl font-extrabold tracking-tight text-(--qs-bg-alt,var(--qs-primary-fg,#fff)) drop-shadow-md leading-tight outline-none @sm:text-6xl @md:text-7xl"
+            className="mx-auto max-w-4xl text-4xl font-extrabold tracking-tight text-white drop-shadow-md leading-tight outline-none @sm:text-6xl @md:text-7xl"
           >
-            {content?.title ?? "Hi, I'm Alex"}
+            {content?.title}
           </h1>
 
           {/* Description */}

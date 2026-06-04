@@ -53,7 +53,8 @@ export default function TemplateGallery() {
             Start faster with stunning templates
           </h1>
           <p className="text-xl text-muted-foreground">
-            Production-ready catalogue designs that connect directly to your Firebase data.
+            Production-ready catalogue designs that connect directly to your
+            Firebase data.
           </p>
         </div>
 
@@ -90,49 +91,31 @@ export default function TemplateGallery() {
           <div className="text-center py-20">
             <div className="text-6xl mb-4">🤔</div>
             <h3 className="text-xl font-semibold mb-2">No templates found</h3>
-            <p className="text-muted-foreground">Try adjusting your search or filter</p>
+            <p className="text-muted-foreground">
+              Try adjusting your search or filter
+            </p>
           </div>
         ) : (
           <div className="space-y-12">
-            {Object.entries(
-              filtered.reduce((acc, t) => {
-                const cat = t.meta.category;
-                if (!acc[cat]) acc[cat] = [];
-                acc[cat].push(t);
-                return acc;
-              }, {} as Record<string, typeof templatesRegistry>)
-            ).map(([category, templates]) => (
-              <div key={category}>
-                {selectedCategory === "all" && (
-                  <div className="flex items-center gap-3 mb-6">
-                    <h2 className="text-2xl font-semibold capitalize">{category}</h2>
-                    <div className="px-3 py-1 text-sm bg-muted rounded-full text-muted-foreground">
-                      {templates.length} templates
-                    </div>
-                  </div>
-                )}
-
-                <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {templates.map((template, i) => (
-                    <TemplateCard
-                      key={template.config.type}
-                      type={template.config.type}
-                      title={template.meta.title}
-                      description={template.meta.description}
-                      category={template.meta.category}
-                      // image={template.meta.image}
-                      isPremium={template.config.isPremium}
-                      previewHref={buildQuery(`/templates/${template.config.type}`)}
-                      useHref={buildQuery(
-                        `/dashboard/new?template=${encodeURIComponent(template.config.type)}`,
-                        "&"
-                      )}
-                      delay={i * 25}
-                    />
-                  ))}
-                </div>
-              </div>
-            ))}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filtered.map((template, i) => (
+                <TemplateCard
+                  key={template.config.type}
+                  type={template.config.type}
+                  title={template.meta.title}
+                  description={template.meta.description}
+                  category={template.meta.category}
+                  image={template.meta.image}
+                  isPremium={template.config.isPremium}
+                  previewHref={buildQuery(`/templates/${template.config.type}`)}
+                  useHref={buildQuery(
+                    `/dashboard/new?template=${encodeURIComponent(template.config.type)}`,
+                    "&",
+                  )}
+                  delay={i * 25}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>

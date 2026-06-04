@@ -1,8 +1,11 @@
 // src/features/templates/TemplateCard.tsx
 import Link from "next/link";
-import { Eye, ArrowRight, Sparkles } from "lucide-react";
 import Image from "next/image";
 
+import { Eye, ArrowRight, Sparkles } from "lucide-react";
+import { useMobile } from "@/hooks/useMobile";
+
+import { insertBeforeExtension } from "@/lib/utils/helpers";
 interface TemplateCardProps {
   type: string;
   title: string;
@@ -24,8 +27,13 @@ export function TemplateCard({
   delay = 0,
   isPremium,
   image,
-  category
+  category,
 }: TemplateCardProps) {
+  const isMobile = useMobile();
+
+  let newImage = image;
+  if (image && isMobile) newImage = insertBeforeExtension(image, "-mobile");
+
   return (
     <div
       className="group rounded-2xl bg-card border border-border shadow-sm hover:shadow-xl hover:border-primary/50 transition-all duration-300 flex flex-col overflow-hidden relative h-full"
@@ -42,10 +50,10 @@ export function TemplateCard({
       )}
 
       {/* Image / Visual Header */}
-      <div className="relative h-48 overflow-hidden bg-linear-to-br from-muted to-card">
-        {image ? (
+      <div className="relative aspect-3/4 sm:aspect-video overflow-hidden bg-linear-to-br from-muted to-card">
+        {newImage ? (
           <Image
-            src={image}
+            src={newImage}
             alt={title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-500"

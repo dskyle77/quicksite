@@ -124,7 +124,7 @@ export default function MessagesScreen() {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-4 pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
+    <div className="max-w-6xl mx-auto pb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 fill-mode-both">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8 mb-12">
         <div className="space-y-2">
@@ -343,7 +343,7 @@ export default function MessagesScreen() {
               })}
             </div>
           ) : (
-            <div className="bg-card border border-border/50 rounded-[3rem] py-32 flex flex-col items-center justify-center text-center gap-10 shadow-inner overflow-hidden group">
+            <div className="bg-card border border-border/50 rounded-4xl py-16 md:py-20 flex flex-col items-center justify-center text-center gap-10 shadow-inner overflow-hidden group">
               <div className="h-32 w-32 rounded-[2.5rem] bg-muted/30 flex items-center justify-center relative transition-transform duration-700 group-hover:scale-110">
                  <Mail className="h-12 w-12 text-muted-foreground/20" />
                  <div className="absolute top-0 right-0 h-4 w-4 bg-primary rounded-full animate-ping" />

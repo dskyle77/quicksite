@@ -192,37 +192,38 @@ export const ItemsSection = ({
   if (variant === "list") {
     return (
       <section id={anchorName} style={{ background: sectionBg }}>
-        <Container className="py-10 sm:py-16 md:py-24">
+        <Container className="py-12 sm:py-16 md:py-24">
           <Header />
 
-          <div className="space-y-8 sm:space-y-12">
+          <div className="flex flex-col gap-6 md:gap-8">
             {items.map((p, i) => (
               <div
                 key={i}
-                className="relative grid gap-6 sm:gap-10 rounded-2xl md:rounded-3xl border p-4 sm:p-6 md:p-8 transition @md:grid-cols-2"
-                style={{
-                  background: cardBg,
-                  border: "1px solid var(--qs-border)",
-                }}
+                className="relative grid gap-6 p-2 sm:p-8 rounded-2xl md:rounded-3xl border border-(--qs-border) transition-all duration-300 hover:shadow-lg md:grid-cols-12 md:items-center"
+                style={{ background: cardBg }}
               >
                 {isEditor && (
-                  <div className="absolute right-3 top-3 sm:right-4 sm:top-4">
+                  <div className="absolute right-4 top-4 z-10">
                     <Xbutton onClick={() => remove(i)} color="red" />
                   </div>
                 )}
 
-                <div className="overflow-hidden rounded-xl md:rounded-2xl aspect-[4/3] sm:aspect-auto">
-                  <TemplateImage
-                    source={p.image}
-                    path={path + `.items.${i}.image`}
-                    isEditor={isEditor}
-                  />
+                {/* Image Section */}
+                <div className="md:col-span-5 w-full">
+                  <div className="overflow-hidden rounded-xl md:rounded-2xl aspect-video md:aspect-4/3">
+                    <TemplateImage
+                      source={p.image}
+                      path={`${path}.items.${i}.image`}
+                      isEditor={isEditor}
+                    />
+                  </div>
                 </div>
 
-                <div className="flex flex-col justify-center mt-4 sm:mt-0">
-                  <div className="flex items-center justify-between gap-4">
+                {/* Content Section */}
+                <div className="flex flex-col justify-center md:col-span-7 h-full p-4 sm:p-0">
+                  <div className="flex flex-wrap items-baseline justify-between gap-4">
                     <h3
-                      className="text-xl sm:text-2xl md:text-3xl font-bold"
+                      className="text-xl sm:text-2xl font-bold tracking-tight text-balance"
                       contentEditable={isEditor}
                       suppressContentEditableWarning
                       onBlur={(e) =>
@@ -235,12 +236,13 @@ export const ItemsSection = ({
                     </h3>
                     {p.price && (
                       <span
-                        className="text-xl font-black text-[var(--qs-primary)]"
+                        className="text-xl font-extrabold text-[var(--qs-primary)]"
                         contentEditable={isEditor}
                         suppressContentEditableWarning
                         onBlur={(e) =>
                           updateOne(i, {
-                            price: e.currentTarget.textContent?.trim() || p.price,
+                            price:
+                              e.currentTarget.textContent?.trim() || p.price,
                           })
                         }
                       >
@@ -250,7 +252,7 @@ export const ItemsSection = ({
                   </div>
 
                   <p
-                    className="mt-2 sm:mt-4 leading-6 sm:leading-7 opacity-70 text-sm sm:text-base"
+                    className="mt-3 text-sm sm:text-base text-neutral-600 dark:text-neutral-300 leading-relaxed max-w-prose"
                     contentEditable={isEditor}
                     suppressContentEditableWarning
                     onBlur={(e) =>
@@ -262,16 +264,16 @@ export const ItemsSection = ({
                     {p.desc}
                   </p>
 
-                  {renderTags(p, i)}
+                  {renderTags && <div className="mt-4">{renderTags(p, i)}</div>}
 
-                  <div className="mt-4 sm:mt-7">{renderLinkButton(p, i)}</div>
+                  <div className="mt-6">{renderLinkButton(p, i)}</div>
                 </div>
               </div>
             ))}
           </div>
 
           {isEditor && (
-            <div className="mt-8 sm:mt-12 flex justify-center">
+            <div className="mt-10 flex justify-center">
               <AddButton onClick={add}>Add Item</AddButton>
             </div>
           )}
@@ -303,11 +305,13 @@ export const ItemsSection = ({
                   </div>
                 )}
 
-                <TemplateImage
+               <div className="overflow-hidden aspect-4/3">
+                 <TemplateImage
                   source={p.image}
                   isEditor={isEditor}
                   path={path + `.items.${i}.image`}
                 />
+               </div>
 
                 <div className="flex h-full flex-col p-4 sm:p-6">
                   <div className="flex items-start justify-between gap-2">
@@ -317,7 +321,9 @@ export const ItemsSection = ({
                       suppressContentEditableWarning={true}
                       onBlur={(e) =>
                         isEditor &&
-                        updateOne(i, { title: e.currentTarget.textContent || "" })
+                        updateOne(i, {
+                          title: e.currentTarget.textContent || "",
+                        })
                       }
                     >
                       {p.title}
@@ -329,7 +335,8 @@ export const ItemsSection = ({
                         suppressContentEditableWarning
                         onBlur={(e) =>
                           updateOne(i, {
-                            price: e.currentTarget.textContent?.trim() || p.price,
+                            price:
+                              e.currentTarget.textContent?.trim() || p.price,
                           })
                         }
                       >
@@ -388,12 +395,13 @@ export const ItemsSection = ({
                   <Xbutton onClick={() => remove(i)} color="red" />
                 </div>
               )}
-
-              <TemplateImage
-                source={p.image}
-                isEditor={isEditor}
-                path={path + `.items.${i}.image`}
-              />
+              <div className="overflow-hidden aspect-4/3">
+                <TemplateImage
+                  source={p.image}
+                  isEditor={isEditor}
+                  path={path + `.items.${i}.image`}
+                />
+              </div>
 
               <div className="flex h-full flex-col p-4 sm:p-6">
                 <div className="flex items-start justify-between gap-2">
